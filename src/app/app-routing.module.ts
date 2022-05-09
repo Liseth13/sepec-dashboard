@@ -104,6 +104,29 @@ export const Approutes: Routes = [
         loadChildren: () =>
           import("./BASE/sub-child/sub-child.module").then((m) => m.SubchildModule),
       },
+      {
+        path : 'dash',
+        children : [
+          {
+            path : '',
+            redirectTo : 'web-sites',
+            pathMatch : 'full'
+          },
+          {
+            path : '',
+            children : [
+              {
+                path : 'web-sites',
+                loadChildren : () => import("./web-sites/web-sites.module").then((m) => m.WebSitesModule)
+              },
+              {
+                path : 'web-pages',
+                loadChildren : () => import("./web-pages/web-pages.module").then((m) => m.WebPagesModule)
+              }
+            ]
+          }
+        ]
+      }
     ],
   },
   {

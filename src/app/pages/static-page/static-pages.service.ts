@@ -9,10 +9,10 @@ export class StaticPagesService {
 
   public token;
 
-  constructor(private http: HttpClient) {
+  constructor(private httpClient: HttpClient) {
   }
 
-  // configUrl = 'https://san-andres-species-app.herokuapp.com';
+ configUrl = 'https://proyecto-appp.herokuapp.com'; // /banner
 
   port = 443;
 
