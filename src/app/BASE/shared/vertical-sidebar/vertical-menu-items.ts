@@ -1213,8 +1213,8 @@ import { RouteInfo } from "./vertical-sidebar.metadata";
 
 export const ROUTES: RouteInfo[] = [
   {
-    path: "/apps/tasks",
-    title: "Tasks",
+    path: "/dash/web-sites",
+    title: "Sitios webs",
     icon: "Layout",
     class: "",
     label: "",
@@ -1223,13 +1223,33 @@ export const ROUTES: RouteInfo[] = [
     submenu: [],
   },
   {
-    path: "../../../pages/static-page",
-    title: "Páginas",
+    path: "/dash/web-pages",
+    title: "Páginas webs",
     icon: "Layout",
     class: "",
     label: "",
     labelClass: "",
     extralink: false,
     submenu: [],
-  },
+  }
+  // {
+  //   path: "/apps/tasks",
+  //   title: "Tasks",
+  //   icon: "Layout",
+  //   class: "",
+  //   label: "",
+  //   labelClass: "",
+  //   extralink: false,
+  //   submenu: [],
+  // },
+  // {
+  //   path: "../../../pages/static-page",
+  //   title: "Páginas",
+  //   icon: "Layout",
+  //   class: "",
+  //   label: "",
+  //   labelClass: "",
+  //   extralink: false,
+  //   submenu: [],
+  // },
 ];
