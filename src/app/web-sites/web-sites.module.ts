@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 
 import { WebSitesRoutingModule } from './web-sites-routing.module';
 import { WebSitesComponent } from './pages/web-sites/web-sites.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
 
 
 @NgModule({
@@ -11,7 +13,10 @@ import { WebSitesComponent } from './pages/web-sites/web-sites.component';
   ],
   imports: [
     CommonModule,
-    WebSitesRoutingModule
+    WebSitesRoutingModule,
+    ReactiveFormsModule,
+    FormsModule,
+    HttpClientModule,
   ]
 })
 export class WebSitesModule { }
