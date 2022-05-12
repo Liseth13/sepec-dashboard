@@ -24,6 +24,7 @@
                     <label for="weight" class="col-sm-4 col-form-label">Peso</label>
                     <div class="col-sm-8">
                     <input type="number" class="form-control"  id="weight" formControlName = "weight">
+                    <!-- <textarea class="form-control" rows="2" placeholder="sdhfgidfhgjkgh"></textarea> -->
                     </div>
                 </div>
                 <div class="form-group row">
@@ -39,14 +40,14 @@
         
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-dark" (click)="closeBtnClick()">Close</button>
+                <button type="button" class="btn btn-dark" (click)="closeBtnClick()">Cerrar</button>
                 <button type="submit" class="btn btn-primary" >Crear página</button>
             </div>
         </form>
     </ng-template>
 
 
-    <div class="d-md-flex align-items-center bg-white p-3">
+    <div class="d-md-flex align-items-center bg-white p-3 mb-2">
         <div>
             <h3 class="mb-0">Páginas</h3>
         </div>
@@ -66,25 +67,30 @@
             </button>
         </div>
     </div>
-    <div class="row mt-3">
-        <!-- Páginas webs -->
-        <div class="col-md-2">
+
+    <div class="row">
+        <div class="col-lg-3" *ngFor="let page of webPages" >
             <div class="card">
+                <!-- <img class="card-img-top img-responsive" src="assets/images/big/img4.jpg" alt="Card image cap"> -->
                 <div class="card-body">
                     <div class="d-flex no-block align-items-center m-b-15">
                         <span>
-                            <i class="ti-calendar"></i> 19 May 2018</span>
+                            <i class="ti-calendar"></i> 25/05/2005</span>
                         <div class="ml-auto">
                             <a href="javascript:void(0)" class="link">
-                                <i class="ti-comments"></i> 5 Comments</a>
+                                <i class="ti-comments"></i> items</a>
                         </div>
                     </div>
-                    <h3 class="font-normal">Featured Hydroflora Pots Garden &amp; Outdoors</h3>
-                    <p class="m-b-0 m-t-10">Titudin venenatis ipsum ac feugiat. Vestibulum ullamcorper quam.</p>
-                    <button class="btn btn-success btn-rounded waves-effect waves-light m-t-20">Read more</button>
+                    <h3 class="font-normal">Página de prueba</h3>
+                    <p class="m-b-0 m-t-10">https://urlDeLaPagina</p>
+                    <button class="btn btn-success btn-rounded waves-effect waves-light m-t-20">Estado</button>
+                    <button class="btn btn-warning btn-rounded waves-effect waves-light m-t-20">Visualizar</button>
                 </div>
             </div>
         </div>
     </div>
+    
+
+    <!-- table -->
     
 </div>

@@ -8,6 +8,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { QuillModule } from 'ngx-quill';
+import { FeatherModule } from 'angular-feather';
 
 
 @NgModule({
@@ -22,6 +23,7 @@ import { QuillModule } from 'ngx-quill';
     DragDropModule,
     NgxChartsModule,
     QuillModule.forRoot(),
+    FeatherModule
   ]
 })
 export class WebPagesModule { }

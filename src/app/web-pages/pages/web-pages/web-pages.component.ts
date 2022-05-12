@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ErrorHandler, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { WebSite } from 'src/app/web-sites/interfaces/web-site';
 import { WebPage } from '../../interfaces/web-page';
+import { WebPagesService } from '../../services/web-pages.service';
 
 @Component({
   selector: 'app-web-pages',
@@ -11,16 +12,21 @@ import { WebPage } from '../../interfaces/web-page';
 })
 export class WebPagesComponent implements OnInit {
 
-  private webPages : Array<WebPage> = [];
+  public webPages   : Array<WebPage> = [];
   private formCreate : FormGroup;
-  private formEdit : FormGroup;
+  private formEdit   : FormGroup;
 
-  constructor( private formBuilder : FormBuilder, private modalService : NgbModal ) { 
+  constructor
+  ( 
+    private formBuilder    : FormBuilder, 
+    private modalService   : NgbModal, 
+    private webPageService : WebPagesService 
+  ) { 
     this.laodFormCreate();
   }
 
   ngOnInit(): void {
-    console.log(this.webPages)
+    this.get( true );
   }
 
   laodFormCreate = () => {
@@ -35,11 +41,11 @@ export class WebPagesComponent implements OnInit {
 
   laodFormEdit = ( webPage : WebPage ) => {
     this.formEdit = this.formBuilder.group({
-      idSite : [ webPage.idSite , [Validators.required]],
+      idSite : [ webPage.site , [Validators.required]],
       name   : [webPage.name, [ Validators.required, Validators.minLength(2), Validators.maxLength(20) ] ],
       slug   : [webPage.slug, [ Validators.required] ],
       weight : [webPage.weight, [ Validators.required] ],
-      isActive : [webPage.isActive, [ Validators.required] ],
+      isActive : [webPage.is_active, [ Validators.required] ],
     });
   }
 
@@ -49,8 +55,17 @@ export class WebPagesComponent implements OnInit {
       return true;
       
     }
-    console.log('Formulario invalido')
+    console.log('Formulario invalido');
     return false;
+  }
+
+  get = ( isShowLoading : boolean = false ) => {
+    this.webPageService.get().subscribe(
+      ( res : any ) => {
+        this.webPages = res;
+      },
+      ( error : any ) => { this.errorHadler( error ) }
+    );
   }
 
   create = () => {
@@ -59,6 +74,16 @@ export class WebPagesComponent implements OnInit {
 
     if ( isValid ) {
       //Metodo para crear paginas webs
+      // this.webPageService.create( this.formCreate.value ).subscribe ( 
+      //   ( res : any ) => {
+      //     this.webPages = res.pages;
+      //   }, 
+      //   ( error : any ) => {
+      //     console.log(error)
+      //   }
+      // );
+
+      this.webPages.push( this.formCreate.value );
     }
   }
 
@@ -78,6 +103,7 @@ export class WebPagesComponent implements OnInit {
   openModal(targetModal: NgbModal, mode: string) {
 
     this.modalService.open(targetModal, {
+      size : 'md',
       centered: true,
       backdrop: 'static',
 
@@ -90,6 +116,8 @@ export class WebPagesComponent implements OnInit {
     this.modalService.dismissAll();
   }
 
-  
+  errorHadler = ( error : any ) => {
+    console.log(error)
+  }
 
 }

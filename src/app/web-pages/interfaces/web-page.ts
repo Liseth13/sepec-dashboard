@@ -1,8 +1,8 @@
 export interface WebPage {
-    _id : string,
-    idSite : string,
+    id : string,
+    site : string,
     name : string,
     slug : string,
     weight : number,
-    isActive : boolean
+    is_active : boolean
 }
