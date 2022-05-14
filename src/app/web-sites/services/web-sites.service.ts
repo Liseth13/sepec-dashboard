@@ -10,21 +10,20 @@ export class WebSitesService {
 
   }
 
-  configUrl = 'https://sepec-backend.herokuapp.com/';
+  configUrl = 'https://sepec-backend.herokuapp.com';
   // port = 443
 
-   getWebSites(from?: number, limit?: number, active?: boolean) {
-    return this.http.get(`${this.configUrl}api/v1/website/sites/`);
+  getWebSites(from?: number, limit?: number, active?: boolean) {
+    return this.http.get(`${this.configUrl}/api/v1/website/sites/`);
   }
-    // createWebSite(data) {
-    // return this.http.post(`${this.configUrl}:${this.port}/api/v1/website/create`, data);
-  // }
-  //  updateWebSite(data) {
-  //   return this.http.post(`${this.configUrl}:${this.port}/api/v1/website/update`, data);
-  // }
-  //  disableWebSite(data) {
-  //   return this.http.post(`${this.configUrl}:${this.port}/api/v1/website/disable`, data);
-  // }
+
+  createWebSite(data: any) {
+    return this.http.post(`${this.configUrl}/api/v1/website/sites/`, data);
+  }
+  
+  updateWebSite(data: any, websiteId: number) {
+    return this.http.put(`${this.configUrl}/api/v1/website/sites/${websiteId}/`, data);
+  }
 }
 
 

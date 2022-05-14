@@ -2,8 +2,15 @@
     <div class="card">
         <div class="card-body">
             <div class="row bd-highlight mb-2">
-                <div class="col-12 float-left align-center justify-content-center">
-                    <h1 class="h3 mb-0 text-gray-800 pt-2">Total: {{ totalWebSites }}</h1>
+                <div class="col-12">
+                    <div class="float-left align-center justify-content-center">
+                        <h1 class="h3 mb-0 text-gray-800 pt-2">Total: {{ totalWebSites }}</h1>
+                    </div>
+                    <div class="float-right bd-highlight">
+                        <button class="btn btn-info cursor mr-0" (click)="openModal(modalCreateWebSite, 0)">
+                            <i class="fas fa-plus-circle"></i> Agregar
+                        </button>
+                    </div>
                 </div>
                 <!-- <div class="col-2 float-right bd-highlight">
                     <div class="d-flex">
@@ -37,42 +44,122 @@
                             <td *ngIf="!data.is_active"><span class="label label-danger">No activo</span></td>
                             <td class="text-center">
                                 <div class="row">
-                                    <div class="col-6 action-btn">
-                                        <a class="btn btn-warning ml-1 action-text cursor" (click)="openModal(modalAddTicket)">
+                                    <div class="col-12 action-btn">
+                                        <a class="btn btn-warning ml-1 action-text cursor" (click)="openModal(modalEditSite, data)">
                                             <i class="far fa-edit"></i>
                                         </a>
-                                    </div>
-                                    <div class="col-6 action-btn">
-                                        <a data-toggle="tooltip" data-original-title="Delete" class="btn btn-danger action-text cursor">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </a>
-                                    </div>
+                                    </div>  
                                 </div>
                             </td>
                         </tr>
                     </tbody>
                 </table>
-            </div>
-            <div class="col-6 action-btn">
-                <button class="btn btn-info action-text cursor" (click)="openModal(modalEditUser, user.uid!)">
-                    <i class="fas fa-plus"> Agregar</i>
-                </button>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title">Pagination Alignment</h4>
+                            <h6 class="card-subtitle">Change the alignment of pagination components with flexbox utilities.</h6>
+                            <ngb-pagination class="d-flex justify-content-start" [collectionSize]="70" [(page)]="page"></ngb-pagination>
+                            <ngb-pagination class="d-flex justify-content-center" [collectionSize]="70" [(page)]="page"></ngb-pagination>
+                            <ngb-pagination class="d-flex justify-content-end" [collectionSize]="70" [(page)]="page"></ngb-pagination>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
-
-<ng-template #modalAddTicket let-modal>
+<!-- modal Editar Sitio web -->
+<ng-template #modalEditSite let-modal>
     <div class="modal-header">
-        <h4 class="modal-title" id="modal-basic-title"><i class="fas fa-plus-circle"></i> Add Ticket</h4>
+        <h4 class="modal-title" id="modal-basic-title"> Editar Sitio Web</h4>
         <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
             <span aria-hidden="true">&times;</span>
         </button>
     </div>
-    <div class="modal-body">
-        <h2>Hola Mundo</h2>
+    
+    <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-12">
+            <div class="card card-body">
+                <form class="form-group" [formGroup]="formSiteEdit" (ngSubmit)= "edit()">
+                    
+                    <div class="form-group">
+                        <label>
+                            <span class="help"> Escriba Nombre del Sitio Web"</span>
+                        </label>
+                        <input type="text" class="form-control" formControlName="name" value="Escriba Nombre del Sitio Web">
+                    </div>
+                    <div class="form-group">
+                        <label >Escribir Slogan</label>
+                        <textarea class="form-control"  formControlName="slogan" rows="2" placeholder="Escribir Slogan"> </textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Selecione imagen</label>
+
+                        <input type="file" class="form-control" (change)="uploadImage($event)">
+                    </div>
+
+                    <div class="form-group" >
+                        <label>Estado</label>
+                        <select class="custom-select col-12" id="inlineFormCustomSelect" formControlName="is_active" >
+                            <option value="" selected>--Seleccione una Opcion</option>
+                            <option value="true">Activado</option>
+                            <option value="false">Desactivado</option>
+                        </select>
+                    </div>
+                        <div class="modal-footer" >
+                            <button type="submit" class="btn btn-success" >Guardar</button>
+                        </div>
+                </form>
+            </div>
+        </div>
     </div>
-    <div class="modal-footer">
-        <button type="button" class="btn btn-outline-dark" (click)="modal.close('Save click')"><i class="fas fa-times"></i> Close</button>
+</ng-template>
+<!-- modal Crear Sitio web -->
+<ng-template #modalCreateWebSite let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title" id="modal-basic-title"> Create Web Site </h4>
+        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
     </div>
+        <div class="row">
+            <div class="col-sm-12 col-md-12 col-lg-12">
+                <div class="card card-body">
+                    <form class="form-group" [formGroup]="formSiteCreate" (ngSubmit)= "create()">
+                        
+                        <div class="form-group">
+                            <label>
+                                <span class="help"> Escriba Nombre del Sitio Web"</span>
+                            </label>
+                            <input type="text" class="form-control" formControlName="name" value="Escriba Nombre del Sitio Web">
+                        </div>
+                        <div class="form-group">
+                            <label >Escribir Slogan</label>
+                            <textarea class="form-control"  formControlName="slogan" rows="2" placeholder="Escribir Slogan"> </textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Selecione imagen</label>
+                            <div class="mb-4">
+                                <img *ngIf="!tempImg" src="../../../../assets/images/big/no-img.png" class="add-modal-image">
+                                <img *ngIf="tempImg" [src]="tempImg" class="add-modal-image">
+                            </div>
+            
+                            <input type="file" class="mt-1 mb-3" (change)="changeImage($event.target.files[0])" formControlName="icon">
+            
+                            <div *ngIf="!validImageExtension" class="mb-2">
+                                <p class="text-danger">La extensión de este archivo no está permitida, cargue un archivo con la extensión jpg, jpe, png.</p>
+                            </div>
+            
+                            <div *ngIf="!allowedFileSize" class="mb-2">
+                                <p class="text-danger">Este archivo no está permitido porque excede el tamaño permitido de 5 MB</p>
+                            </div>
+                        </div>
+                            <div class="modal-footer" >
+                                <button type="submit" class="btn btn-success" >Guardar</button>
+                            </div>
+                    </form>
+                </div>
+            </div>
+        </div>
 </ng-template>

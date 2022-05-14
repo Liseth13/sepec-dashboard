@@ -3,3 +3,12 @@ td {
     text-align: center;
     vertical-align: middle !important;
 }
+
+.add-modal-image {
+    width: auto;
+    height: auto;
+    max-height: 400px;
+    max-width: 650px;
+    border: 1px solid rgb(216, 214, 214);
+    padding: 1rem;
+}
