@@ -5,6 +5,7 @@ import { WebSitesRoutingModule } from './web-sites-routing.module';
 import { WebSitesComponent } from './pages/web-sites/web-sites.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 
 @NgModule({
@@ -15,6 +16,7 @@ import { HttpClientModule } from '@angular/common/http';
     CommonModule,
     WebSitesRoutingModule,
     ReactiveFormsModule,
+    NgbModule,
     FormsModule,
     HttpClientModule,
   ]

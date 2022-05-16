@@ -24,6 +24,13 @@ export class WebSitesComponent implements OnInit {
   public tempImg: any = null;
   private websiteId: number = 0;
 
+  //Paginación
+  page =1;
+  pageSize = 8;
+  collectionSize = 0;
+  _searchTerm = '';
+
+
   //Este validImageExtension para indicar si una extensión es valida o no, true es valida y false es no valida
   public validImageExtension: boolean = true;
 
@@ -158,6 +165,7 @@ export class WebSitesComponent implements OnInit {
           this.webSiteService.createWebSite(this.formSiteCreate.value).subscribe(
             (res:any)=>{
               console.log(res)
+              
               this.getWebSite()
               this.closeModal()
               Swal.fire(' Success','Guardado correctamente','success')
@@ -196,6 +204,7 @@ export class WebSitesComponent implements OnInit {
       (res:any) =>{
         this.webSites = res;
         this.totalWebSites = res.length;
+        this.collectionSize = this.webSites.length;
         this.charging = false;
         Swal.close();
         console.log(res);

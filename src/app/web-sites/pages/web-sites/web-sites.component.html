@@ -34,7 +34,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let data of webSites">
+                        <tr *ngFor="let data of webSites |slice: (page-1) * pageSize : (page-1) * pageSize + pageSize">
                             <td class="text-center">
                                 <img [src]="data.icon" alt="Icon" class="avatar cursor">
                             </td>
@@ -54,17 +54,11 @@
                         </tr>
                     </tbody>
                 </table>
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-body">
-                            <h4 class="card-title">Pagination Alignment</h4>
-                            <h6 class="card-subtitle">Change the alignment of pagination components with flexbox utilities.</h6>
-                            <ngb-pagination class="d-flex justify-content-start" [collectionSize]="70" [(page)]="page"></ngb-pagination>
-                            <ngb-pagination class="d-flex justify-content-center" [collectionSize]="70" [(page)]="page"></ngb-pagination>
-                            <ngb-pagination class="d-flex justify-content-end" [collectionSize]="70" [(page)]="page"></ngb-pagination>
-                        </div>
-                    </div>
-                </div>
+            </div>
+            <div class="d-flex justify-content-center mt-5">
+                <ngb-pagination [collectionSize]="collectionSize" [(page)]="page" [pageSize]="pageSize">
+
+                </ngb-pagination>
             </div>
         </div>
     </div>
