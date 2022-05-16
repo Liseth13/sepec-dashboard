@@ -88,11 +88,6 @@ export const Approutes: Routes = [
           import("./BASE/maps/maps.module").then((m) => m.MapsModule),
       },
       {
-        path: "pages",
-        loadChildren: () =>
-          import("./pages/pages.module").then((m) => m.PagesModule),
-      },
-      {
         path: "sample-pages",
         loadChildren: () =>
           import("./BASE/sample-pages/sample-pages.module").then(

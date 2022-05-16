@@ -95,7 +95,7 @@ export class TasksComponent implements OnInit {
 
 
         if (selected.sectionTaskType === 'section') {
-            this.titleTaskSection = 'Section';
+            this.titleTaskSection = 'Section'; 
         } else {
             this.titleTaskSection = 'Task';
         }

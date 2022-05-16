@@ -1,51 +1,49 @@
 <div>
-    <ng-template #modalWebPage let-modal>
+    <ng-template #modalWebSites let-modal>
         <div class="modal-header">
-            <h3 class="modal-title font-weight-bold" id="taskLabel">Crear página</h3>
-            <button type="button" class="close" (click)="closeBtnClick()" aria-label="Close">
+            <h3 class="modal-title font-weight-bold" id="taskLabel">
+                Seleccionar sitio web
+            </h3>
+            <button type="button" class="close" (click)="closeModals()" aria-label="Close">
             <span aria-hidden="true">&times;</span>
             </button>
         </div>
-        <form [formGroup] = "formCreate" (ngSubmit)="create()">
-            <div class="modal-body">
-                <div class="form-group row">
-                    <label for="name" class="col-sm-4 col-form-label">Nombre de la página</label>
-                    <div class="col-sm-8">
-                    <input type="text" class="form-control"  id="name" formControlName = "name">
-                    </div>
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-borderes table-hover">
+                        <thead class = "table-dark">
+                            <tr>
+                                <th>Sitio web</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let site of webSites | slice: (paginacionSites.page-1) * paginacionSites.pageSize : (paginacionSites.page-1) * paginacionSites.pageSize + paginacionSites.pageSize">
+                                <td>{{site.name}}</td>
+                                <td class ="text-center">
+                                    <div class="row">
+                                        <div class="col-12 action-btn">
+                                            <button
+                                                class="btn btn-success ml-1 action-text cursor-pointer"
+                                                (click)="sidebarMode === 'create'? selectSite(formCreate, site.id) : selectSite(formEdit, site.id)"
+                                            >
+                                                <i class="far fa-edit"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
-                <div class="form-group row">
-                    <label for="slug" class="col-sm-4 col-form-label">Dirección de la página </label>
-                    <div class="col-sm-8">
-                    <input type="text" class="form-control"  id="slug" formControlName = "slug">
-                    </div>
+                <div class="d-flex justify-content-center mt-2">
+                    <ngb-pagination [collectionSize]="paginacionSites.collectionSize" [(page)]="paginacionSites.page" [pageSize]="paginacionSites.pageSize">
+                    </ngb-pagination>
                 </div>
-                <div class="form-group row">
-                    <label for="weight" class="col-sm-4 col-form-label">Peso</label>
-                    <div class="col-sm-8">
-                    <input type="number" class="form-control"  id="weight" formControlName = "weight">
-                    <!-- <textarea class="form-control" rows="2" placeholder="sdhfgidfhgjkgh"></textarea> -->
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label for="isActive" class="col-sm-4 col-form-label">Estado</label>
-                    <div class="col-sm-8">
-                        <select  class="form-control" name="isActive" id="isActive" formControlName ="isActive">
-                            <option value="">-- Selecciona una opción --</option>
-                            <option value="true">Activo</option>
-                            <option value="false">Inactivo</option>      
-                        </select>
-                    </div>
-                </div>
-        
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-dark" (click)="closeBtnClick()">Cerrar</button>
-                <button type="submit" class="btn btn-primary" >Crear página</button>
-            </div>
-        </form>
+        </div>
     </ng-template>
-
 
     <div class="d-md-flex align-items-center bg-white p-3 mb-2">
         <div>
@@ -54,12 +52,11 @@
     
         <div class="ml-auto">
             <!-- Add new web site -->
-            <button type="button" class="btn btn-dark ml-3" (click) ="openModal(modalWebPage, null)" >
-                
+            <button type="button" class="btn btn-dark ml-3" (click) ="openRightSidebar('create')" >
                 <i class="fas fa-plus"></i> Agregar Página
             </button>
             <!-- Add new section -->
-            <button  type="button" class="btn btn-danger ml-1" >
+            <button  type="button" class="btn btn-danger ml-1" (click)="openRightSidebar('dfgdfg')">
                 <i class="fas fa-minus-circle" name="Inhabilitados"></i> 
             </button>
             <button  type="button" class="btn btn-success ml-1" >
@@ -67,30 +64,142 @@
             </button>
         </div>
     </div>
-
-    <div class="row">
-        <div class="col-lg-3" *ngFor="let page of webPages" >
-            <div class="card">
-                <!-- <img class="card-img-top img-responsive" src="assets/images/big/img4.jpg" alt="Card image cap"> -->
-                <div class="card-body">
-                    <div class="d-flex no-block align-items-center m-b-15">
-                        <span>
-                            <i class="ti-calendar"></i> 25/05/2005</span>
-                        <div class="ml-auto">
-                            <a href="javascript:void(0)" class="link">
-                                <i class="ti-comments"></i> items</a>
+    
+    <div>
+        <div class="row">
+            <div class="col-md-3 col-lg-3 col-sm-6 col-12" *ngFor="let page of webPages | slice: (paginationPages.page-1) * paginationPages.pageSize : (paginationPages.page-1) * paginationPages.pageSize + paginationPages.pageSize" >
+                <div class="card">
+                    <!-- <img class="card-img-top img-responsive" src="assets/images/big/img4.jpg" alt="Card image cap"> -->
+                    <div class="card-body">
+                        <div class="d-flex no-block align-items-center m-b-15">
+                            <span>
+                                <i class="ti-calendar"></i> {{page.site | siteName : webSites}}</span>
+                            <div class="ml-auto">
+                                <a href="javascript:void(0)" class="link">
+                                    <i class="ti-comments"></i> {{ page.weight }}</a>
+                            </div>
                         </div>
+                        <h3 class="font-normal">{{ page.name }}</h3>
+                        <p class="m-b-0 m-t-10">{{ page.slug }}</p>
+                        <button 
+                            class="btn btn-success btn-rounded waves-effect waves-light m-t-20"
+                            (click) ="openRightSidebar('edit', page)">
+                            Editar
+                        </button>
+                        <button class="btn btn-warning btn-rounded waves-effect waves-light m-t-20">Visualizar</button>
                     </div>
-                    <h3 class="font-normal">Página de prueba</h3>
-                    <p class="m-b-0 m-t-10">https://urlDeLaPagina</p>
-                    <button class="btn btn-success btn-rounded waves-effect waves-light m-t-20">Estado</button>
-                    <button class="btn btn-warning btn-rounded waves-effect waves-light m-t-20">Visualizar</button>
                 </div>
             </div>
         </div>
+        <div class="d-flex justify-content-center mt-5">
+            <ngb-pagination [collectionSize]="paginationPages.collectionSize" [(page)]="paginationPages.page" [pageSize]="paginationPages.pageSize">
+            </ngb-pagination>
+        </div>
     </div>
     
+    <!-- sidebar -->
+    <div class="app-sidebar card" id="rightMenu">
+        <div>
+            <!-- -------------------------------------------------------------------------------------- -->
+            <!-- Header of sidebar -->
+            <!-- -------------------------------------------------------------------------------------- -->
+            <div class="d-flex p-3 border-bottom card-header">
+                <div  class="d-flex align-items-center">
+                    <!-- <input type="checkbox" class="custom-checkbox-width" >
+                    <label  class="ml-3 mb-0 text-dark font-medium">MARK AS INCOMPLETE</label>
+                    <label  class="ml-3 mb-0 text-dark font-medium">MARK AS COMPLETE</label> -->
+                    <h2 class="text-center text-title"> {{sidebarMode === 'create'? 'Crear página' : 'Editar página'}} </h2>
+                </div>
 
-    <!-- table -->
-    
+                <div class="ml-auto">
+                    <a href="javascript:void(0)" class="text-danger" (click)='closeRightSidebar()'>
+                        <i-feather name="x" class="feather-sm"></i-feather>
+                    </a>
+                </div>
+            </div>
+            <!-- ./  Header of sidebar -->
+            <!-- -------------------------------------------------------------------------------------- -->
+            <!-- Body of sidebar -->
+            <!-- -------------------------------------------------------------------------------------- -->
+            <div class="p-4">
+                <form *ngIf="sidebarMode === 'create'" [formGroup] = "formCreate" (ngSubmit)="create()">
+                    <div class="form-group">
+                        <label for="siteNameCreate">Sitio web</label>     
+                        <input type="text" value="{{ formCreate.controls['site'].value | siteName : webSites }}" class="form-control"  id="siteNameCreate" disabled>
+                        <button type = "button" (click) ="openModal( modalWebSites )" >
+                            <i-feather name="search" class="feather-sm mr-2"></i-feather>
+                        </button>
+                    </div>  
+                    <input type="hidden" class="form-control"  formControlName = "site" >
+                    <div class="form-group">
+                        <label for="name">Nombre de la página</label>     
+                        <input type="text" class="form-control"  id="name" formControlName = "name">
+                    </div>
+                    <div class="form-group">
+                        <label for="slug">Dirección de la página </label>
+                        <input type="text" class="form-control"  id="slug" formControlName = "slug">                      
+                    </div>
+                    <div class="form-group">
+                        <label for="weight">Peso</label>                 
+                        <input type="number" class="form-control"  id="weight" formControlName = "weight">
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-success btn-block" >
+                            <i-feather name="save" class="feather-sm mr-2"></i-feather>
+                            Crear página
+                        </button>
+                    </div>
+                    <div class="form-group">
+                        <button type="button" class="btn btn-danger btn-block" (click)='formCreate.reset()'>
+                            <i-feather name="trash-2" class="feather-sm mr-2"></i-feather>
+                            Limpiar Formulario
+                        </button>
+                    </div>
+                </form>
+
+                <form *ngIf="sidebarMode === 'edit'"  [formGroup] = "formEdit" (ngSubmit)="edit()">
+                    <div class="form-group">
+                        <button type = "button" (click) ="openModal(modalWebSites)" >
+                            <i-feather name="search" class="feather-sm mr-2"></i-feather>
+                        </button>
+                        <label for="siteName">Sitio web</label>     
+                        <input value="{{ formEdit.controls['site'].value | siteName : webSites }}" type="text" class="form-control"  id="siteName"  disabled>
+                    </div>
+                    <input type="hidden" class="form-control"  id="site" formControlName = "site">
+                    <div class="form-group">
+                        <label for="name">Nombre de la página</label>     
+                        <input type="text" class="form-control"  id="name" formControlName = "name">
+                    </div>
+                    <div class="form-group">
+                        <label for="slug">Dirección de la página </label>
+                        <input type="text" class="form-control"  id="slug" formControlName = "slug">                      
+                    </div>
+                    <div class="form-group">
+                        <label for="weight">Peso</label>                 
+                        <input type="number" class="form-control"  id="weight" formControlName = "weight">
+                    </div>
+                    <div class="form-group">
+                        <label for="statusEdit">Estado</label>                 
+                        <select id="statusEdit" formControlName = "is_active" class="form-control">
+                            <option value="true" >Activo</option>
+                            <option value="false" >Inactivo</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-success btn-block">
+                            <i-feather name="save" class="feather-sm mr-2"></i-feather>
+                            Guardar cambios
+                        </button>
+                    </div>
+                    <div class="form-group">
+                        <button type="button" class="btn btn-danger btn-block" (click)='formEdit.reset()'>
+                            <i-feather name="trash-2" class="feather-sm mr-2"></i-feather>
+                            Limpiar Formulario
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <!-- ./ Body of sidebar -->
+        </div>
+    </div>
 </div>
