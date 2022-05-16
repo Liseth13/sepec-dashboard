@@ -159,7 +159,8 @@ export class WebPagesComponent implements OnInit {
       this.sidebarMode = mode;
       this.loadFormEdit( page );
     } else if ( mode === 'create' ) {
-      this.sidebarMode = mode
+      this.sidebarMode = mode;
+      this.formCreate.reset();
     } else {
       return;
     }
