@@ -1,8 +1,10 @@
-import { Component, ErrorHandler, OnInit } from '@angular/core';
+import { Component, ComponentRef, ElementRef, OnInit, TemplateRef, ViewChild, } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import Swal from 'sweetalert2';
+// import { PageContentManagerComponent } from '../../components/page-content-manager/page-content-manager.component';
 import { WebPage } from '../../interfaces/web-page';
+import { ContentPagesService } from '../../services/content-pages.service';
 import { WebPagesService } from '../../services/web-pages.service';
 
 @Component({
@@ -13,11 +15,16 @@ import { WebPagesService } from '../../services/web-pages.service';
 export class WebPagesComponent implements OnInit {
 
   public  webPages   : Array<WebPage> = [];
-  public webSites    : Array<any> = [];
+  public  webSites   : Array<any>     = [];
+  public contentPages: Array<any>    = [];
   private formCreate : FormGroup;
   private formEdit   : FormGroup;
-  sidebarMode : string = 'create';
 
+  //private modalPageContentManager  ;
+
+  //  public contentManager : PageContentManagerComponent;
+
+  sidebarMode : string = 'create';
   //Paginación
 
   paginationPages : any = {
@@ -41,14 +48,19 @@ export class WebPagesComponent implements OnInit {
   ( 
     private formBuilder    : FormBuilder, 
     private modalService   : NgbModal, 
-    private webPageService : WebPagesService
+    private webPageService : WebPagesService,
+    private contentPageService : ContentPagesService
   ) { 
+
+    //this.modalPageContentManager = PageContentManagerComponent
     this.loadFormCreate();
-    
+    //console.log(this.modalPageContentManager.getId())
+    // this.contentManager.getId();
   }
 
   ngOnInit(): void {
     this.get( true );
+    this.getContentPages();
     this.getWebSites();
   }
 
@@ -88,6 +100,13 @@ export class WebPagesComponent implements OnInit {
       },
       ( error : any ) => { this.errorHandler( error ) }
     );
+  }
+
+  getContentPages = () => {
+    this.contentPageService.get().subscribe(
+      ( res : any ) => { this.contentPages = res;},
+      ( error : any ) => { this.errorHandler( error )}
+    )
   }
 
   getWebSites = () => {
@@ -136,22 +155,33 @@ export class WebPagesComponent implements OnInit {
     //this.webPages.map( ( page : WebPage ) => page.id === res.id);
   }
 
-  disabled = () => {
+  disabled = () => {  }
 
-  }
-
-  openModal(targetModal: NgbModal, mode: string) {
+  openModal(targetModal: NgbModal, size : string = 'md') {
     this.modalService.open(targetModal, {
-      size : 'md',
+      size : size ,
       centered: true,
       backdrop: 'static',
-
     });
   }
+
+  openContentManager = ( targetModal : NgbModal , pageId : string ) => {
+    this.openModal( targetModal, 'lg' );
+  }
+
 
   closeModals = () => {
     this.modalService.dismissAll();
   }
+
+  // open(){
+    
+  //   this.modalService.open(this.contentManager, {
+  //     size : 'lg',
+  //     centered: true,
+  //     backdrop: 'static',
+  //   });
+  // }
 
   openRightSidebar( mode: string, page? : WebPage ) {
     this.sidebarMode = mode;

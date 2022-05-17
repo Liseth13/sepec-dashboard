@@ -4,7 +4,7 @@
             <h3 class="modal-title font-weight-bold" id="taskLabel">
                 Seleccionar sitio web
             </h3>
-            <button type="button" class="close" (click)="closeModals()" aria-label="Close">
+            <button type="button" class="close" (click)="modal.dismiss()" aria-label="Close">
             <span aria-hidden="true">&times;</span>
             </button>
         </div>
@@ -45,13 +45,29 @@
         </div>
     </ng-template>
 
+    <ng-template #modalContentPageManager let-modal>
+        <div class="modal-header">
+            <h3 class="modal-title font-weight-bold" id="taskLabel">
+                Seleccionar sitio web
+            </h3>
+            <button type="button" class="close" (click)="modal.dismiss()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                
+            </div>
+        </div>
+    </ng-template>
+
     <div class="d-md-flex align-items-center bg-white p-3 mb-2">
         <div>
             <h3 class="mb-0">Páginas</h3>
         </div>
-    
+        
         <div class="ml-auto">
-            <!-- Add new web site -->
+            <!-- Add new web page -->
             <button type="button" class="btn btn-dark ml-3" (click) ="openRightSidebar('create')" >
                 <i class="fas fa-plus"></i> Agregar Página
             </button>
@@ -87,7 +103,12 @@
                         >
                             Editar
                         </button>
-                        <button class="btn btn-warning btn-rounded waves-effect waves-light m-t-20">Visualizar</button>
+                        <button 
+                            class="btn btn-warning btn-rounded waves-effect waves-light m-t-20"
+                            (click) ="openContentManager(modalContentPageManager, page.id)"
+                        >
+                            Contenido
+                        </button>
                     </div>
                 </div>
             </div>
@@ -127,7 +148,7 @@
                     <div class="form-group">
                         <label for="siteNameCreate">Sitio web</label>     
                         <input type="text" value="{{ formCreate.controls['site'].value | siteName : webSites }}" class="form-control"  id="siteNameCreate" disabled>
-                        <button type = "button" (click) ="openModal( modalWebSites )" >
+                        <button type = "button" (click) ="openModal( modalWebSites, 'md' )" >
                             <i-feather name="search" class="feather-sm mr-2"></i-feather>
                         </button>
                     </div>  
@@ -160,7 +181,7 @@
 
                 <form *ngIf="sidebarMode === 'edit'"  [formGroup] = "formEdit" (ngSubmit)="edit()">
                     <div class="form-group">
-                        <button type = "button" (click) ="openModal(modalWebSites)" >
+                        <button type = "button" (click) ="openModal(modalWebSites, 'md')" >
                             <i-feather name="search" class="feather-sm mr-2"></i-feather>
                         </button>
                         <label for="siteName">Sitio web</label>     
