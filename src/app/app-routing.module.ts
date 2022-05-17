@@ -87,11 +87,11 @@ export const Approutes: Routes = [
         loadChildren: () =>
           import("./BASE/maps/maps.module").then((m) => m.MapsModule),
       },
-      {
-        path: "pages",
-        loadChildren: () =>
-          import("./pages/pages.module").then((m) => m.PagesModule),
-      },
+      // {
+      //   path: "pages",
+      //   loadChildren: () =>
+      //     import("./pages/pages.module").then((m) => m.PagesModule),
+      // },
       {
         path: "sample-pages",
         loadChildren: () =>
@@ -116,8 +116,8 @@ export const Approutes: Routes = [
             path : '',
             children : [
               {
-                path : 'web-sites',
-                loadChildren : () => import("./web-sites/web-sites.module").then((m) => m.WebSitesModule)
+                path : 'sites',
+                loadChildren : () => import("./sites/web-sites.module").then((m) => m.WebSitesModule)
               },
               {
                 path : 'web-pages',

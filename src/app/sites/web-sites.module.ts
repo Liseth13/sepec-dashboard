@@ -6,11 +6,14 @@ import { WebSitesComponent } from './pages/web-sites/web-sites.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { FootersSitesComponent } from './pages/footers-sites/footers-sites.component';
+
 
 
 @NgModule({
   declarations: [
-    WebSitesComponent
+    WebSitesComponent,
+    FootersSitesComponent
   ],
   imports: [
     CommonModule,
