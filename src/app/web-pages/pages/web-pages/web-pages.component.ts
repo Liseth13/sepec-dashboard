@@ -1,6 +1,7 @@
 import { Component, ComponentRef, ElementRef, OnInit, TemplateRef, ViewChild, } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import { PerfectScrollbarConfigInterface } from 'ngx-perfect-scrollbar';
 import Swal from 'sweetalert2';
 // import { PageContentManagerComponent } from '../../components/page-content-manager/page-content-manager.component';
 import { WebPage } from '../../interfaces/web-page';
@@ -14,7 +15,8 @@ import { WebPagesService } from '../../services/web-pages.service';
 })
 export class WebPagesComponent implements OnInit {
 
-  public  webPages   : Array<WebPage> = [];
+  public  webPages       : Array<WebPage> = [];
+  public webPagesFilter : Array<WebPage> = [];
   public  webSites   : Array<any>     = [];
   public contentPages: Array<any>    = [];
   private formCreate : FormGroup;
@@ -40,6 +42,10 @@ export class WebPagesComponent implements OnInit {
     collectionSize : 0,
     _searchTerm : ''
   }
+
+  // TEMPLATE
+  public showSidebar = false;
+  public config: PerfectScrollbarConfigInterface = {};
  
   
   //selectedST: TaskSection | undefined = Object.create(null);
@@ -62,6 +68,10 @@ export class WebPagesComponent implements OnInit {
     this.get( true );
     this.getContentPages();
     this.getWebSites();
+  }
+
+  mobileSidebar() {
+    this.showSidebar = !this.showSidebar;
   }
 
   loadFormCreate = () => {
@@ -174,14 +184,6 @@ export class WebPagesComponent implements OnInit {
     this.modalService.dismissAll();
   }
 
-  // open(){
-    
-  //   this.modalService.open(this.contentManager, {
-  //     size : 'lg',
-  //     centered: true,
-  //     backdrop: 'static',
-  //   });
-  // }
 
   openRightSidebar( mode: string, page? : WebPage ) {
     this.sidebarMode = mode;
@@ -216,6 +218,14 @@ export class WebPagesComponent implements OnInit {
 
   errorHandler = ( error : any ) => {
     Swal.fire('Error', "Ha ocurrido un error, reintentar operación", 'error');
+  }
+
+  pageSelected = ( page : WebPage ) => {
+    console.log(page) ;
+  }
+
+  pagesStatusChanged = ( status : boolean = true ) => {
+    this.webPagesFilter = this.webPages.filter(p => p.is_active === status);
   }
 
 }

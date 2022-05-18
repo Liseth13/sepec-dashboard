@@ -11,6 +11,7 @@ import { QuillModule } from 'ngx-quill';
 import { FeatherModule } from 'angular-feather';
 import { HttpClientModule } from '@angular/common/http';
 import { SiteNamePipe } from './pipes/site-name.pipe';
+import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 
 
 @NgModule({
@@ -29,7 +30,8 @@ import { SiteNamePipe } from './pipes/site-name.pipe';
     FeatherModule,
     HttpClientModule,
     FormsModule,
-    NgbModalModule
+    NgbModalModule,
+    PerfectScrollbarModule,
   ]
 })
 export class WebPagesModule { }

@@ -55,7 +55,7 @@ export class ListingComponent implements OnInit {
 
     mailboxesChanged(type: string) {
 
-        if (type === 'Inbox') {
+        if (type === 'Inbox') {     
             this.ms.mailList = this.mailService.getInbox();
             this.ms.collectionSize = this.mailService.getInbox().length;
             this.changeCaterories(type);
