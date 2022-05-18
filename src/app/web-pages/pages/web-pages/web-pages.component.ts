@@ -18,7 +18,8 @@ export class WebPagesComponent implements OnInit {
   public  webPages       : Array<WebPage> = [];
   public webPagesFilter : Array<WebPage> = [];
   public  webSites   : Array<any>     = [];
-  public contentPages: Array<any>    = [];
+  public contentsPages: Array<any>    = [];
+  public showContentsPage : Array<any> = [];
   private formCreate : FormGroup;
   private formEdit   : FormGroup;
 
@@ -68,6 +69,7 @@ export class WebPagesComponent implements OnInit {
     this.get( true );
     this.getContentPages();
     this.getWebSites();
+    
   }
 
   mobileSidebar() {
@@ -107,6 +109,7 @@ export class WebPagesComponent implements OnInit {
       ( res : WebPage[] ) => {
         this.webPages = res;
         this.paginationPages.collectionSize = this.webPages.length;
+        this.pagesStatusChanged( true );
       },
       ( error : any ) => { this.errorHandler( error ) }
     );
@@ -114,7 +117,7 @@ export class WebPagesComponent implements OnInit {
 
   getContentPages = () => {
     this.contentPageService.get().subscribe(
-      ( res : any ) => { this.contentPages = res;},
+      ( res : any ) => { this.contentsPages = res;},
       ( error : any ) => { this.errorHandler( error )}
     )
   }
@@ -221,11 +224,15 @@ export class WebPagesComponent implements OnInit {
   }
 
   pageSelected = ( page : WebPage ) => {
-    console.log(page) ;
+    //console.log(page) ;
+
+    this.showContentsPage = this.contentsPages.filter( c => c.page === page.id );
+    console.log(page.id);
   }
 
   pagesStatusChanged = ( status : boolean = true ) => {
     this.webPagesFilter = this.webPages.filter(p => p.is_active === status);
+    this.paginationPages.collectionSize = this.webPagesFilter.length;
+    this.paginationPages.page = 1;
   }
-
 }
