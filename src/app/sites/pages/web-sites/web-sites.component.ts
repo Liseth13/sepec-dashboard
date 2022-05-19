@@ -5,6 +5,7 @@ import { WebSitesService }  from '../../services/web-sites.service';
 import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 
 import Swal from 'sweetalert2';
+import { Site } from './site';
 
 @Component({
   selector: 'app-web-sites',
@@ -13,10 +14,12 @@ import Swal from 'sweetalert2';
 })
 
 export class WebSitesComponent implements OnInit {
-  private webSites    : Array <any> = [];
+  selectedST: Site | undefined = Object.create(null);
+  sectionTask: Site[] | null = null;
+  public webSites    : Array <any> = [];
   private totalWebSites : number = 0;
   public charging : boolean = true;
-  private formSiteCreate      : FormGroup;
+  public formSiteCreate      : FormGroup;
   private formSiteEdit        : FormGroup;
   alerts: any;
   public imageUpload!: File;
@@ -38,6 +41,7 @@ export class WebSitesComponent implements OnInit {
   public allowedFileSize: boolean = true;
 
   closeResult = '';
+  titleTaskSection: string;
 
   constructor(
    private formBuilder : FormBuilder, private webSiteService: WebSitesService,
@@ -167,7 +171,7 @@ export class WebSitesComponent implements OnInit {
               console.log(res)
               
               this.getWebSite()
-              this.closeModal()
+              this.closeRightMenu();
               Swal.fire(' Success','Guardado correctamente','success')
             },
             (error:any)=>{
@@ -256,5 +260,29 @@ export class WebSitesComponent implements OnInit {
     }
     console.log(this.formSiteEdit.value)
   }
+  addTaskSection() {
+
+    this.formSiteCreate.reset();
+
+    if ((document.getElementById('rightMenu')as HTMLFormElement).style.width === '300px') {
+        this.closeRightMenu();
+        return;
+    }
+    (document.getElementById('rightMenu')as HTMLFormElement).style.width = '300px';
+
+    this.titleTaskSection = 'Task';
+
+    const data = new Site();
+    data.name = 'bla@bla.com';
+    data.slogan = 'bla@bla.com';
+    data.status = true;
+    this.tempImg = null;
+
+  }
+  closeRightMenu() {
+    (document.getElementById('rightMenu')as HTMLFormElement).style.width = '0';
+  }
+
+ 
 }
 

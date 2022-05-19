@@ -17,11 +17,15 @@ export class footerSiteService {
     return this.http.get(`${this.configUrl}/api/v1/website/site/footer/`);
   }
 
-//   createFootersSites(data: any) {
-//     return this.http.post(`${this.configUrl}/api/v1/website/sites/`, data);
-//   }
+  createFootersSites(data: any) {
+    return this.http.post(`${this.configUrl}/api/v1/website/sites/`, footer);
+  }
   
 //   updateFootersSites(data: any, websiteId: number) {
 //     return this.http.put(`${this.configUrl}/api/v1/website/sites/${websiteId}/`, data);
 //   }
 }
+function footer(arg0: string, footer: any) {
+  throw new Error('Function not implemented.');
+}
+

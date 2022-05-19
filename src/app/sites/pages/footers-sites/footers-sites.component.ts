@@ -4,6 +4,7 @@ import { ModalDismissReasons, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Footer } from './footer';
 import Swal from 'sweetalert2';
 import { footerSiteService } from '../../services/footers-sites.service';
+import { WebSitesService } from '../../services/web-sites.service';
 
 
 
@@ -17,12 +18,12 @@ export class FootersSitesComponent implements OnInit {
   selectedST: Footer | undefined = Object.create(null);
   titleTaskSection = '';
 
-
+  public webSites : Array <any> = [];
   public footers  : Array <any> = [];
   public charging : boolean = true;
   public totalFooterSite:number = 0;
-  formFooterCreate: any;
-  formFooterEdit: any;
+  formFooterCreate: FormGroup;
+  formFooterEdit: FormGroup;
   websiteId: any;
   closeResult: string;
   count = 0;
@@ -38,19 +39,20 @@ export class FootersSitesComponent implements OnInit {
 
   constructor(
     private formBuilder : FormBuilder, private footerSiteService : footerSiteService,
-    private modalService: NgbModal
+    private modalService: NgbModal, private webSiteService: WebSitesService
   ) { }
 
   ngOnInit(): void {
    this.getWebFooters();
    this.loadformSiteCreate();
+   this.getWebSite();
    console.log(this.selectedST);
    
   }
 
   loadformSiteCreate(){
     this.formFooterCreate = this.formBuilder.group({ 
-      sitio:['',[Validators.required, Validators.maxLength(20),Validators.minLength(3)]],
+      site:['',[Validators.required, Validators.maxLength(20),Validators.minLength(3)]],
       email:['',[Validators.required, Validators.maxLength(40),Validators.minLength(8)]],
       address:['',[Validators.required, Validators.maxLength(40),Validators.minLength(5)]],
       phone:['',[Validators.required, Validators.maxLength(40),Validators.minLength(8)]],
@@ -59,7 +61,7 @@ export class FootersSitesComponent implements OnInit {
 
   loadformSiteEdit(){
     this.formFooterEdit = this.formBuilder.group({
-      sitio:['',[Validators.required, Validators.maxLength(20),Validators.minLength(3)]],
+      site:['',[Validators.required, Validators.maxLength(20),Validators.minLength(3)]],
       email:['',[Validators.required, Validators.maxLength(40),Validators.minLength(8)]],
       address:['',[Validators.required, Validators.maxLength(40),Validators.minLength(8)]],
       phone:['',[Validators.required, Validators.maxLength(40),Validators.minLength(8)]],
@@ -76,16 +78,6 @@ export class FootersSitesComponent implements OnInit {
   };
 
   getWebFooters = () =>{
-    Swal.fire({
-      title: 'Cargando',
-      html: 'Por favor espera un momento...',
-      showCancelButton: false,
-      showConfirmButton: false,
-      allowOutsideClick: false,
-      didOpen: () => {
-        Swal.showLoading()
-      }
-    });
     this.footerSiteService.getFootersSites().subscribe(
       (res:any) =>{
     this.footers = res;
@@ -98,21 +90,21 @@ export class FootersSitesComponent implements OnInit {
     (error:any) =>{})
   }
 
-  openModal(content1: string, data) {
-    if(data != 0){
-      this.formFooterEdit.patchValue({
-        sitio: data.sitio,
-        email: data.email,
-        address: data.address,
-        phone: data.phone,
-        is_active: data.is_active
-      });
+  getWebSite = () => {
+    this.webSiteService.getWebSites().subscribe(
+      (res:any) =>{
+        this.webSites = res;
+      },
+      (error) => {
+        console.log(error);
+        
+      }
+    )
+  }
 
-      this.websiteId = data.id;
 
-      // console.log(this.formSiteEdit.value);
-    }
-
+  openModal(content1: string) {
+  
     this.modalService.open(content1, { ariaLabelledBy: 'modal-basic-title', size: 'lg' }).result.then((result) => {
 			this.closeResult = `Closed with: ${result}`;
 		}, (reason) => {
@@ -123,6 +115,9 @@ export class FootersSitesComponent implements OnInit {
   closeModal() { 
     this.modalService.dismissAll()
   }
+   addWebSite = ( )=> {
+     
+   }
 
   getDismissReason(reason: ModalDismissReasons) : string {
     if (reason === ModalDismissReasons.ESC) {
@@ -153,8 +148,6 @@ export class FootersSitesComponent implements OnInit {
     footer.status = true;
 
   }
-
-
   closeRightMenu() {
     (document.getElementById('rightMenu')as HTMLFormElement).style.width = '0';
   }
@@ -166,12 +159,12 @@ export class FootersSitesComponent implements OnInit {
       Swal.fire('Error','Faltan Campos Por Validar','warning')
     }else{
       
-      this.webFooterService.createWebSite(this.formFooterCreate.value).subscribe(
+      this.webFooterService.createFootersSites(this.formFooterCreate.value).subscribe(
         (res:any)=>{
           console.log(res)
           
           this.getWebFooters()
-          this.closeModal()
+          this.closeRightMenu()
           Swal.fire(' Success','Guardado correctamente','success')
         },
         (error:any)=>{
@@ -181,5 +174,25 @@ export class FootersSitesComponent implements OnInit {
       )
     }
 }
+  seleccionar(site){
+    console.log(site);
+    
+      this.formFooterCreate.get('site').setValue(site.id);
+      this.closeModal()
+
+  }
+
+  getName(siteId) {
+    let siteName = '';
+
+    if (siteId != '' && siteId != null) {
+      const siteName = this.webSites.find(site => site.id === siteId);
+      return siteName.name
+    } else {
+      return siteName;
+    }
+  }
+
+
 }
 
