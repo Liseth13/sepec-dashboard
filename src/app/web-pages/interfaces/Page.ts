@@ -1,4 +1,4 @@
-export interface WebPage {
+export interface Page {
     id : string,
     site : string,
     name : string,

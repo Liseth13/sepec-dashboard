@@ -4,7 +4,8 @@ import { NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import { PerfectScrollbarConfigInterface } from 'ngx-perfect-scrollbar';
 import Swal from 'sweetalert2';
 // import { PageContentManagerComponent } from '../../components/page-content-manager/page-content-manager.component';
-import { WebPage } from '../../interfaces/web-page';
+import { Page } from '../../interfaces/Page';
+import { Pagination } from '../../interfaces/pagination';
 import { ContentPagesService } from '../../services/content-pages.service';
 import { WebPagesService } from '../../services/web-pages.service';
 
@@ -15,34 +16,40 @@ import { WebPagesService } from '../../services/web-pages.service';
 })
 export class WebPagesComponent implements OnInit {
 
-  public  webPages       : Array<WebPage> = [];
-  public webPagesFilter : Array<WebPage> = [];
+  public  webPages       : Array<Page> = [];
+  public webPagesFilter : Array<Page> = [];
+
+  //ARREGLO DE TODOS LOS SITIOS
   public  webSites   : Array<any>     = [];
-  public contentsPages: Array<any>    = [];
-  public showContentsPage : Array<any> = [];
+
+  //ARREGLOS CON CONTENIDO DE PÁGINAS
+  public allContentsPages: Array<any>    = [];
+  public contentsByPage : Array<any> = [];
+
+  //fORMULARIOS DE CONTENIDO DE PÁGINAS
+  private formCreatePageContent : FormGroup;
+  private formEditPageContent   : FormGroup;
+
+  //FORMULARIOS DE PÁGINAS
   private formCreate : FormGroup;
   private formEdit   : FormGroup;
+
+  // pages : WebPage;
+
+  
 
   //private modalPageContentManager  ;
 
   //  public contentManager : PageContentManagerComponent;
 
-  sidebarMode : string = 'create';
+  sidebarMode : 'create' | 'edit' | string = 'create';
+
+  idPageSelected : string = '';
+
   //Paginación
-
-  paginationPages : any = {
-    page : 1,
-    pageSize :16,
-    collectionSize : 0,
-    _searchTerm : ''
-  }
-
-  paginacionSites: any = {
-    page : 1,
-    pageSize :7,
-    collectionSize : 0,
-    _searchTerm : ''
-  }
+  paginationPages = new Pagination();
+  paginacionSites = new Pagination();
+  paginationContentPage = new Pagination();
 
   // TEMPLATE
   public showSidebar = false;
@@ -61,12 +68,13 @@ export class WebPagesComponent implements OnInit {
 
     //this.modalPageContentManager = PageContentManagerComponent
     this.loadFormCreate();
+    this.loadFormCreatePageContent();
     //console.log(this.modalPageContentManager.getId())
     // this.contentManager.getId();
   }
 
   ngOnInit(): void {
-    this.get( true );
+    this.get( this.paginationPages.status );
     this.getContentPages();
     this.getWebSites();
     
@@ -85,7 +93,17 @@ export class WebPagesComponent implements OnInit {
     })
   }
 
-  loadFormEdit = ( webPage : WebPage ) => {
+  loadFormCreatePageContent = ( pageId : string = '' ) => {
+    this.formCreatePageContent = this.formBuilder.group({
+      page      : [ pageId , [Validators.required ] ],
+      body      : [ '', [ Validators.required, Validators.minLength(5), Validators.maxLength(100) ] ],
+      is_active : ['', [ Validators.required ] ]
+    });
+  }
+
+
+
+  loadFormEdit = ( webPage : Page ) => {
     this.formEdit = this.formBuilder.group({
       site     : [webPage.site , [Validators.required]],
       id       : [webPage.id, [Validators.required]],
@@ -96,7 +114,7 @@ export class WebPagesComponent implements OnInit {
     });
   }
 
-  validateForm = ( form : FormGroup ) : boolean => {
+  validateForms = ( form : FormGroup ) : boolean => {
     if ( form.valid ) {
       return true;
     }
@@ -106,10 +124,10 @@ export class WebPagesComponent implements OnInit {
 
   get = ( isShowLoading : boolean = false ) => {
     this.webPageService.get().subscribe(
-      ( res : WebPage[] ) => {
+      ( res : Page[] ) => {
         this.webPages = res;
         this.paginationPages.collectionSize = this.webPages.length;
-        this.pagesStatusChanged( true );
+        this.showPagesByStatus( this.paginationPages.status );
       },
       ( error : any ) => { this.errorHandler( error ) }
     );
@@ -117,7 +135,7 @@ export class WebPagesComponent implements OnInit {
 
   getContentPages = () => {
     this.contentPageService.get().subscribe(
-      ( res : any ) => { this.contentsPages = res;},
+      ( res : any ) => { this.allContentsPages = res;},
       ( error : any ) => { this.errorHandler( error )}
     )
   }
@@ -133,45 +151,63 @@ export class WebPagesComponent implements OnInit {
   }
 
   create = () => {
-    
-    const  isValid : boolean = this.validateForm( this.formCreate );
-
+    const  isValid : boolean = this.validateForms( this.formCreate );
     if ( isValid ) {
      this.webPageService.create( this.formCreate.value ).subscribe(
-       ( res : WebPage ) => {
+       ( res : Page ) => {
         this.webPages.push( res );
         this.closeRightSidebar();
         Swal.fire('Exito!', 'La página se ha creado exitosamente', 'success');
         
        }
      ), ( error : any ) => { this.errorHandler( error ) }
-     
     }
+  }
+
+  createPageContent = () => {
+    const isValid : boolean = this.validateForms( this.formCreatePageContent );
+    if ( isValid ) {
+      this.contentPageService.create( this.formCreatePageContent.value ).subscribe(
+      ( res : any ) => {
+        this.allContentsPages.push( res );
+        this.ShowContentsByPage( this.idPageSelected );
+        this.closeModals();
+      },
+      ( error : any ) => { this.errorHandler( error ) });
+    }
+    console.log(this.formCreatePageContent.value)
+    //this.contentPageService.
   }
 
   edit = () => {
     console.log(this.formEdit );
-    const  isValid : boolean = this.validateForm( this.formEdit );
+    const  isValid : boolean = this.validateForms( this.formEdit );
     if ( isValid ) {
       this.webPageService.edit( this.formEdit.value ).subscribe( 
-        ( res : WebPage ) => {
-          this.webPages = this.webPages.map( ( page : WebPage) => page.id === res.id ? { ...res } : page );
+        ( res : Page ) => {
+          this.webPages = this.webPages.map( ( page : Page) => page.id === res.id ? { ...res } : page );
+          this.showPagesByStatus( this.paginationPages.status, this.paginationPages.page );
           this.closeRightSidebar();
-          Swal.fire('Exito!', 'La página se ha creado exitosamente', 'success');
+          Swal.fire('Exito!', 'Datos actualizados exitosamente', 'success');
         },
         ( error : any ) => { this.errorHandler( error ) }
       );
     }
   }
 
-  push = ( webPage : WebPage ) => {
+  push = ( webPage : Page ) => {
     //this.webPages.map( ( page : WebPage ) => page.id === res.id);
   }
 
   disabled = () => {  }
 
-  openModal(targetModal: NgbModal, size : string = 'md') {
-    this.modalService.open(targetModal, {
+  openModal( targetModal: NgbModal, size : string = 'md', mode : 'createContent' | 'editContent' | string = '') {
+    
+    if ( mode === 'createContent' ) {
+      this.loadFormCreatePageContent( this.idPageSelected );
+    }
+    
+    this.modalService.open( targetModal , {
       size : size ,
       centered: true,
       backdrop: 'static',
@@ -188,7 +224,7 @@ export class WebPagesComponent implements OnInit {
   }
 
 
-  openRightSidebar( mode: string, page? : WebPage ) {
+  openRightSidebar( mode: string, page? : Page ) {
     this.sidebarMode = mode;
     if ( mode === 'edit' && page ){
       this.sidebarMode = mode;
@@ -211,7 +247,6 @@ export class WebPagesComponent implements OnInit {
   selectSite = ( form : FormGroup, idSite : string ) => {
     form.controls['site'].setValue( idSite ) ;
     this.closeModals();
-    console.log(form);
   }
 
   closeRightSidebar() {
@@ -223,16 +258,17 @@ export class WebPagesComponent implements OnInit {
     Swal.fire('Error', "Ha ocurrido un error, reintentar operación", 'error');
   }
 
-  pageSelected = ( page : WebPage ) => {
-    //console.log(page) ;
-
-    this.showContentsPage = this.contentsPages.filter( c => c.page === page.id );
-    console.log(page.id);
+  ShowContentsByPage = ( pageId : string ) => {
+    this.contentsByPage = this.allContentsPages.filter( c => c.page === pageId );
+    this.idPageSelected = pageId;
+    console.log( this.idPageSelected)
   }
 
-  pagesStatusChanged = ( status : boolean = true ) => {
+  showPagesByStatus = ( status : boolean = true, page : number = 1 ) => {
     this.webPagesFilter = this.webPages.filter(p => p.is_active === status);
+    this.paginationPages.status = status;
     this.paginationPages.collectionSize = this.webPagesFilter.length;
-    this.paginationPages.page = 1;
+    this.paginationPages.page = page;
+    this.idPageSelected = '';
   }
 }

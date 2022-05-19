@@ -12,12 +12,14 @@ import { FeatherModule } from 'angular-feather';
 import { HttpClientModule } from '@angular/common/http';
 import { SiteNamePipe } from './pipes/site-name.pipe';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
+import { PageNamePipe } from './pipes/page-name.pipe';
 
 
 @NgModule({
   declarations: [
     WebPagesComponent,
-    SiteNamePipe
+    SiteNamePipe,
+    PageNamePipe
   ],
   imports: [
     CommonModule,

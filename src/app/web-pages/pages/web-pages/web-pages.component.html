@@ -45,10 +45,10 @@
         </div>
     </ng-template>
 
-    <ng-template #modalContentPageManager let-modal>
+    <ng-template #modalCreateContent let-modal>
         <div class="modal-header">
             <h3 class="modal-title font-weight-bold" id="taskLabel">
-                Seleccionar sitio web
+                Nuevo contenido de página
             </h3>
             <button type="button" class="close" (click)="modal.dismiss()" aria-label="Close">
             <span aria-hidden="true">&times;</span>
@@ -56,7 +56,32 @@
         </div>
         <div class="card">
             <div class="card-body">
-                
+                <form [formGroup] = 'formCreatePageContent' (ngSubmit) ='createPageContent()'>
+                    <div class="form-group">
+                        <label for="contentBody">Contenido</label>
+                        <!-- <input type="text" class="form-control"  id="slug" formControlName = "slug">        -->
+                        <textarea 
+                            class="form-control" 
+                            name="contentPage" 
+                            id="contentPage" 
+                            cols="30" rows="4" 
+                            formControlName='body'
+                            placeholder="Contenido de la página">
+                        </textarea>               
+                    </div>
+                    <div class="form-group">
+                        <label for="contentIsActive">Estado de contenido</label>
+                        <select name="contentIsActive" id="contentIsActive" class="form-control" formControlName ='is_active'>
+                            <option value="" select>Seleccionar estado</option>
+                            <option value="true" select>Activo</option>
+                            <option value="false" select>Inactivo</option>
+                        </select>
+                    </div>
+                    <div class="form-group ml-p2">
+                        <button type ="submmit" class="btn btn-primary">Agregar</button>
+                        <button type ="button" class="btn btn-danger" (click)="modal.dismiss()">Cancelar</button>
+                    </div>
+                </form>
             </div>
         </div>
     </ng-template>
@@ -97,7 +122,7 @@
                                 </div>
                                 <div>
                                     <a class="message-item border-0 d-flex align-items-center py-3"
-                                        (click)='pagesStatusChanged(true)'
+                                        (click)='showPagesByStatus(true)'
                                     >
                                         <span>
                                             <i class="fa fa-envelope"></i>
@@ -112,7 +137,7 @@
                                 </div>
                                 <div>
                                     <a class="message-item border-0 d-flex align-items-center py-3"
-                                        (click)='pagesStatusChanged(false)'
+                                        (click)='showPagesByStatus(false)'
                                     >
                                         <span>
                                             <i class="fa fa-envelope"></i>
@@ -148,14 +173,18 @@
                                     </div>
         
                                     <div class="mail-pagination">
-                                        <ngb-pagination [collectionSize]="paginationPages.collectionSize" [(page)]="paginationPages.page" [pageSize]="paginationPages.pageSize">
+                                        <ngb-pagination 
+                                            (pageChange)='idPageSelected = ""'
+                                            [collectionSize]="paginationPages.collectionSize" [(page)]="paginationPages.page" [pageSize]="paginationPages.pageSize"
+                                        >
                                         </ngb-pagination>   
+                                        <!-- <h1 *ngIf="pages === undefined && pages.id ==''" >sdfsdffsd</h1> -->
                                     </div>
                                 </div>
                                 <div class="position-relative" style="height: calc(100vh - 248px);" [perfectScrollbar]="config" >
                                     <!-- NgFor -->
                                     <div  
-                                        *ngFor="let page of webPagesFilter | slice: (paginationPages.page-1) * paginationPages.pageSize : (paginationPages.page-1) * paginationPages.pageSize + paginationPages.pageSize" (click)="pageSelected(page)">
+                                        *ngFor="let page of webPagesFilter | slice: (paginationPages.page-1) * paginationPages.pageSize : (paginationPages.page-1) * paginationPages.pageSize + paginationPages.pageSize" (click)="ShowContentsByPage(page.id)">
                                         <div class="p-3 border-bottom cursor-pointer">
                                             <div class="d-flex align-items-start">
                                                 <span class="ml-2">
@@ -190,47 +219,60 @@
                             </div>
                         </div>
                         <div class="col-lg-6 col-md-12 col-xl-8 detail-part">
-                            <div *ngIf='showContentsPage.length === 0'  class="h-100 d-none d-lg-block">
+                            <div *ngIf='idPageSelected !== ""' class="d-flex align-items-center justify-content-between px-3 py-4 border-bottom">
+                                <div>
+                                    <select name="" id="" class="form-control">
+                                        <option value="true" selected> Contenido activo </option>
+                                        <option value="">Contenido inactivo</option>
+                                    </select>
+                                </div>
+    
+                                <div class="mail-pagination">
+                                    <ngb-pagination 
+                                        [collectionSize]="paginationContentPage.collectionSize" [(page)]="paginationContentPage.page" [pageSize]="paginationContentPage.pageSize"
+                                    >
+                                    </ngb-pagination>   
+                                    <!-- <h1 *ngIf="pages === undefined && pages.id ==''" >sdfsdffsd</h1> -->
+                                </div>
+                                <div  class="text-left">
+                                    <button class ="btn btn-primary">Agregar Contenido</button>
+                                </div>
+                            </div>
+
+                            <div *ngIf='idPageSelected !== ""' class="d-flex align-items-center p-3 border-bottom">
+                                <h4 class="mb-0">    
+                                    <span class="badge badge-pill badge-primary mr-2 font-16 font-medium"> Página
+                                    </span>
+                                    {{ idPageSelected | pageName : webPages }}
+                                </h4>
+                            </div>
+                            <div class="h-100 d-none d-lg-block" *ngIf = "idPageSelected ==='' || contentsByPage.length === 0">
                                 <div class="d-flex align-items-center justify-content-center h-100">
-                                    <div class="text-center">
-                                        <i class="far fa-envelope display-5"></i>
-                                        <h3> Select to read. </h3>
+                                    <div *ngIf = "idPageSelected ===''" class="text-center">
+                                        
+                                        <i class="fas fa-arrow-left display-6">
+                                        </i>
+                                       
+                                        <h3> Selecciona una página para visualizar su contenido. </h3>
+                                    </div>
+                                    <div *ngIf = "idPageSelected !=='' && contentsByPage.length === 0 " class="text-center">
+                                        <a href="javascript:void(0)" (click) ='openModal(modalCreateContent, "md", "createContent")' >
+                                            <i class=" fas fa-plus display-6">
+                                            </i>
+                                        </a>
+                                        <h3> Agregár contenido. </h3>
                                     </div>
                                 </div>
         
                             </div>
         
-                            <div *ngIf='showContentsPage.length >0'>
+                            <div *ngIf='contentsByPage.length > 0 && idPageSelected !== "" '>
                                 <div class="position-relative" style="height: calc(100vh - 180px);" [perfectScrollbar]="config">
                                     <!-- <router-outlet></router-outlet> -->
                                     <!-- POSTS NAVIGATION -->
-                                    <div *ngIf='true' class="d-flex align-items-center px-3 py-2 border-bottom bg-light">
-                                        <div class="d-flex align-items-center">
-                                            <button class="mr-3 d-block d-lg-none btn btn-info btn-sm">
-                                                <i class="fas fa-arrow-left" ></i>
-                                            </button>
-                                            <span> <i class="fas fa-bookmark" ></i></span>
-                                    
-                                            <span class="ml-3"> <i class="fas fa-star"></i></span>                                    
-                                        </div>
-                                    </div>
-
-                                    <!-- <div class="ml-auto">
-                                        <div ngbDropdown class="d-inline-block">
-                                        </div>
-                                    </div> -->
-
                                     <!-- POSTS -->
-                                    <spam *ngFor="let content of showContentsPage" >
-                                        <div class="d-flex align-items-center p-3 border-bottom">
-                                            <h4 class="mb-0">Titulo del contenido
-                                                <span  class="ml-2">
-                                                    <span *ngIf='true' class="badge badge-pill badge-danger ml-1 font-12 font-medium"> PERSONAL
-                                                    </span>
+                                    <spam *ngFor="let content of contentsByPage" >
                                         
-                                                </span>
-                                            </h4>
-                                        </div>
                                         <div class="p-3">
                                             <div class="mb-3 d-flex align-items-center">
                                                 <img src="../../../../assets/images/img1.jpg" class="rounded-circle" alt="userimg" width="35" height="35">
@@ -241,8 +283,7 @@
                                         
                                             </div>
                                             <div class="mb-4">
-                                                Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quo officiis quas in. Fugit nostrum, molestias aliquid officiis eaque mollitia at, praesentium, doloremque perferendis blanditiis expedita dolores saepe quo quae ut.
-                                                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Provident commodi sit molestias omnis maxime quibusdam quos, eveniet quidem reiciendis quod labore id consequatur praesentium mollitia rem cupiditate debitis autem reprehenderit!
+                                                {{ content.body }}
                                             </div>
                                             <div class="mb-3">
                                                 <div *ngIf='true'>

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http'
-import { WebPage } from '../interfaces/web-page';
+import { Page } from '../interfaces/Page';
 
 @Injectable({
   providedIn: 'root'
@@ -17,5 +17,5 @@ export class WebPagesService {
 
   getWebSites = () => this.httpClient.get(`${this.url}/api/v1/website/sites/`);
 
-  edit = ( webPage : WebPage ) => this.httpClient.put(`${this.url}/api/v1/website/pages/${webPage.id}`, webPage);
+  edit = ( webPage : Page ) => this.httpClient.put(`${this.url}/api/v1/website/pages/${webPage.id}`, webPage);
 }
