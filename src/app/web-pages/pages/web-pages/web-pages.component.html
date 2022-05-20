@@ -48,7 +48,7 @@
     <ng-template #modalCreateContent let-modal>
         <div class="modal-header">
             <h3 class="modal-title font-weight-bold" id="taskLabel">
-                Nuevo contenido de página
+                Nuevo contenido para {{ idPageSelected | pageName : webPages }}
             </h3>
             <button type="button" class="close" (click)="modal.dismiss()" aria-label="Close">
             <span aria-hidden="true">&times;</span>
@@ -56,9 +56,9 @@
         </div>
         <div class="card">
             <div class="card-body">
-                <form [formGroup] = 'formCreatePageContent' (ngSubmit) ='createPageContent()'>
+                <form [formGroup] = 'formCreatePageContent' (ngSubmit) ='createPageContent( formCreatePageContent )'>
                     <div class="form-group">
-                        <label for="contentBody">Contenido</label>
+                        <label for="contentBody">Contenido:</label>
                         <!-- <input type="text" class="form-control"  id="slug" formControlName = "slug">        -->
                         <textarea 
                             class="form-control" 
@@ -70,7 +70,7 @@
                         </textarea>               
                     </div>
                     <div class="form-group">
-                        <label for="contentIsActive">Estado de contenido</label>
+                        <label for="contentIsActive">Estado de contenido:</label>
                         <select name="contentIsActive" id="contentIsActive" class="form-control" formControlName ='is_active'>
                             <option value="" select>Seleccionar estado</option>
                             <option value="true" select>Activo</option>
@@ -79,6 +79,48 @@
                     </div>
                     <div class="form-group ml-p2">
                         <button type ="submmit" class="btn btn-primary">Agregar</button>
+                        <button type ="button" class="btn btn-danger" (click)="modal.dismiss()">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </ng-template>
+
+    <!-- Modal editar contenido de página -->
+    <ng-template #modalEditContentPage let-modal>
+        <div class="modal-header">
+            <h3 class="modal-title font-weight-bold" id="taskLabel">
+                Editando contenido de {{ idPageSelected | pageName : webPages }}
+            </h3>
+            <button type="button" class="close" (click)="modal.dismiss()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <form [formGroup] = 'formEditPageContent' (ngSubmit) ='editPageContent( formEditPageContent )'>
+                    <div class="form-group">
+                        <label for="contentBody">Contenido:</label>
+                        <!-- <input type="text" class="form-control"  id="slug" formControlName = "slug">        -->
+                        <textarea 
+                            class="form-control" 
+                            name="contentPage" 
+                            id="contentPage" 
+                            cols="30" rows="4" 
+                            formControlName='body'
+                            placeholder="Contenido de la página">
+                        </textarea>               
+                    </div>
+                    <div class="form-group">
+                        <label for="contentIsActive">Estado de contenido:</label>
+                        <select name="contentIsActive" id="contentIsActive" class="form-control" formControlName ='is_active'>
+                            <option value="" select>Seleccionar estado</option>
+                            <option value="true" select>Activo</option>
+                            <option value="false" select>Inactivo</option>
+                        </select>
+                    </div>
+                    <div class="form-group ml-p2">
+                        <button type ="submmit" class="btn btn-primary" >Editar</button>
                         <button type ="button" class="btn btn-danger" (click)="modal.dismiss()">Cancelar</button>
                     </div>
                 </form>
@@ -95,7 +137,7 @@
                 <div class="position-relative" style="height:100%;">
                     <div class="p-l-15 p-r-25 py-3 d-flex align-items-center mt-1 border-bottom">
                         <div>
-                            <img src="assets/images/users/8.jpg" width="45" alt="user" class="rounded-circle">
+                            <img src="assets/images/paginas-web.png" width="45" alt="pages" class="rounded-circle">
                         </div>
                         <div class="text-dark m-b-0 m-l-15 font-18">
                             Páginas
@@ -122,30 +164,31 @@
                                 </div>
                                 <div>
                                     <a class="message-item border-0 d-flex align-items-center py-3"
-                                        (click)='showPagesByStatus(true)'
+                                        (click)='showPages( true )'
                                     >
                                         <span>
-                                            <i class="fa fa-envelope"></i>
+                                            <i class="me-2 mdi mdi-format-page-break"></i>
                                         </span>
                                         <h5 class="ml-3 mb-0">Activas</h5>
                                         <div class="ml-auto">
                                             <span
-                                                class="badge badge-success text-white font-medium badge-pill px-3 d-flex align-items-center">45
+                                                class="badge badge-success text-white font-medium badge-pill px-3 d-flex align-items-center">
+                                                {{ webPages | counterStatus : true }}
                                             </span>
                                         </div>
                                     </a>
                                 </div>
                                 <div>
                                     <a class="message-item border-0 d-flex align-items-center py-3"
-                                        (click)='showPagesByStatus(false)'
+                                        (click)='showPages( false )'
                                     >
                                         <span>
-                                            <i class="fa fa-envelope"></i>
+                                            <i class="me-2 mdi mdi-format-page-break"></i>
                                         </span>
                                         <h5 class="ml-3 mb-0">Inactivas</h5>
                                         <div class="ml-auto">
                                             <span class="badge badge-danger text-white font-medium badge-pill px-3 d-flex align-items-center">
-                                                45
+                                                {{ webPages | counterStatus : false }}
                                             </span>
                                         </div>
                                     </a>
@@ -169,7 +212,7 @@
                             <div class="position-relative" style="height:100%;">
                                 <div class="d-flex align-items-center justify-content-between px-3 py-4 border-bottom">
                                     <div>
-                                        <span class="font-16 font-medium">Páginas activas</span>
+                                        <span class="font-16 font-medium">Páginas {{ paginationPages.status? ' activas' : 'inactivas' }}</span>
                                     </div>
         
                                     <div class="mail-pagination">
@@ -184,7 +227,7 @@
                                 <div class="position-relative" style="height: calc(100vh - 248px);" [perfectScrollbar]="config" >
                                     <!-- NgFor -->
                                     <div  
-                                        *ngFor="let page of webPagesFilter | slice: (paginationPages.page-1) * paginationPages.pageSize : (paginationPages.page-1) * paginationPages.pageSize + paginationPages.pageSize" (click)="ShowContentsByPage(page.id)">
+                                        *ngFor="let page of webPagesFilter | slice: (paginationPages.page-1) * paginationPages.pageSize : (paginationPages.page-1) * paginationPages.pageSize + paginationPages.pageSize" (click)="showContents(page.id, true, 1)">
                                         <div class="p-3 border-bottom cursor-pointer">
                                             <div class="d-flex align-items-start">
                                                 <span class="ml-2">
@@ -205,11 +248,14 @@
                                                     </div>
                                                 </div>
                                                 <div class="ml-4">
-                                                    <button 
+                                                    <!-- <button 
                                                         class="btn btn-warning"
                                                         (click) = 'openRightSidebar( "edit", page)'
                                                     >
                                                         Editar
+                                                    </button> -->
+                                                    <button type="button" class=" btn btn-circle rounded-circle btn-warning" (click) = 'openRightSidebar( "edit", page)' >
+                                                        <i class="fas fa-edit"></i> Editar
                                                     </button>
                                                 </div>
                                             </div>
@@ -219,23 +265,25 @@
                             </div>
                         </div>
                         <div class="col-lg-6 col-md-12 col-xl-8 detail-part">
+                            
                             <div *ngIf='idPageSelected !== ""' class="d-flex align-items-center justify-content-between px-3 py-4 border-bottom">
+                                <!-- <app-page-content [pageId]="idPageSelected"></app-page-content> -->
                                 <div>
-                                    <select name="" id="" class="form-control">
-                                        <option value="true" selected> Contenido activo </option>
-                                        <option value="">Contenido inactivo</option>
+                                    <select id="" class="form-control"  (change)="showContents(idPageSelected, !paginationContentPage.status, 1)">
+                                        <option value="true" [selected] = "paginationContentPage.status"> Contenido activo </option>
+                                        <option value="false" [selected] = "paginationContentPage.status===false">Contenido inactivo</option>
                                     </select>
+                                    
                                 </div>
     
-                                <div class="mail-pagination">
+                                <div *ngIf='contentsByPage.length > 0' class="mail-pagination ">
                                     <ngb-pagination 
                                         [collectionSize]="paginationContentPage.collectionSize" [(page)]="paginationContentPage.page" [pageSize]="paginationContentPage.pageSize"
                                     >
                                     </ngb-pagination>   
-                                    <!-- <h1 *ngIf="pages === undefined && pages.id ==''" >sdfsdffsd</h1> -->
                                 </div>
                                 <div  class="text-left">
-                                    <button class ="btn btn-primary">Agregar Contenido</button>
+                                    <button class ="btn btn-primary" (click)='openModal(modalCreateContent, "md", "createContent")'>Agregar Contenido</button>
                                 </div>
                             </div>
 
@@ -271,7 +319,7 @@
                                     <!-- <router-outlet></router-outlet> -->
                                     <!-- POSTS NAVIGATION -->
                                     <!-- POSTS -->
-                                    <spam *ngFor="let content of contentsByPage" >
+                                    <spam *ngFor="let content of contentsByPage | slice: (paginationContentPage.page-1) * paginationContentPage.pageSize : (paginationContentPage.page-1) * paginationContentPage.pageSize + paginationContentPage.pageSize" >
                                         
                                         <div class="p-3">
                                             <div class="mb-3 d-flex align-items-center">
@@ -287,11 +335,11 @@
                                             </div>
                                             <div class="mb-3">
                                                 <div *ngIf='true'>
-                                                    <button type="button" class="btn btn-outline-info btn-sm" >
-                                                        <i class="fas fa-reply"></i> Editar
+                                                    <button type="button" class="btn btn-outline-success btn-sm" (click)="openModal(modalEditContentPage, 'md', 'editContent', content)" >
+                                                        <i class="me-2 fas fa-edit"></i> Editar
                                                     </button>
                                                     <button type="button" class="btn btn-outline-danger ml-1 btn-sm" >
-                                                        <i class="fas fa-reply-all"></i> Deshabilitar
+                                                        <i class="me-1 mdi mdi-delete-forever"></i> Deshabilitar
                                                     </button>
                                                 </div>
                                             </div>
@@ -304,8 +352,8 @@
                         </div>
                     </div>
                 </div>
+            </div>
         </div>
-    </div>
 
     <!-- sidebar -->
     <div class="app-sidebar card" id="rightMenu">
@@ -332,14 +380,17 @@
             <!-- Body of sidebar -->
             <!-- -------------------------------------------------------------------------------------- -->
             <div class="p-4">
-                <form *ngIf="sidebarMode === 'create'" [formGroup] = "formCreate" (ngSubmit)="create()">
+                <form *ngIf="sidebarMode === 'create'" [formGroup] = "formCreate" (ngSubmit)="create( formCreate )">
+
                     <div class="form-group">
-                        <label for="siteNameCreate">Sitio web</label>     
-                        <input type="text" value="{{ formCreate.controls['site'].value | siteName : webSites }}" class="form-control"  id="siteNameCreate" disabled>
-                        <button type = "button" (click) ="openModal( modalWebSites, 'md' )" >
-                            <i-feather name="search" class="feather-sm mr-2"></i-feather>
-                        </button>
-                    </div>  
+                        <label for="siteNameCreate">Sitio web</label>
+                        <div class="input-group mb-3">    
+                            <button type = "button" class=" ml-1 btn btn-info" (click) ="openModal( modalWebSites, 'md' )" >
+                                <i class="fa fa-search me-1"></i>
+                            </button>      
+                            <input type="text" value="{{ formCreate.controls['site'].value | siteName : webSites }}" class="form-control"  id="siteNameCreate" disabled>
+                        </div>  
+                    </div>
                     <input type="hidden" class="form-control"  formControlName = "site" >
                     <div class="form-group">
                         <label for="name">Nombre de la página</label>     
@@ -369,11 +420,13 @@
 
                 <form *ngIf="sidebarMode === 'edit'"  [formGroup] = "formEdit" (ngSubmit)="edit()">
                     <div class="form-group">
-                        <button type = "button" (click) ="openModal(modalWebSites, 'md')" >
-                            <i-feather name="search" class="feather-sm mr-2"></i-feather>
-                        </button>
-                        <label for="siteName">Sitio web</label>     
-                        <input value="{{ formEdit.controls['site'].value | siteName : webSites }}" type="text" class="form-control"  id="siteName"  disabled>
+                        <label for="siteNameCreate">Sitio web</label>
+                        <div class="input-group mb-3">    
+                            <button type = "button" class=" ml-1 btn btn-info" (click) ="openModal(modalWebSites, 'md')" >
+                                <i class="fa fa-search me-1"></i>
+                            </button>      
+                            <input type="text" value="{{ formEdit.controls['site'].value | siteName : webSites }}" class="form-control"  id="siteNameCreate" disabled>
+                        </div>  
                     </div>
                     <input type="hidden" class="form-control"  id="site" formControlName = "site">
                     <div class="form-group">

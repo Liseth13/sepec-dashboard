@@ -5,8 +5,9 @@ import { PerfectScrollbarConfigInterface } from 'ngx-perfect-scrollbar';
 import Swal from 'sweetalert2';
 // import { PageContentManagerComponent } from '../../components/page-content-manager/page-content-manager.component';
 import { Page } from '../../interfaces/Page';
+import { PageContent } from '../../interfaces/PageContent';
 import { Pagination } from '../../interfaces/pagination';
-import { ContentPagesService } from '../../services/content-pages.service';
+import { pageContentService } from '../../services/page-content.service';
 import { WebPagesService } from '../../services/web-pages.service';
 
 @Component({
@@ -20,10 +21,11 @@ export class WebPagesComponent implements OnInit {
   public webPagesFilter : Array<Page> = [];
 
   //ARREGLO DE TODOS LOS SITIOS
-  public  webSites   : Array<any>     = [];
+  public  webSites   : Array<any> = [];
 
   //ARREGLOS CON CONTENIDO DE PÁGINAS
-  public allContentsPages: Array<any>    = [];
+  public allPageContents: Array<PageContent> = [];
+  public pageContentsFilter: Array<PageContent> = [];
   public contentsByPage : Array<any> = [];
 
   //fORMULARIOS DE CONTENIDO DE PÁGINAS
@@ -63,14 +65,14 @@ export class WebPagesComponent implements OnInit {
     private formBuilder    : FormBuilder, 
     private modalService   : NgbModal, 
     private webPageService : WebPagesService,
-    private contentPageService : ContentPagesService
+    private pageContentService : pageContentService
   ) { 
 
     //this.modalPageContentManager = PageContentManagerComponent
     this.loadFormCreate();
     this.loadFormCreatePageContent();
     //console.log(this.modalPageContentManager.getId())
-    // this.contentManager.getId();
+    // this.contentManager.getId()
   }
 
   ngOnInit(): void {
@@ -101,7 +103,14 @@ export class WebPagesComponent implements OnInit {
     });
   }
 
-
+  loadFormEditPageContent = ( pageContent : PageContent ) => {
+    this.formEditPageContent = this.formBuilder.group({
+      id        : [ pageContent.id, [ Validators.required ] ],
+      page      : [ pageContent.page , [Validators.required ] ],
+      body      : [ pageContent.body, [ Validators.required, Validators.minLength(5), Validators.maxLength(100) ] ],
+      is_active : [ pageContent.is_active, [ Validators.required ] ]
+    });
+  }
 
   loadFormEdit = ( webPage : Page ) => {
     this.formEdit = this.formBuilder.group({
@@ -127,15 +136,15 @@ export class WebPagesComponent implements OnInit {
       ( res : Page[] ) => {
         this.webPages = res;
         this.paginationPages.collectionSize = this.webPages.length;
-        this.showPagesByStatus( this.paginationPages.status );
+        this.showPages( this.paginationPages.status );
       },
       ( error : any ) => { this.errorHandler( error ) }
     );
   }
 
   getContentPages = () => {
-    this.contentPageService.get().subscribe(
-      ( res : any ) => { this.allContentsPages = res;},
+    this.pageContentService.get().subscribe(
+      ( res : any ) => { this.allPageContents = res;},
       ( error : any ) => { this.errorHandler( error )}
     )
   }
@@ -150,7 +159,7 @@ export class WebPagesComponent implements OnInit {
     );
   }
 
-  create = () => {
+  create = ( form : FormGroup ) => {
     const  isValid : boolean = this.validateForms( this.formCreate );
     if ( isValid ) {
      this.webPageService.create( this.formCreate.value ).subscribe(
@@ -164,13 +173,13 @@ export class WebPagesComponent implements OnInit {
     }
   }
 
-  createPageContent = () => {
+  createPageContent = ( form : FormGroup ) => {
     const isValid : boolean = this.validateForms( this.formCreatePageContent );
     if ( isValid ) {
-      this.contentPageService.create( this.formCreatePageContent.value ).subscribe(
+      this.pageContentService.create( this.formCreatePageContent.value ).subscribe(
       ( res : any ) => {
-        this.allContentsPages.push( res );
-        this.ShowContentsByPage( this.idPageSelected );
+        this.allPageContents.push( res );
+        this.showContents( this.idPageSelected, this.paginationContentPage.status, this.paginationContentPage.page );
         this.closeModals();
       },
       ( error : any ) => { this.errorHandler( error ) });
@@ -179,19 +188,34 @@ export class WebPagesComponent implements OnInit {
     //this.contentPageService.
   }
 
-  edit = () => {
-    console.log(this.formEdit );
+  edit = ( form : FormGroup ) => {
     const  isValid : boolean = this.validateForms( this.formEdit );
     if ( isValid ) {
       this.webPageService.edit( this.formEdit.value ).subscribe( 
         ( res : Page ) => {
           this.webPages = this.webPages.map( ( page : Page) => page.id === res.id ? { ...res } : page );
-          this.showPagesByStatus( this.paginationPages.status, this.paginationPages.page );
+          this.showPages(this.paginationPages.status, this.paginationPages.page );
           this.closeRightSidebar();
           Swal.fire('Exito!', 'Datos actualizados exitosamente', 'success');
         },
         ( error : any ) => { this.errorHandler( error ) }
       );
+    }
+  }
+
+  editPageContent( form : FormGroup ) {
+    console.log(form.value)
+    const isValid : boolean = this.validateForms( form );
+    if ( isValid ) {
+      //
+      this.pageContentService.edit( form.value ).subscribe(
+      ( res : PageContent ) => {
+        this.allPageContents = this.allPageContents.map( ( content : PageContent) => content.id === res.id ? { ...res } : content );
+        this.showContents(this.idPageSelected, this.paginationContentPage.status, this.paginationContentPage.page);
+        Swal.fire('Exito!', 'Datos actualizados exitosamente', 'success');
+        this.closeModals();
+      },
+      ( error : any ) => { this.errorHandler( error )});
     }
   }
 
@@ -201,11 +225,15 @@ export class WebPagesComponent implements OnInit {
 
   disabled = () => {  }
 
-  openModal( targetModal: NgbModal, size : string = 'md', mode : 'createContent' | 'editContent' | string = '') {
+  openModal( targetModal: NgbModal, size : string = 'md', mode : 'createContent' | 'editContent' | string = '', data? : any) {
     
     if ( mode === 'createContent' ) {
       this.loadFormCreatePageContent( this.idPageSelected );
     }
+
+    if ( mode === 'editContent' && data ) {
+      this.loadFormEditPageContent( data );
+    } 
     
     this.modalService.open( targetModal , {
       size : size ,
@@ -255,20 +283,35 @@ export class WebPagesComponent implements OnInit {
   }
 
   errorHandler = ( error : any ) => {
+    console.log( error )
     Swal.fire('Error', "Ha ocurrido un error, reintentar operación", 'error');
   }
 
-  ShowContentsByPage = ( pageId : string ) => {
-    this.contentsByPage = this.allContentsPages.filter( c => c.page === pageId );
+
+  showContents = ( pageId : string, status : boolean = true, page : number = 1   ) => {
     this.idPageSelected = pageId;
-    console.log( this.idPageSelected)
+    this.contentsByPage = this.allPageContents.filter( c => c.page === pageId && c.is_active === status );
+    
+    if ( this.contentsByPage.length > 0 ) {
+      this.paginationContentPage.page = page;
+      this.paginationContentPage.status = status;
+      this.paginationContentPage.collectionSize = this.contentsByPage.length;
+      console.log(status)
+      return;
+    }
+
+    this.paginationContentPage = new Pagination();
   }
 
-  showPagesByStatus = ( status : boolean = true, page : number = 1 ) => {
-    this.webPagesFilter = this.webPages.filter(p => p.is_active === status);
-    this.paginationPages.status = status;
-    this.paginationPages.collectionSize = this.webPagesFilter.length;
-    this.paginationPages.page = page;
+  showPages = ( status : boolean = true, page : number = 1 ) => {
     this.idPageSelected = '';
+    this.webPagesFilter = this.webPages.filter(p => p.is_active === status);
+    if ( this.webPagesFilter.length > 0 ) {
+      this.paginationPages.status = status;
+      this.paginationPages.collectionSize = this.webPagesFilter.length;
+      this.paginationPages.page = page;
+    }
   }
+
 }
+ 

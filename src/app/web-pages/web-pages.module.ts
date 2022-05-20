@@ -13,13 +13,17 @@ import { HttpClientModule } from '@angular/common/http';
 import { SiteNamePipe } from './pipes/site-name.pipe';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { PageNamePipe } from './pipes/page-name.pipe';
+import { PageContentComponent } from './components/page-content/page-content.component';
+import { CounterStatusPipe } from './pipes/counter-status.pipe';
 
 
 @NgModule({
   declarations: [
     WebPagesComponent,
     SiteNamePipe,
-    PageNamePipe
+    PageNamePipe,
+    PageContentComponent,
+    CounterStatusPipe
   ],
   imports: [
     CommonModule,
