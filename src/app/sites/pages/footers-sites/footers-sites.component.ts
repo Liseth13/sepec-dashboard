@@ -22,7 +22,8 @@ export class FootersSitesComponent implements OnInit {
   public footers  : Array <any> = [];
   public charging : boolean = true;
   public totalFooterSite:number = 0;
-  formFooterCreate: FormGroup;
+  private webFooterId: number = 0;
+  private formFooterCreate: FormGroup;
   formFooterEdit: FormGroup;
   websiteId: any;
   closeResult: string;
@@ -34,7 +35,6 @@ export class FootersSitesComponent implements OnInit {
     pageSize = 8;
     collectionSize = 0;
     _searchTerm = '';
-    webFooterService: any;
     
 
   constructor(
@@ -45,6 +45,7 @@ export class FootersSitesComponent implements OnInit {
   ngOnInit(): void {
    this.getWebFooters();
    this.loadformSiteCreate();
+   this.loadformSiteEdit();
    this.getWebSite();
    console.log(this.selectedST);
    
@@ -61,9 +62,10 @@ export class FootersSitesComponent implements OnInit {
 
   loadformSiteEdit(){
     this.formFooterEdit = this.formBuilder.group({
+      id:[null,[Validators.required,]],
       site:['',[Validators.required, Validators.maxLength(20),Validators.minLength(3)]],
       email:['',[Validators.required, Validators.maxLength(40),Validators.minLength(8)]],
-      address:['',[Validators.required, Validators.maxLength(40),Validators.minLength(8)]],
+      address:['',[Validators.required, Validators.maxLength(40),Validators.minLength(2)]],
       phone:['',[Validators.required, Validators.maxLength(40),Validators.minLength(8)]],
       is_active:[null,[Validators.required,]],
     })
@@ -103,8 +105,20 @@ export class FootersSitesComponent implements OnInit {
   }
 
 
-  openModal(content1: string) {
-  
+  openModal(content1: string, data: any) {
+    console.log(data.site);
+    
+    if (data != 0) {
+      this.formFooterEdit.patchValue({
+        id: data.id,
+        site: data.site,
+        email: data.email,
+        address: data.address,
+        phone: data.phone,
+        is_active: data.is_active,
+      })
+    } 
+    
     this.modalService.open(content1, { ariaLabelledBy: 'modal-basic-title', size: 'lg' }).result.then((result) => {
 			this.closeResult = `Closed with: ${result}`;
 		}, (reason) => {
@@ -115,9 +129,7 @@ export class FootersSitesComponent implements OnInit {
   closeModal() { 
     this.modalService.dismissAll()
   }
-   addWebSite = ( )=> {
-     
-   }
+
 
   getDismissReason(reason: ModalDismissReasons) : string {
     if (reason === ModalDismissReasons.ESC) {
@@ -152,6 +164,31 @@ export class FootersSitesComponent implements OnInit {
     (document.getElementById('rightMenu')as HTMLFormElement).style.width = '0';
   }
 
+  edit(){
+    if(this.formFooterEdit.invalid){
+      Swal.fire('Error','Faltan Campos Por Validar','warning')
+    }else{
+      this.webFooterId=this.formFooterEdit.value.id;
+      console.log(this.formFooterEdit.value);
+      const { ...data } = this.formFooterEdit.value;
+      // is_active === 'true' ? data.is_active = true : data.is_active = false;
+      console.log(data);
+
+      this.footerSiteService.updateFootersSites(data, this.webFooterId).subscribe(
+        (res:any)=>{
+          console.log(res);
+          this.getWebFooters();
+          this.closeModal();
+          Swal.fire(' Success','Editado correctamente','success');
+        },
+        (error:any)=>{
+          console.log(error)
+          Swal.fire('Error','vuelva a intentarlo','error');
+        }
+      )
+    }
+  }
+
   create(){
       
     console.log (this.formFooterCreate.value)
@@ -159,12 +196,12 @@ export class FootersSitesComponent implements OnInit {
       Swal.fire('Error','Faltan Campos Por Validar','warning')
     }else{
       
-      this.webFooterService.createFootersSites(this.formFooterCreate.value).subscribe(
+      this.footerSiteService.createFootersSites(this.formFooterCreate.value).subscribe(
         (res:any)=>{
           console.log(res)
           
           this.getWebFooters()
-          this.closeRightMenu()
+          this.closeRightMenu();
           Swal.fire(' Success','Guardado correctamente','success')
         },
         (error:any)=>{

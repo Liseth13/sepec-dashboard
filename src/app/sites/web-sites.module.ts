@@ -7,13 +7,15 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { FootersSitesComponent } from './pages/footers-sites/footers-sites.component';
+import { BannerComponent } from './pages/banner/banner.component';
 
 
 
 @NgModule({
   declarations: [
     WebSitesComponent,
-    FootersSitesComponent
+    FootersSitesComponent,
+    BannerComponent
   ],
   imports: [
     CommonModule,

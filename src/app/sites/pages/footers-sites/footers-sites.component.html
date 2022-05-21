@@ -3,6 +3,7 @@
         <div class="card-body">
             <div class="row bd-highlight mb-2">
                 <div class="col-12">
+                    
                         <div class="float-left align-center justify-content-center">
                             <h1 class="h3 mb-0 text-gray-800 pt-2">Total: {{ totalFooterSite }}</h1>
                         </div>
@@ -38,7 +39,7 @@
                             <td class="text-center">
                                 <div class="row">
                                     <div class="col-12 action-btn">
-                                        <a class="btn btn-warning ml-1 action-text cursor" (click)="openModal(modalEditSite, data)">
+                                        <a class="btn btn-warning ml-1 action-text cursor" (click)="openModal(modalEditFooter, footer)">
                                             <i class="far fa-edit"></i>
                                         </a>
                                     </div>  
@@ -79,7 +80,7 @@
                             <label> Site</label>
                             <input type="text" disabled value="{{ getName(formFooterCreate.value.site) || ''}}" >
                             <input type="hidden" class="form-control" formControlName="site">
-                            <button type="button" class="btn btn-primary" (click)="openModal(modalMostrarSitios)">
+                            <button type="button" class="btn btn-primary" (click)="openModal(modalMostrarSitios, 0)">
                                 Buscar
                             </button>
                         </div>
@@ -144,5 +145,50 @@
     </div>
     <div class="modal-footer">
         
+    </div>
+</ng-template>
+<!-- modal Editar Sitio web -->
+<ng-template #modalEditFooter let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title" id="modal-basic-title"> Editar Footer</h4>
+        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    
+    <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-12">
+            <div class="card card-body">
+                <form class="form-group" [formGroup]="formFooterEdit" (ngSubmit)= "edit()">
+                    
+                    <div class="form-group">
+                        <label>
+                            <span> E-mail"</span>
+                        </label>
+                        <input type="text" class="form-control" formControlName="email" value="Escriba E-mail">
+                    </div>
+                    <div class="form-group">
+                        <label >Dirección</label>
+                        <textarea class="form-control"  formControlName="address" rows="2" placeholder="Escribir Dirección"> </textarea>
+                    </div>
+                    <div class="form-group">
+                        <label >Telefono</label>
+                        <textarea class="form-control"  formControlName="phone" rows="2" placeholder="Escribir Numero de Telefono"> </textarea>
+                    </div>
+
+                    <div class="form-group" >
+                        <label>Estado</label>
+                        <select class="custom-select col-12" id="inlineFormCustomSelect" formControlName="is_active" >
+                            <option value="" selected>--Seleccione una Opcion</option>
+                            <option value="true">Activado</option>
+                            <option value="false">Desactivado</option>
+                        </select>
+                    </div>
+                        <div class="modal-footer" >
+                            <button type="submit" class="btn btn-success" >Guardar</button>
+                        </div>
+                </form>
+            </div>
+        </div>
     </div>
 </ng-template>

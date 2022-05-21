@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 @Injectable({
@@ -10,6 +10,9 @@ export class footerSiteService {
 
   }
 
+  //headers = new HttpHeaders();
+ 
+
   configUrl = 'https://sepec-backend.herokuapp.com';
   // port = 443
 
@@ -18,14 +21,16 @@ export class footerSiteService {
   }
 
   createFootersSites(data: any) {
-    return this.http.post(`${this.configUrl}/api/v1/website/sites/`, footer);
+    
+    return this.http.post(`${this.configUrl}/api/v1/website/site/footer/`, data, {headers: {'Content-Type': 'application/json; charset=utf-8'}});
+
   }
   
-//   updateFootersSites(data: any, websiteId: number) {
-//     return this.http.put(`${this.configUrl}/api/v1/website/sites/${websiteId}/`, data);
-//   }
+  updateFootersSites(data: any, webFooterId: number) {
+
+    return this.http.put(`${this.configUrl}/api/v1/website/site/footer/${webFooterId}/`, data);
+
+  }
 }
-function footer(arg0: string, footer: any) {
-  throw new Error('Function not implemented.');
-}
+
 
