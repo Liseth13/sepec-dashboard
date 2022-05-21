@@ -120,10 +120,6 @@ export const Approutes: Routes = [
                 loadChildren : () => import("./sites/web-sites.module").then((m) => m.WebSitesModule)
               },
               {
-                path : 'posts',
-                loadChildren : () => import("./posts/posts.module").then(m => m.PostsModule)
-              },
-              {
                 path : 'web-pages',
                 loadChildren : () => import("./web-pages/web-pages.module").then((m) => m.WebPagesModule)
               }

@@ -2,14 +2,35 @@ import { RouteInfo } from "./vertical-sidebar.metadata";
 
 export const ROUTES: RouteInfo[] = [
   {
-    path: "/dash/web-sites",
+    path: "/dash/sites",
     title: "Sitios webs",
     icon: "Layout",
     class: "",
     label: "",
     labelClass: "",
     extralink: false,
-    submenu: [],
+    submenu: [
+      {
+        path: "/dash/sites/sites",
+        title: "Sitios",
+        icon: "Layout",
+        class: "",
+        label: "",
+        labelClass: "",
+        extralink: false,
+        submenu: [],
+      },
+      {
+        path: "/dash/sites/footers",
+        title: "Footer",
+        icon: "Layout",
+        class: "",
+        label: "",
+        labelClass: "",
+        extralink: false,
+        submenu: [],
+      },
+    ],
   },
   {
     path: "/dash/web-pages",
@@ -19,28 +40,32 @@ export const ROUTES: RouteInfo[] = [
     label: "",
     labelClass: "",
     extralink: false,
-    submenu: [],
+    submenu: [
+      {
+        path: "/dash/web-pages/pages",
+        title: "Páginas",
+        icon: "",
+        class: "",
+        label: "",
+        labelClass: "",
+        extralink: false,
+        submenu: [],
+      },
+      {
+        path: "./dash/web-pages/banner",
+        title: "Banner",
+        icon: "",
+        class: "",
+        label: "",
+        labelClass: "",
+        extralink: false,
+        submenu: [],
+      },
+    ],
   },
-  {
-    path: "../../dash/sites/footers",
-    title: "Footer",
-    icon: "Layout",
-    class: "",
-    label: "",
-    labelClass: "",
-    extralink: false,
-    submenu: [],
-  },
-  {
-    path: "../../dash/sites/banner",
-    title: "Banner",
-    icon: "Layout",
-    class: "",
-    label: "",
-    labelClass: "",
-    extralink: false,
-    submenu: [],
-  },
+  
+  
+  
   // {
   //   path: "../../dash/sites/",
   //   title: "Sitio Web",

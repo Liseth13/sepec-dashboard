@@ -73,8 +73,9 @@
                <form *ngIf='selectedST' [formGroup]="formBannerCreate"  (ngSubmit)="create()">
                    <div class="form-group">
                        <label> Page</label>
-                       <input type="text" disabled value="{{ getName(formBannerCreate.value.page) || ''}}" >
-                       <input type="hidden" class="form-control" formControlName="site">
+                       <!-- <input type="text" disabled value="{{ getName(formBannerCreate.value.page) || ''}}" > -->
+                       <input type="text" disabled value="hola" >
+                       <!-- <input type="hidden" class="form-control" formControlName="site"> -->
                        <button type="button" class="btn btn-primary" (click)="openModal(modalMostrarSitios, 0)">
                            Buscar
                        </button>
