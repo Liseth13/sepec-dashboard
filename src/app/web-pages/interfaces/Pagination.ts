@@ -1,7 +1,7 @@
 export class Pagination {
     
     public page : number = 1;
-    public pageSize : number = 15;
+    public pageSize : number = 10;
     public collectionSize : number = 0;
 
     //filtros

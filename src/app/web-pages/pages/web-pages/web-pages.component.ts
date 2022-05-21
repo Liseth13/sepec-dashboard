@@ -289,18 +289,20 @@ export class WebPagesComponent implements OnInit {
 
 
   showContents = ( pageId : string, status : boolean = true, page : number = 1   ) => {
+    console.log(status)
     this.idPageSelected = pageId;
     this.contentsByPage = this.allPageContents.filter( c => c.page === pageId && c.is_active === status );
-    
     if ( this.contentsByPage.length > 0 ) {
-      this.paginationContentPage.page = page;
       this.paginationContentPage.status = status;
+      this.paginationContentPage.page = page;
       this.paginationContentPage.collectionSize = this.contentsByPage.length;
-      console.log(status)
       return;
     }
 
-    this.paginationContentPage = new Pagination();
+    this.paginationContentPage.status = status;
+    this.paginationContentPage.collectionSize = 0
+    this.paginationContentPage.page = 1;
+    //this.paginationContentPage = new Pagination();
   }
 
   showPages = ( status : boolean = true, page : number = 1 ) => {
@@ -310,7 +312,10 @@ export class WebPagesComponent implements OnInit {
       this.paginationPages.status = status;
       this.paginationPages.collectionSize = this.webPagesFilter.length;
       this.paginationPages.page = page;
+      return;
     }
+
+    this.paginationPages = new Pagination();
   }
 
 }
