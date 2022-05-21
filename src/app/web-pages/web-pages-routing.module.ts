@@ -5,6 +5,10 @@ import { WebPagesComponent } from './pages/web-pages/web-pages.component';
 
 const routes: Routes = [
   {
+    path: '',
+    redirectTo: 'pages',
+  },
+  {
 		path: '',
 		children: [
 			{
