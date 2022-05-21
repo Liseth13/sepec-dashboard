@@ -260,6 +260,7 @@ export class WebSitesComponent implements OnInit {
     }
     console.log(this.formSiteEdit.value)
   }
+
   addTaskSection() {
 
     this.formSiteCreate.reset();

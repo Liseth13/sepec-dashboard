@@ -15,7 +15,7 @@ const routes: Routes = [
   },
   {
     
-   path : ' banner',
+   path : 'banner',
    component : BannerComponent
 
   }

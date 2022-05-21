@@ -1,1 +1,93 @@
+<div class="col-12 mb-3 table-users" *ngIf="!charging">
+    <div class="card">
+        <div class="card-body">
+            <div class="row bd-highlight mb-2">
+                <div class="col-12">
+                    <div class="float-left align-center justify-content-center">
+                        <h1 class="h3 mb-0 text-gray-800 pt-2">Total: {{ totalWebBanner }}</h1>
+                    </div>
+                
+                    <div class="float-right bd-highlight">
+                        <button class="btn btn-info cursor" (click)="addTaskSection()">
+                            <i class="fas fa-plus-circle"></i> Agregar
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Pagina</th>
+                            <th>Nombre</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let data of webBanner |slice: (page-1) * pageSize : (page-1) * pageSize + pageSize">
+                            <td>{{ data.page }}</td>
+                            <td>{{ data.name }}</td>
+                            <td *ngIf="data.is_active"><span class="label label-success">Activo</span></td>
+                            <td *ngIf="!data.is_active"><span class="label label-danger">No activo</span></td>
+                            <td class="text-center">
+                                <div class="row">
+                                    <div class="col-12 action-btn">
+                                        <a class="btn btn-warning ml-1 action-text cursor" (click)="openModal(modalEditSite, data)">
+                                            <i class="far fa-edit"></i>
+                                        </a>
+                                    </div>  
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="d-flex justify-content-center mt-5">
+                <ngb-pagination [collectionSize]="collectionSize" [(page)]="page" [pageSize]="pageSize">
 
+                </ngb-pagination>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Crear Banner -->
+<div class="app-sidebar card" id="rightMenu">
+    <!-- Header -->
+   <div class="d-flex p-3 border-bottom card-header">
+       <div class="d-flex align-items-center">
+           AGREGAR BANNER
+       </div>
+       <div class="ml-auto">
+           <a href="javascript:void(0)" class="text-danger" (click)='closeRightMenu()'>
+               X
+           </a>
+       </div>
+   </div>
+
+   <!-- Body -->
+   <div class="row">
+       <div class="p-4">
+           <div class="card card-body">
+               <form *ngIf='selectedST' [formGroup]="formBannerCreate"  (ngSubmit)="create()">
+                   <div class="form-group">
+                       <label> Page</label>
+                       <input type="text" disabled value="{{ getName(formBannerCreate.value.page) || ''}}" >
+                       <input type="hidden" class="form-control" formControlName="site">
+                       <button type="button" class="btn btn-primary" (click)="openModal(modalMostrarSitios, 0)">
+                           Buscar
+                       </button>
+                   </div>
+                   <div class="form-group">
+                       <label> Nombre</label>
+                       <input type="text" class="form-control" formControlName="name" placeholder="Escribir Nombre" >
+                   </div>
+                   <div class="modal-footer" >
+                       <button type="submit" class="btn btn-success" >Guardar</button>
+                   </div>
+               </form>
+           </div>
+       </div>
+   </div>
+</div>
