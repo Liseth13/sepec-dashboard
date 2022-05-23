@@ -15,6 +15,7 @@ import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { PageNamePipe } from './pipes/page-name.pipe';
 import { PageContentComponent } from './components/page-content/page-content.component';
 import { CounterStatusPipe } from './pipes/counter-status.pipe';
+import { PostsComponent } from './components/posts/posts.component';
 
 
 @NgModule({
@@ -23,7 +24,8 @@ import { CounterStatusPipe } from './pipes/counter-status.pipe';
     SiteNamePipe,
     PageNamePipe,
     PageContentComponent,
-    CounterStatusPipe
+    CounterStatusPipe,
+    PostsComponent
   ],
   imports: [
     CommonModule,

@@ -224,7 +224,7 @@
                                         <!-- <h1 *ngIf="pages === undefined && pages.id ==''" >sdfsdffsd</h1> -->
                                     </div>
                                 </div>
-                                <div class="position-relative" style="height: calc(100vh - 248px);" [perfectScrollbar]="config" >
+                                <div class="position-relative" style="height: calc(100vh - 180px);" [perfectScrollbar]="config" >
                                     <!-- NgFor -->
                                     <div  
                                         *ngFor="let page of webPagesFilter | slice: (paginationPages.page-1) * paginationPages.pageSize : (paginationPages.page-1) * paginationPages.pageSize + paginationPages.pageSize" (click)="showContents(page.id, true, 1)">
@@ -272,35 +272,36 @@
                             </div>
                         </div>
                         <div class="col-lg-6 col-md-12 col-xl-8 detail-part">
+                            <app-posts *ngIf ="contentMode === 'posts'" [idPage] ="idPageSelected"></app-posts>
                             
-                            <div *ngIf='idPageSelected !== ""' class="d-flex align-items-center justify-content-between px-3 py-4 border-bottom">
+                            <div *ngIf='idPageSelected !== "" && contentMode === "contents"' class="d-flex align-items-center justify-content-between px-3 py-4 border-bottom">
                                 <!-- <app-page-content [pageId]="idPageSelected"></app-page-content> -->
-                                <div>
+                                <div >
                                     <select class="form-control" [(ngModel)] ="paginationContentPage.status"  (change)="showContents(idPageSelected,paginationContentPage.status, 1)">
                                         <option [ngValue]="true" [(selected)]="paginationContentPage.status"> Contenido activo </option>
                                         <option [ngValue]="false"[(selected)]="!paginationContentPage.status">Contenido inactivo</option>
                                     </select>   
                                     
                                 </div>
-                                <div *ngIf='contentsByPage.length > 0 || idPageSelected !==""' class="mail-pagination ">
+                                <div *ngIf='contentsByPage.length > 0 || idPageSelected !=="" && contentMode === "contents"' class="mail-pagination ">
                                     <ngb-pagination 
                                         [collectionSize]="paginationContentPage.collectionSize" [(page)]="paginationContentPage.page" [pageSize]="paginationContentPage.pageSize"
                                     >
                                     </ngb-pagination>   
                                 </div>
-                                <div  class="text-left">
+                                <div  class="text-left" *ngIf='contentMode === "contents"'>
                                     <button class ="btn btn-primary" (click)='openModal(modalCreateContent, "md", "createContent")'>Agregar Contenido</button>
                                 </div>
                             </div>
 
-                            <div *ngIf='idPageSelected !== ""' class="d-flex align-items-center p-3 border-bottom">
+                            <div *ngIf='idPageSelected !== ""  && contentMode === "contents"' class="d-flex align-items-center p-3 border-bottom">
                                 <h4 class="mb-0">    
                                     <span class="badge badge-pill badge-primary mr-2 font-16 font-medium"> Página
                                     </span>
                                     {{ idPageSelected | pageName : webPages }}
                                 </h4>
                             </div>
-                            <div class="h-100 d-none d-lg-block" *ngIf = "idPageSelected ==='' || contentsByPage.length === 0">
+                            <div class="position-relative" style="height: calc(100vh - 180px);" [perfectScrollbar]="config" *ngIf = "idPageSelected ==='' || contentsByPage.length === 0 && contentMode === 'contents'">
                                 <div class="d-flex align-items-center justify-content-center h-100">
                                     <div *ngIf = "idPageSelected ===''" class="text-center">
                                         
@@ -320,8 +321,8 @@
         
                             </div>
         
-                            <div *ngIf='contentsByPage.length > 0 && idPageSelected !== "" '>
-                                <div class="position-relative" style="height: calc(100vh - 180px);" [perfectScrollbar]="config">
+                            <div *ngIf='contentsByPage.length > 0 && idPageSelected !== "" && contentMode === "contents"'>
+                                <div class="position-relative" style="height: calc(100vh - 250px);" [perfectScrollbar]="config">
                                     <!-- <router-outlet></router-outlet> -->
                                     <!-- POSTS NAVIGATION -->
                                     <!-- POSTS -->
@@ -352,7 +353,6 @@
                                         </div>
                                         <div class = 'border-bottom mb-2'></div>
                                     </spam>
-                                    
                                 </div>
                             </div>
                         </div>

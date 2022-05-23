@@ -36,13 +36,7 @@ export class WebPagesComponent implements OnInit {
   private formCreate : FormGroup;
   private formEdit   : FormGroup;
 
-  // pages : WebPage;
-
-  
-
-  //private modalPageContentManager  ;
-
-  //  public contentManager : PageContentManagerComponent;
+  contentMode : 'contents' | 'posts' | string = 'posts' ;
 
   sidebarMode : 'create' | 'edit' | string = 'create';
 
