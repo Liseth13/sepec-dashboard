@@ -24,7 +24,7 @@ export class FootersSitesComponent implements OnInit {
   public totalFooterSite:number = 0;
   private webFooterId: number = 0;
   private formFooterCreate: FormGroup;
-  formFooterEdit: FormGroup;
+  private formFooterEdit: FormGroup;
   websiteId: any;
   closeResult: string;
   count = 0;
@@ -229,7 +229,5 @@ export class FootersSitesComponent implements OnInit {
       return siteName;
     }
   }
-
-
 }
 

@@ -24,8 +24,8 @@ createBanner(data: any) {
 
 }
 
-updateBanner(data: any, webBanner: number) {
-  return this.http.put(`${this.configUrl}/api/v1/website/banners/5/${webBanner}/`, data);
+updateBanner(data: any, weBanner: number) {
+  return this.http.put(`${this.configUrl}/api/v1/website/banners/${weBanner}/`, data);
 
 }
 }
