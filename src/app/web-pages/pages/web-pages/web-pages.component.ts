@@ -17,26 +17,18 @@ import { WebPagesService } from '../../services/web-pages.service';
 })
 export class WebPagesComponent implements OnInit {
 
-  public  webPages       : Array<Page> = [];
+  public  webPages : Array<Page> = [];
+
   public webPagesFilter : Array<Page> = [];
 
   //ARREGLO DE TODOS LOS SITIOS
-  public  webSites   : Array<any> = [];
-
-  //ARREGLOS CON CONTENIDO DE PÁGINAS
-  public allPageContents: Array<PageContent> = [];
-  public pageContentsFilter: Array<PageContent> = [];
-  public contentsByPage : Array<any> = [];
-
-  //fORMULARIOS DE CONTENIDO DE PÁGINAS
-  private formCreatePageContent : FormGroup;
-  private formEditPageContent   : FormGroup;
+  public  webSites  : Array<any> = [];
 
   //FORMULARIOS DE PÁGINAS
   private formCreate : FormGroup;
   private formEdit   : FormGroup;
 
-  contentMode : 'contents' | 'posts' | string = 'posts' ;
+  showMode : 'contents' | 'posts' | string = '' ;
 
   sidebarMode : 'create' | 'edit' | string = 'create';
 
@@ -45,7 +37,6 @@ export class WebPagesComponent implements OnInit {
   //Paginación
   paginationPages = new Pagination();
   paginacionSites = new Pagination();
-  paginationContentPage = new Pagination();
 
   // TEMPLATE
   public showSidebar = false;
@@ -64,14 +55,12 @@ export class WebPagesComponent implements OnInit {
 
     //this.modalPageContentManager = PageContentManagerComponent
     this.loadFormCreate();
-    this.loadFormCreatePageContent();
     //console.log(this.modalPageContentManager.getId())
     // this.contentManager.getId()
   }
 
   ngOnInit(): void {
     this.get( this.paginationPages.status );
-    this.getContentPages();
     this.getWebSites();
     
   }
@@ -87,23 +76,6 @@ export class WebPagesComponent implements OnInit {
       slug   : ['', [ Validators.required] ],
       weight : ['', [ Validators.required] ],
     })
-  }
-
-  loadFormCreatePageContent = ( pageId : string = '' ) => {
-    this.formCreatePageContent = this.formBuilder.group({
-      page      : [ pageId , [Validators.required ] ],
-      body      : [ '', [ Validators.required, Validators.minLength(5), Validators.maxLength(100) ] ],
-      is_active : ['', [ Validators.required ] ]
-    });
-  }
-
-  loadFormEditPageContent = ( pageContent : PageContent ) => {
-    this.formEditPageContent = this.formBuilder.group({
-      id        : [ pageContent.id, [ Validators.required ] ],
-      page      : [ pageContent.page , [Validators.required ] ],
-      body      : [ pageContent.body, [ Validators.required, Validators.minLength(5), Validators.maxLength(100) ] ],
-      is_active : [ pageContent.is_active, [ Validators.required ] ]
-    });
   }
 
   loadFormEdit = ( webPage : Page ) => {
@@ -136,13 +108,6 @@ export class WebPagesComponent implements OnInit {
     );
   }
 
-  getContentPages = () => {
-    this.pageContentService.get().subscribe(
-      ( res : any ) => { this.allPageContents = res;},
-      ( error : any ) => { this.errorHandler( error )}
-    )
-  }
-
   getWebSites = () => {
     this.webPageService.getWebSites().subscribe(
       ( res : any ) => {
@@ -167,20 +132,6 @@ export class WebPagesComponent implements OnInit {
     }
   }
 
-  createPageContent = ( form : FormGroup ) => {
-    const isValid : boolean = this.validateForms( this.formCreatePageContent );
-    if ( isValid ) {
-      this.pageContentService.create( this.formCreatePageContent.value ).subscribe(
-      ( res : any ) => {
-        this.allPageContents.push( res );
-        this.showContents( this.idPageSelected, this.paginationContentPage.status, this.paginationContentPage.page );
-        this.closeModals();
-      },
-      ( error : any ) => { this.errorHandler( error ) });
-    }
-    console.log(this.formCreatePageContent.value)
-    //this.contentPageService.
-  }
 
   edit = ( form : FormGroup ) => {
     const  isValid : boolean = this.validateForms( this.formEdit );
@@ -197,49 +148,13 @@ export class WebPagesComponent implements OnInit {
     }
   }
 
-  editPageContent( form : FormGroup ) {
-    console.log(form.value)
-    const isValid : boolean = this.validateForms( form );
-    if ( isValid ) {
-      //
-      this.pageContentService.edit( form.value ).subscribe(
-      ( res : PageContent ) => {
-        this.allPageContents = this.allPageContents.map( ( content : PageContent) => content.id === res.id ? { ...res } : content );
-        this.showContents(this.idPageSelected, this.paginationContentPage.status, this.paginationContentPage.page);
-        Swal.fire('Exito!', 'Datos actualizados exitosamente', 'success');
-        this.closeModals();
-      },
-      ( error : any ) => { this.errorHandler( error )});
-    }
-  }
-
-  push = ( webPage : Page ) => {
-    //this.webPages.map( ( page : WebPage ) => page.id === res.id);
-  }
-
-  disabled = () => {  }
-
-  openModal( targetModal: NgbModal, size : string = 'md', mode : 'createContent' | 'editContent' | string = '', data? : any) {
-    
-    if ( mode === 'createContent' ) {
-      this.loadFormCreatePageContent( this.idPageSelected );
-    }
-
-    if ( mode === 'editContent' && data ) {
-      this.loadFormEditPageContent( data );
-    } 
-    
+  openModal( targetModal: NgbModal, size : string = 'md', ) {  
     this.modalService.open( targetModal , {
       size : size ,
       centered: true,
       backdrop: 'static',
     });
   }
-
-  openContentManager = ( targetModal : NgbModal , pageId : string ) => {
-    this.openModal( targetModal, 'lg' );
-  }
-
 
   closeModals = () => {
     this.modalService.dismissAll();
@@ -282,21 +197,17 @@ export class WebPagesComponent implements OnInit {
   }
 
 
-  showContents = ( pageId : string, status : boolean = true, page : number = 1   ) => {
-    console.log(status)
-    this.idPageSelected = pageId;
-    this.contentsByPage = this.allPageContents.filter( c => c.page === pageId && c.is_active === status );
-    if ( this.contentsByPage.length > 0 ) {
-      this.paginationContentPage.status = status;
-      this.paginationContentPage.page = page;
-      this.paginationContentPage.collectionSize = this.contentsByPage.length;
-      return;
+  showData = ( pageId : string, mode : 'contents' | 'posts' | string  ) => {
+    if ( mode === 'contents' || mode === 'posts' ){
+      if ( pageId === '' ) {
+        return;
+      }
+
+      this.showMode = mode;
+      this.idPageSelected = pageId;
     }
 
-    this.paginationContentPage.status = status;
-    this.paginationContentPage.collectionSize = 0
-    this.paginationContentPage.page = 1;
-    //this.paginationContentPage = new Pagination();
+    console.log(this.showMode)
   }
 
   showPages = ( status : boolean = true, page : number = 1 ) => {

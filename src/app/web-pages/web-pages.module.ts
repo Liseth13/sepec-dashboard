@@ -25,7 +25,7 @@ import { PostsComponent } from './components/posts/posts.component';
     PageNamePipe,
     PageContentComponent,
     CounterStatusPipe,
-    PostsComponent
+    PostsComponent,
   ],
   imports: [
     CommonModule,

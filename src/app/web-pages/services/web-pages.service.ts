@@ -17,5 +17,5 @@ export class WebPagesService {
 
   getWebSites = () => this.httpClient.get(`${this.url}/api/v1/website/sites/`);
 
-  edit = ( webPage : Page ) => this.httpClient.put(`${this.url}/api/v1/website/pages/${webPage.id}`, webPage);
+  edit = ( page : Page ) => this.httpClient.put(`${this.url}/api/v1/website/pages/${page.id}`, page);
 }

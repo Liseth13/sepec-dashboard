@@ -1,45 +1,136 @@
+<ng-template #modalCreatePost let-modal>
+    <div class="modal-header">
+        <h3 class="modal-title font-weight-bold" id="taskLabel">
+            Nuevo post para {{ idPage | pageName : pages }}
+        </h3>
+        <button type="button" class="close" (click)="modal.dismiss()" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <form [formGroup] = 'formCreate' (ngSubmit) ='create( formCreate )'>
+                <div class="form-group">
+                    <label for="title">Título:</label>
+                    <input class="form-control" type="text" formControlName = "title" id="title" placeholder="Título del post">
+                </div>
+                <div class="form-group">
+                    <label for="title">Url:</label>
+                    <input class="form-control" type="text" formControlName = "slug" id="slug" placeholder="Dirección url">
+                </div>
+                <!-- <div class="form-group">
+                    <label for="title">Autor:</label>
+                    <input class="form-control" type="text" formControlName = "author" id="author" placeholder="Nombre del autor">
+                </div> -->
+                <div class="form-group">
+                    <label for="body">Contenido:</label>
+                    <textarea class="form-control" name="body" id="body" cols="30" rows="10" formControlName ="body"></textarea>
+                </div>
+                <div class="form-group ml-p2">
+                    <button type ="submmit" class="btn btn-primary">Crear post</button>
+                    <button type ="button" class="btn btn-danger" (click)="modal.dismiss()">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</ng-template>
+<ng-template #modalEditPost let-modal>
+    <div class="modal-header">
+        <h3 class="modal-title font-weight-bold" id="taskLabel">
+            Editar post de {{ idPage | pageName : pages }}
+        </h3>
+        <button type="button" class="close" (click)="modal.dismiss()" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <form [formGroup] = 'formEdit' (ngSubmit) ='edit( formEdit )'>
+                <div class="form-group">
+                    <label for="titleEdit">Título:</label>
+                    <input class="form-control" type="text" formControlName = "title" id="titleEdit" placeholder="Título del post">
+                </div>
+                <div class="form-group">
+                    <label for="title">Url:</label>
+                    <input class="form-control" type="text" formControlName = "slug" id="slugEdit" placeholder="Dirección url">
+                </div>
+                <!-- <div class="form-group">
+                    <label for="title">Autor:</label>
+                    <input class="form-control" type="text" formControlName = "author" id="author" placeholder="Nombre del autor">
+                </div> -->
+                <div class="form-group">
+                    <label for="is_activeEdit">Contenido:</label>
+                    <select class="form-control" id="is_activeEdit" formControlName="is_active">
+                        <option value="">-- Selecciona una opción --</option>
+                        <option value="true">Activo</option>
+                        <option value="false">Inactivo</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="bodyEdit">Contenido:</label>
+                    <textarea class="form-control" name="body" id="bodyEdit" cols="30" rows="10" formControlName ="body"></textarea>
+                </div>
+                <div class="form-group ml-p2">
+                    <button type ="submmit" class="btn btn-primary">Editar post</button>
+                    <button type ="button" class="btn btn-danger" (click)="modal.dismiss()">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</ng-template>
+
+<div class="card bg-info">
+    <div class="card-body text-white">
+        <div class="d-flex flex-row">
+            <div class="display-6 align-self-center">
+                <i class="ti-calendar"></i>
+            </div>
+            <div class="p-10 align-self-center">
+                <h4 class="m-b-0 text-white">{{ idPage | pageName : pages }}</h4>
+                <span>Posts</span>
+            </div>
+            <div class="ml-auto align-self-center">
+                <h2 class="font-medium m-b-0 text-white">{{ postsByPage.length }} Totales</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="d-flex align-items-center justify-content-between px-3 py-4 border-bottom">
     <!-- <app-page-content [pageId]="idPageSelected"></app-page-content> -->
-    <div>
-        <select class="form-control">
-            <option> Posts activos </option>
-            <option >Posts inactivos</option>
+    <div >
+        <select class="form-control" [(ngModel)] ="paginationPosts.status" (change)='getPostsByPage(posts, idPage, paginationPosts.status)'>
+            <option [ngValue]="true" [(selected)]="paginationPosts.status"> Posts activos </option>
+            <option [ngValue]="false"[(selected)]="!paginationPosts.status">Posts inactivos</option>
         </select>   
         
     </div>
-    <div class="mail-pagination ">
+    <div *ngIf="postsByPage.length > 0" class="mail-pagination ">
         <ngb-pagination 
-            
+            [collectionSize]="paginationPosts.collectionSize" 
+            [(page)]="paginationPosts.page" 
+            [pageSize]="paginationPosts.pageSize"   
         >
         </ngb-pagination>   
     </div>
     <div  class="text-left">
-        <button class ="btn btn-primary" (click)="change(idPage)" >Crear Post</button>
+        <button class ="btn btn-primary" (click)="openModals( modalCreatePost, 'create' )" >Crear Post</button>
     </div>
-
-    
-</div>
-<div class="d-flex align-items-center p-3 border-bottom">
-    <h4 class="mb-0">    
-        <span class="badge badge-pill badge-primary mr-2 font-16 font-medium"> Página
-        </span>
-        Nombre
-    </h4>
 </div>
 
-<div >
+<div *ngIf="postsByPage.length > 0" >
     <div class="position-relative" style="height: calc(100vh - 250px);" [perfectScrollbar]="config">
         <!-- <router-outlet></router-outlet> -->
         <!-- POSTS NAVIGATION -->
         <!-- POSTS -->
-        <spam *ngFor="let post of posts " >
+        <spam *ngFor="let post of postsByPage | slice: (paginationPosts.page-1) * paginationPosts.pageSize : (paginationPosts.page-1) * paginationPosts.pageSize + paginationPosts.pageSize" >
             
             <div class="p-3">
                 <div class="mb-3 d-flex align-items-center">
                     <img src="../../../../assets/images/img1.jpg" class="rounded-circle" alt="userimg" width="35" height="35">
                     <div class="ml-2">
                         <h5 class="mb-0">{{ post.author }}</h5>
-                        <span class="text-muted">To me,</span>
+                        <span class="text-muted">Administrador,</span>
                     </div>
             
                 </div>
@@ -48,12 +139,15 @@
                 </div>
                 <div class="mb-3">
                     <div *ngIf='true'>
-                        <button type="button" class="btn btn-outline-success btn-sm" >
+                        <button 
+                            (click)="openModals( modalEditPost, 'edit', post )"
+                            type="button" class="btn btn-outline-success btn-sm" 
+                        >
                             <i class="me-2 fas fa-edit"></i> Editar
                         </button>
-                        <button type="button" class="btn btn-outline-danger ml-1 btn-sm" >
+                        <!-- <button type="button" class="btn btn-outline-danger ml-1 btn-sm" >
                             <i class="me-1 mdi mdi-delete-forever"></i> Deshabilitar
-                        </button>
+                        </button> -->
                     </div>
                 </div>
             </div>
@@ -62,4 +156,14 @@
     </div>
 </div>
 
-<h1 >{{idPage}}</h1>
+<div *ngIf="postsByPage.length === 0 " class="position-relative" style="height: calc(100vh - 220px);" [perfectScrollbar]="config">
+    <div class="d-flex align-items-center justify-content-center h-100" (click)="openModals( modalCreatePost, 'create' )">
+        <div class="text-center" >
+            
+            <i class="fas fa-plus display-6">
+            </i>
+           
+            <h3> Crear un post </h3>
+        </div>
+    </div>     
+</div>
