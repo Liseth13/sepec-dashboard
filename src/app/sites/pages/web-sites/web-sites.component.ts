@@ -17,7 +17,7 @@ export class WebSitesComponent implements OnInit {
   selectedST: Site | undefined = Object.create(null);
   sectionTask: Site[] | null = null;
   public webSites    : Array <any> = [];
-  private totalWebSites : number = 0;
+  public totalWebSites : number = 0;
   public charging : boolean = true;
   public formSiteCreate      : FormGroup;
   private formSiteEdit        : FormGroup;

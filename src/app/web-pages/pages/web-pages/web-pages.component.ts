@@ -98,7 +98,7 @@ export class WebPagesComponent implements OnInit {
   loadFormCreatePageContent = ( pageId : string = '' ) => {
     this.formCreatePageContent = this.formBuilder.group({
       page      : [ pageId , [Validators.required ] ],
-      body      : [ '', [ Validators.required, Validators.minLength(5), Validators.maxLength(100) ] ],
+      body      : [ '', [ Validators.required, Validators.minLength(5), Validators.maxLength(5000) ] ],
       is_active : ['', [ Validators.required ] ]
     });
   }

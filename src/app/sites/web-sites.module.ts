@@ -8,14 +8,16 @@ import { HttpClientModule } from '@angular/common/http';
 import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { FootersSitesComponent } from './pages/footers-sites/footers-sites.component';
 import { BannerComponent } from './pages/banner/banner.component';
-
-
+import { ItemBannerComponent } from './pages/item-banner/item-banner.component';
+import { BannerNamePipe } from './pipes/banner-name.pipe';
 
 @NgModule({
   declarations: [
     WebSitesComponent,
     FootersSitesComponent,
-    BannerComponent
+    BannerComponent,
+    ItemBannerComponent,
+    BannerNamePipe
   ],
   imports: [
     CommonModule,

@@ -4,11 +4,18 @@ td {
     vertical-align: middle !important;
 }
 
-.add-modal-image {
+.img-banner{
+    min-width: auto;
+    min-height: auto;
+    max-width: 12rem;
+    max-height: 12rem;
+}
+
+.modal-image {
     width: auto;
     height: auto;
-    max-height: 120px;
-    max-width: 170px;
+    max-height: 400px;
+    max-width: 400px;
     border: 1px solid rgb(216, 214, 214);
     padding: 0.5rem;
 }

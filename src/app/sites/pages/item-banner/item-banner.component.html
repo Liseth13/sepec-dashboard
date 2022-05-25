@@ -1,0 +1,222 @@
+<div class="col-12 mb-3 table-users" *ngIf="!charging">
+<div class="card">
+    <div class="card-body">
+        <div class="row bd-highlight mb-2">
+            <div class="col-12">
+                <div class="float-left align-center justify-content-center">
+                    <!-- <h1 class="h3 mb-0 text-gray-800 pt-2">Total: {{ totalWebItemBanner }}</h1> -->
+                </div>
+            
+                <div class="float-right bd-highlight">
+                    <button class="btn btn-info cursor" (click)="openModal(modalAddItemBanner,0)">
+                        <i class="fas fa-plus-circle"></i> Agregar
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Banner</th>
+                        <th>Nombre</th>
+                        <th>Url</th>
+                        <th>Texto</th>
+                        <th>Imagen</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let data of webItemBanner | slice: (page-1) * pageSize : (page-1) * pageSize + pageSize">
+                        <td>{{ data.banner | bannerName : banners}}</td>
+                        <td>{{ data.name }}</td>
+                        <td>{{ data.url }}</td>
+                        <td>{{ data.text }}</td>
+                        <td>
+                          <div>
+                            <img [src]="data.img" alt="imagen" class="img-banner">
+                          </div>
+                        </td>
+                        <td *ngIf="data.is_active"><span class="label label-success">Activo</span></td>
+                        <td *ngIf="!data.is_active"><span class="label label-danger">No activo</span></td>
+                        <td class="text-center">
+                            <div class="row">
+                                <div class="col-12 action-btn">
+                                    <a class="btn btn-warning ml-1 action-text cursor" (click)="openModal(modalEditItemBanner, data)">
+                                        <i class="far fa-edit"></i>
+                                    </a>
+                                </div>  
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="d-flex justify-content-center mt-5">
+            <ngb-pagination [collectionSize]="collectionSize" [(page)]="page" [pageSize]="pageSize">
+
+            </ngb-pagination>
+        </div>
+    </div>
+</div>
+
+<!-- Modal agregar item Banner -->
+<ng-template #modalAddItemBanner let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title" id="modal-basic-title"> Agregar Item Banner</h4>
+        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    
+    <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-12">
+            <div class="card card-body">
+                <form class="form-group" [formGroup]="formItemBannerCreate" (ngSubmit)="create()">
+                    
+                    <div class="form-group">
+                        <label> Banner</label>
+                        <input type="text" class="form-control" disabled value="{{ formItemBannerCreate.value.banner | bannerName: banners}}" >
+                        <button type="button" class="btn btn-primary mt-2" (click)="openModal(modalMostrarBanner,0)">
+                            Buscar
+                        </button>
+                    </div>
+                        <div class="form-group">
+                            <label> Nombre</label>
+                            <input type="text" class="form-control" formControlName="name" placeholder="Escribir Nombre" >
+                        </div>
+                        <div class="form-group">
+                            <label> Url</label>
+                            <input type="text" class="form-control" formControlName="url" placeholder="Escribir Nombre" >
+                        </div>
+                        <div class="form-group">
+                            <label> Text</label>
+                            <input type="text" class="form-control" formControlName="text" placeholder="Escribir Nombre" >
+                        </div>
+                        <div class="form-group">
+                            <label> Imagen</label>
+                            <div class="mb-4">
+                                <img *ngIf="!tempImg" src="../../../../assets/images/big/no-img.png" class="modal-image">
+                                <img *ngIf="tempImg" [src]="tempImg" class="modal-image">
+                            </div>
+                            <input type="file" class="" (change)="changeImage($event.target.files[0])">
+                        </div>
+                        <div class="modal-footer" >
+                            <button type="submit" class="btn btn-success" >Guardar</button>
+                        </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</ng-template>
+</div>
+ <!-- mostrar Banner -->
+ <ng-template id="modalShow" #modalMostrarBanner let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title" id="modal-basic-title"> Mostrar Banner</h4>
+        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="float-left align-center justify-content-center">
+        <h1 class="h3 mb-0 text-gray-800 pt-2 ml-3"></h1>
+    </div>
+    <div class="modal-body">
+        <div class="table-responsive" > 
+        
+            <table class="table table-bordered table-hover">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Pagina</th>
+                        <th>Seleccionar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let banner of banners |slice: (pageP-1) * pageSizeP : (pageP-1) * pageSizeP + pageSizeP">
+                        <td>{{ banner.name }}</td>
+                        <td>
+                            <div class="col">
+                                <button  class="btn btn-info" (click)="seleccionar(banner, modal.dismiss('Cross click'))">
+                                    <span>
+                                        <i class="fas fa-chevron-circle-right"></i>
+                                    </span> Seleccionar                       
+                                </button>
+                                <!-- <button *ngIf="idView == 'edit'" class="btn btn-warning" (click)="seleccionar(item)">
+                                    <span>
+                                        <i class="fas fa-chevron-circle-right"></i>
+                                    </span> Seleccionar                       
+                                </button> -->
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+                <div class="d-flex justify-content-center mt-5">
+                    
+                </div>
+            </table>
+        </div>
+    </div>
+    <div class="modal-footer">
+        
+    </div>
+</ng-template>
+
+<!-- modal Editar Item Banner -->
+<ng-template #modalEditItemBanner let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title" id="modal-basic-title"> Editar Banner</h4>
+        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    
+    <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-12">
+            <div class="card card-body">
+                <form class="form-group" [formGroup]="formItemBannerEdit" (ngSubmit)="edit()">
+                    
+                    <div class="form-group">
+                        <label> Banner</label>
+                        <input type="text" class="form-control" disabled value="{{ formItemBannerEdit.value.banner | bannerName: banners}}" >
+                        <button type="button" class="btn btn-primary mt-2" (click)="openModal(modalMostrarBanner,1)">
+                            Buscar
+                        </button>
+                    </div>
+                    <div class="form-group">
+                        <label> Nombre</label>
+                        <input type="text" class="form-control" formControlName="name" placeholder="Escribir Nombre" >
+                    </div>
+                    <div class="form-group">
+                        <label> Url</label>
+                        <input type="text" class="form-control" formControlName="url" placeholder="Escribir Nombre" >
+                    </div>
+                    <div class="form-group">
+                        <label> Text</label>
+                        <input type="text" class="form-control" formControlName="text" placeholder="Escribir Nombre" >
+                    </div>
+                    <div class="form-group">
+                        <label> Imagen</label>
+                        <div class="mb-4">
+                            <img *ngIf="!tempImg" src="../../../../assets/images/big/no-img.png" class="modal-image">
+                            <img *ngIf="tempImg" [src]="tempImg" class="modal-image">
+                        </div>
+                        <input type="file" class="" (change)="changeImage($event.target.files[0])">
+                    </div>
+                    <div class="form-group" >
+                        <label>Estado</label>
+                        <select class="custom-select col-12" id="inlineFormCustomSelect" formControlName="is_active" >
+                            <option value="" selected>--Seleccione una Opcion</option>
+                            <option value="true">Activado</option>
+                            <option value="false">Desactivado</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer" >
+                        <button type="submit" class="btn btn-success" >Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</ng-template>
+

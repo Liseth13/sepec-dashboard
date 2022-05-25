@@ -1,7 +1,8 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { BannerComponent } from '../sites/pages/banner/banner.component';
 import { WebPagesComponent } from './pages/web-pages/web-pages.component';
+import { BannerComponent } from '../sites/pages/banner/banner.component';
+import { ItemBannerComponent } from '../sites/pages/item-banner/item-banner.component';
 
 const routes: Routes = [
 	{
@@ -9,16 +10,20 @@ const routes: Routes = [
 		redirectTo: 'pages'
 	},
 	{
-		path: '',
-		children: [
-			{
-				path: 'pages',
-				component: WebPagesComponent,
-			},
-			{
-				path: 'banner',
-				component: BannerComponent,
-			},
+	path: '',
+	children: [
+		{
+			path: 'pages',
+			component: WebPagesComponent,
+		},
+		{
+			path: 'banner',
+			component: BannerComponent,
+		},
+		{
+			path: 'items-banner',
+			component: ItemBannerComponent,
+		},
     ]
   }
 ];

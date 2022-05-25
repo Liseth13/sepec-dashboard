@@ -61,6 +61,16 @@ export const ROUTES: RouteInfo[] = [
         extralink: false,
         submenu: [],
       },
+      {
+        path: "./dash/web-pages/items-banner",
+        title: "Items Banner",
+        icon: "",
+        class: "",
+        label: "",
+        labelClass: "",
+        extralink: false,
+        submenu: [],
+      },
     ],
   },
   
