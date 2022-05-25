@@ -1,13 +1,16 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http'
 import { Page } from '../interfaces/Page';
+import { environment } from 'src/environments/environment.prod';
 
 @Injectable({
   providedIn: 'root'
 })
+
+
 export class WebPagesService {
 
-  private url : string ="https://sepec-backend.herokuapp.com";
+  private url : string = environment.api_url;
 
   constructor( private httpClient : HttpClient) {}
 

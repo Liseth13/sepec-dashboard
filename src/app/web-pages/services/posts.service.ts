@@ -1,13 +1,14 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Post } from '../interfaces/post';
+import { environment } from 'src/environments/environment.prod';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PostsService {
 
-  private url : string ="https://sepec-backend.herokuapp.com";
+  private url : string = environment.api_url ;
 
   constructor( private httpClient : HttpClient ) { }
 

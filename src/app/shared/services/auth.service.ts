@@ -13,7 +13,12 @@ export class AuthService {
     localStorage.setItem('sepec_session', JSON.stringify(user) );
   }
 
-  checkSesion = () : boolean => {
+  removeSesion = () : boolean => {
+    localStorage.removeItem( 'sepec_session' );
+    return true;
+  }
+
+  isAuthenticated = () : boolean => {
     const user : User = JSON.parse(localStorage.getItem('sepec_session'));
     if ( user ) {
       return true;

@@ -3,6 +3,8 @@ import { Routes, RouterModule } from "@angular/router";
 
 import { FullComponent } from "./BASE/layouts/full/full.component";
 import { BlankComponent } from "./BASE/layouts/blank/blank.component";
+import { AuthGuard } from "./shared/guards/auth.guard";
+import { LoginGuard } from "./auth/guards/login.guard";
 
 export const Approutes: Routes = [
   {
@@ -20,6 +22,7 @@ export const Approutes: Routes = [
           import("./auth/auth.module").then(
             (m) => m.AuthModule
           ),
+        canActivate : [ LoginGuard ]
       },
     ],
   },
@@ -40,11 +43,13 @@ export const Approutes: Routes = [
             children : [
               {
                 path : 'sites',
-                loadChildren : () => import("./sites/web-sites.module").then((m) => m.WebSitesModule)
+                loadChildren : () => import("./sites/web-sites.module").then((m) => m.WebSitesModule),
+                canActivate : [ AuthGuard ]
               },
               {
                 path : 'web-pages',
-                loadChildren : () => import("./web-pages/web-pages.module").then((m) => m.WebPagesModule)
+                loadChildren : () => import("./web-pages/web-pages.module").then((m) => m.WebPagesModule),
+                canActivate : [ AuthGuard ]
               }
             ]
           }

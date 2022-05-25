@@ -3,14 +3,14 @@
         <!-- User Profile-->
         <li class="sidebar-item user-profile" [class.active]="showMenu === 'user'">
             <a class="sidebar-link has-arrow waves-effect waves-dark" href="javascript:void(0)"
-                (click)="addExpandClass('user')" aria-expanded="false"><span><img src="assets/images/users/profile.png"
-                        alt="user" /></span><span class="hide-menu">Steave Jobs </span></a>
+                (click)="addExpandClass('user')" aria-expanded="false"><span><img src="assets/images/users/user.png"
+                        alt="user" /></span><span class="hide-menu">Sepec Admin </span></a>
             <ul aria-expanded="false" class="collapse" [class.in]="showMenu === 'user'">
-                <li><a href="javascript:void()" class="sidebar-link p-0">My Profile </a></li>
+                <!-- <li><a href="javascript:void()" class="sidebar-link p-0">My Profile </a></li>
                 <li><a href="javascript:void()" class="sidebar-link p-0">My Balance</a></li>
                 <li><a href="javascript:void()" class="sidebar-link p-0">Inbox</a></li>
-                <li><a href="javascript:void()" class="sidebar-link p-0">Account Setting</a></li>
-                <li><a href="javascript:void()" class="sidebar-link p-0">Logout</a></li>
+                <li><a href="javascript:void()" class="sidebar-link p-0">Account Setting</a></li> -->
+                <li><a (click)="logout()" href="javascript:void()" class="sidebar-link p-0">Logout</a></li>
             </ul>
         </li>
         <!-- First level menu -->

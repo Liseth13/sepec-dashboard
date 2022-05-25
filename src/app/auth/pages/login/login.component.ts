@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import Swal from 'sweetalert2';
 import { LoginService } from '../../services/login.service';
+
 
 @Component({
   selector: 'app-login',
@@ -11,7 +14,7 @@ export class LoginComponent implements OnInit {
 
   formLogin : FormGroup;
 
-  constructor( private formBuilder : FormBuilder, private loginService : LoginService ) { 
+  constructor( private formBuilder : FormBuilder, private loginService : LoginService, private router : Router ) { 
     this.loadForms();
   }
 
@@ -26,7 +29,12 @@ export class LoginComponent implements OnInit {
   }
 
   login = ( form : FormGroup ) => {
-      this.loginService.login( form.value )
+    const isLogin : boolean = this.loginService.login( form.value );
+    if ( isLogin ) {
+      this.router.navigate(['dash/']);
+      return;
+    }
+    Swal.fire('Error!', 'Usuario o contraseña invalidos','error');
   }
 
 }

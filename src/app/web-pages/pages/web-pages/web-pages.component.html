@@ -148,7 +148,8 @@
                                         <div class="p-3 border-bottom cursor-pointer">
                                             <div class="d-flex align-items-start">
                                                 <span class="ml-2">
-                                                    <i class="fab fa-internet-explorer text-primary"></i>
+                                                    <!-- <i class="fab fa-internet-explorer text-primary"></i> -->
+                                                    <i-feather name="file" class="feather-xl"></i-feather>
                                                 </span>
                                                 <div class="ml-3">
                                                     <div class="d-flex align-items-center">
@@ -156,7 +157,7 @@
                                                     </div>
                                                     <!-- <h4 class="text-muted"> {{ page.name }} </h4> -->
                                                     <div class="text-white d-flex mt-2">
-                                                        <span _ngcontent-sbc-c141="" class="badge bg-primary">Sitio web:</span>
+                                                        <span _ngcontent-sbc-c141="" class="badge  bg-primary">Sitio web:</span>
                                                         <span class="text-muted ml-2">{{ page.site | siteName : webSites }}</span>
                                                     </div>
                                                     <div class="text-white d-flex mt-2">
@@ -168,8 +169,8 @@
                                                         <span class="text-muted ml-2">{{ page.weight }}</span>
                                                     </div>
                                                     <div class="text-white d-flex mt-2" >
-                                                        <button class="btn btn-outline-primary " (click)="showData( page.id, 'contents' )">Mostrar contenido</button>
-                                                        <button class="btn btn-outline-info" (click)="showData( page.id, 'posts' )">Mostrar posts</button>
+                                                        <button class="btn btn-sm btn-outline-primary " (click)="showData( page.id, 'contents' )">Mostrar contenido</button>
+                                                        <button class="btn btn-sm btn-outline-info" (click)="showData( page.id, 'posts' )">Mostrar posts</button>
                                                     </div>
                                                 </div>
                                                 <!-- <div class="ml-auto">

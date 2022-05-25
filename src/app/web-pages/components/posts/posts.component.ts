@@ -4,7 +4,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { PerfectScrollbarConfigInterface } from 'ngx-perfect-scrollbar';
 import Swal from 'sweetalert2';
 import { Page } from '../../interfaces/Page';
-import { Pagination } from '../../interfaces/pagination';
+import { Pagination } from '../../../shared/interfaces/Pagination';
 import { Post } from '../../interfaces/post';
 import { PostsService } from '../../services/posts.service';
 
@@ -57,24 +57,9 @@ export class PostsComponent implements OnInit, OnChanges {
     this.get();
   }
 
-  // getPostsByPage = ( status : boolean = true, page : number = 1 ) => {
-  //   this.paginationPosts.status = status;
-
-  //   if ( this.posts.length > 0 ) {
-  //     this.postsByPage = this.posts.filter( p => p.page_id === this.idPage && p.is_active === status);
-  //     this.paginationPosts.collectionSize = this.postsByPage.length;
-  //     this.paginationPosts.page = page;
-  //     return;
-  //   }
-
-  //   this.paginationPosts.collectionSize = 0;
-  //   this.paginationPosts.page = 1;
-    
-  // }
-
   loadFormCreate = () => {
     this.formCreate = this.formBuilder.group({
-      page   : [ this.idPage, [ Validators.required ] ],
+      page_id   : [ this.idPage, [ Validators.required ] ],
       title  : [ '', [ Validators.required, Validators.minLength( 5 ), Validators.maxLength( 200 ) ] ],
       slug   : ['', [ Validators.required] ],
       body   : [ '', [ Validators.required, Validators.minLength(5), Validators.maxLength(15000) ] ],
@@ -126,7 +111,8 @@ export class PostsComponent implements OnInit, OnChanges {
     if ( isValid ) {
       this.postService.create( form.value ).subscribe(
       ( res : Post ) => {
-        this.posts.push( res ); 
+        //this.posts.push( res ); 
+        this.get()
         // this.getPostsByPage( this.paginationPosts.status, this.paginationPosts.page )
         this.closeModals();
         Swal.fire('Exito!', 'Se ha creado el post exitosamente', 'success');
@@ -141,7 +127,7 @@ export class PostsComponent implements OnInit, OnChanges {
     if ( isValid ) {
       this.postService.edit( form.value ).subscribe( 
       ( res : Post ) => {
-        this.onFixPagination( res );
+        this.onFixPagination( res, 'edit' );
         this.get()
         this.closeModals();
         Swal.fire('Exito!', 'Se ha actualizado el post exitosamente!', 'success');
@@ -149,10 +135,17 @@ export class PostsComponent implements OnInit, OnChanges {
     }
   }
 
-  onFixPagination = ( res : Post ) => {
-    if ( (this.posts.length === 1 && this.paginationPosts.page > 1)){
-      if ( res.page_id !== this.idPage || res.is_active !== this.paginationPosts.status ){
-        this.paginationPosts.page --;
+  onFixPagination = ( res : Post, mode : 'edit' | 'create'| string ) => {
+    if ( mode === 'create' ){
+
+    }
+
+    if ( mode === 'edit' ) {
+      if ( (this.posts.length === 1 && this.paginationPosts.page > 1)){
+        if ( res.page_id !== this.idPage || res.is_active !== this.paginationPosts.status ){
+          this.paginationPosts.page -- ;
+          return;
+        }
       }
     }
   }

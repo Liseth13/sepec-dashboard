@@ -3,6 +3,7 @@ import { RouteInfo } from './vertical-sidebar.metadata';
 import { VerticalSidebarService } from './vertical-sidebar.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { AuthService } from 'src/app/shared/services/auth.service';
 declare var $: any;
 
 @Component({
@@ -24,7 +25,8 @@ export class VerticalSidebarComponent {
     this.notify.emit(!this.showClass);
   }
 
-  constructor(private menuServise: VerticalSidebarService, private router: Router) {
+  constructor(private menuServise: VerticalSidebarService,  private authService : AuthService,
+    private router  :Router) {
     this.menuServise.items.subscribe(menuItems => {
       this.sidebarnavItems = menuItems;
 
@@ -59,5 +61,11 @@ export class VerticalSidebarComponent {
       left: 0,
       behavior: 'smooth'
     });
+  }
+
+  logout = () =>{
+    if ( this.authService.removeSesion() ){
+      this.router.navigate(['authentication']);
+    }
   }
 }

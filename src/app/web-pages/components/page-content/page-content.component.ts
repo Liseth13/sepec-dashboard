@@ -5,7 +5,7 @@ import { PerfectScrollbarConfigInterface } from 'ngx-perfect-scrollbar';
 import Swal from 'sweetalert2';
 import { Page } from '../../interfaces/Page';
 import { PageContent } from '../../interfaces/PageContent';
-import { Pagination } from '../../interfaces/pagination';
+import { Pagination } from '../../../shared/interfaces/Pagination';
 import { pageContentService } from '../../services/page-content.service';
 
 @Component({
@@ -127,7 +127,7 @@ export class PageContentComponent implements OnInit, OnChanges {
     }
   }
 
-  openModals( target: NgbModal , mode : 'create' | 'edit' | string = '', content? : PageContent) {
+  openModals( target: NgbModal , mode : 'create' | 'edit' | string = '', content? : PageContent ) {
     
     if ( mode === 'create' ) {
       this.loadFormCreate();

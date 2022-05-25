@@ -6,7 +6,7 @@ import Swal from 'sweetalert2';
 // import { PageContentManagerComponent } from '../../components/page-content-manager/page-content-manager.component';
 import { Page } from '../../interfaces/Page';
 import { PageContent } from '../../interfaces/PageContent';
-import { Pagination } from '../../interfaces/pagination';
+import { Pagination } from '../../../shared/interfaces/Pagination';
 import { pageContentService } from '../../services/page-content.service';
 import { WebPagesService } from '../../services/web-pages.service';
 

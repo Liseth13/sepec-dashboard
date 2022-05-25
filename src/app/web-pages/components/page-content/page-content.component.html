@@ -1,27 +1,15 @@
 <ng-template #modalCreateContent let-modal>
-    <div class="modal-header">
-        <h3 class="modal-title font-weight-bold" id="taskLabel">
+    <div class="modal-header bg-primary">
+        <h3 class="modal-title font-weight-bold text-white" id="taskLabel">
             Nuevo contenido para {{ idPage | pageName : pages }}
         </h3>
-        <button type="button" class="close" (click)="modal.dismiss()" aria-label="Close">
+        <button type="button" class="close text-white" (click)="modal.dismiss()" aria-label="Close">
         <span aria-hidden="true">&times;</span>
         </button>
     </div>
     <div class="card">
         <div class="card-body">
             <form [formGroup] = 'formCreate' (ngSubmit) ='create( formCreate )'>
-                <div class="form-group">
-                    <label for="contentBody">Contenido:</label>
-                    <!-- <input type="text" class="form-control"  id="slug" formControlName = "slug">        -->
-                    <textarea 
-                        class="form-control" 
-                        name="contentPage" 
-                        id="contentPage" 
-                        cols="30" rows="4" 
-                        formControlName='body'
-                        placeholder="Contenido de la página">
-                    </textarea>               
-                </div>
                 <div class="form-group">
                     <label for="contentIsActive">Estado de contenido:</label>
                     <select name="contentIsActive" id="contentIsActive" class="form-control" formControlName ='is_active'>
@@ -30,6 +18,18 @@
                         <option value="false" select>Inactivo</option>
                     </select>
                 </div>
+                <div class="form-group">
+                    <label for="contentBody">Contenido:</label>
+                    <!-- <input type="text" class="form-control"  id="slug" formControlName = "slug">        -->
+                    <textarea 
+                        class="form-control" 
+                        name="contentPage" 
+                        id="contentPage" 
+                        cols="30" rows="10" 
+                        formControlName='body'
+                        placeholder="Contenido de la página">
+                    </textarea>               
+                </div> 
                 <div class="form-group ml-p2">
                     <button type ="submmit" class="btn btn-primary">Agregar</button>
                     <button type ="button" class="btn btn-danger" (click)="modal.dismiss()">Cancelar</button>
@@ -41,29 +41,17 @@
 
 <!-- Modal editar contenido de página -->
 <ng-template #modalEditContentPage let-modal>
-    <div class="modal-header">
-        <h3 class="modal-title font-weight-bold" id="taskLabel">
+    <div class="modal-header bg-primary">
+        <h3 class="modal-title font-weight-bold text-white" id="taskLabel">
             Editando contenido de {{ idPage | pageName : pages }}
         </h3>
-        <button type="button" class="close" (click)="modal.dismiss()" aria-label="Close">
+        <button type="button" class="close text-white" (click)="modal.dismiss()" aria-label="Close">
         <span aria-hidden="true">&times;</span>
         </button>
     </div>
     <div class="card">
         <div class="card-body">
-            <form [formGroup] = 'formEdit' (ngSubmit) ='edit( formEdit )'>
-                <div class="form-group">
-                    <label for="contentBody">Contenido:</label>
-                    <!-- <input type="text" class="form-control"  id="slug" formControlName = "slug">        -->
-                    <textarea 
-                        class="form-control" 
-                        name="contentPage" 
-                        id="contentPage" 
-                        cols="30" rows="4" 
-                        formControlName='body'
-                        placeholder="Contenido de la página">
-                    </textarea>               
-                </div>
+            <form [formGroup] = 'formEdit' (ngSubmit) ='edit( formEdit )'> 
                 <div class="form-group">
                     <label for="contentIsActive">Estado de contenido:</label>
                     <select name="contentIsActive" id="contentIsActive" class="form-control" formControlName ='is_active'>
@@ -71,6 +59,18 @@
                         <option value="true" select>Activo</option>
                         <option value="false" select>Inactivo</option>
                     </select>
+                </div>
+                <div class="form-group">
+                    <label for="contentBody">Contenido:</label>
+                    <!-- <input type="text" class="form-control"  id="slug" formControlName = "slug">        -->
+                    <textarea 
+                        class="form-control" 
+                        name="contentPage" 
+                        id="contentPage" 
+                        cols="30" rows="10"  
+                        formControlName='body'
+                        placeholder="Contenido de la página">
+                    </textarea>               
                 </div>
                 <div class="form-group ml-p2">
                     <button type ="submmit" class="btn btn-primary" >Editar</button>
@@ -81,18 +81,19 @@
     </div>
 </ng-template>
 
-<div class="card bg-primary">
-    <div class="card-body text-white">
-        <div class="d-flex flex-row">
-            <div class="display-6 align-self-center">
-                <i class="ti-calendar"></i>
+
+<div class="card border-left border-primary">
+    <div class="card-body">
+        <div class="d-flex no-block align-items-center">
+            <div>
+                <span class="text-primary display-6">
+                    <i class="ti-layout-media-left-alt"></i>
+                    <h3>Contenido | {{ idPage | pageName : pages }}</h3>
+                </span>
             </div>
-            <div class="p-10 align-self-center">
-                <h4 class="m-b-0 text-white">{{ idPage | pageName : pages }}</h4>
-                <span>Contenido</span>
-            </div>
-            <div class="ml-auto align-self-center">
-                <h2 class="font-medium m-b-0 text-white">{{ contentsByPage.length }} Totales</h2>
+            <div class="ml-auto">
+                <h2>{{ contentsByPage.length }} Totales</h2>
+                <h6 class="text-primary">Contenidos</h6>
             </div>
         </div>
     </div>
@@ -114,7 +115,7 @@
         </ngb-pagination>   
     </div>
     <div  class="text-left">
-        <button class ="btn btn-primary" (click)='openModals(modalCreateContent, "create")'>Crear Contenido</button>
+        <button  class="btn btn-primary text-white" (click)='openModals(modalCreateContent, "create")' ><i  class="fa fa-plus-square me-2 mr-1"></i>Nuevo contenido</button> 
     </div>
 </div>
 
@@ -138,7 +139,7 @@
                 </div>
                 <div class="mb-3">
                     <div *ngIf='true'>
-                        <button type="button" class="btn btn-outline-success btn-sm" (click)="openModals(modalEditContentPage, 'edit', content)" >
+                        <button type="button" class="btn btn-outline-primary btn-sm" (click)="openModals(modalEditContentPage, 'edit', content)" >
                             <i class="me-2 fas fa-edit"></i> Editar
                         </button>
                     </div>
