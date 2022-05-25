@@ -45,7 +45,12 @@ export class PageContentComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    this.getContentsByPage( this.contents, this.idPage );
+
+    if ( this.contents.length > 0 ) {
+      this.getContentsByPage();
+    }
+
+    this.get();
   }
 
   loadFormCreate= ( ) => {
@@ -60,7 +65,7 @@ export class PageContentComponent implements OnInit, OnChanges {
     this.formEdit = this.formBuilder.group({
       id        : [ pageContent.id, [ Validators.required ] ],
       page      : [ pageContent.page , [Validators.required ] ],
-      body      : [ pageContent.body, [ Validators.required, Validators.minLength(5), Validators.maxLength(100) ] ],
+      body      : [ pageContent.body, [ Validators.required, Validators.minLength(5), Validators.maxLength(15000) ] ],
       is_active : [ pageContent.is_active, [ Validators.required ] ]
     });
   }
@@ -77,25 +82,31 @@ export class PageContentComponent implements OnInit, OnChanges {
     this.pageContentService.get().subscribe(
     ( res : PageContent[] ) => {
       this.contents = res;
-      this.getContentsByPage( this.contents, this.idPage, this.paginationContentPage.status )
+      this.getContentsByPage();
     }, ( error : any ) => { this.errorHandler( error )});
   }
 
-  getContentsByPage = ( contents : PageContent[], idPage : string, status : boolean = true, page : number = 1 ) => {
-    this.contentsByPage = this.contents.filter( c => c.page === idPage && c.is_active === status);
-    this.paginationContentPage.collectionSize = this.contentsByPage.length;
+  getContentsByPage = ( status : boolean = true, page : number = 1 ) => {
     this.paginationContentPage.status = status;
+
+    if ( this.contents.length > 0 ) {
+      this.contentsByPage = this.contents.filter( c => c.page === this.idPage && c.is_active === status);
+      this.paginationContentPage.collectionSize = this.contentsByPage.length;
+      this.paginationContentPage.page = page;
+      return;
+    }
+    this.paginationContentPage.collectionSize = 0;
     this.paginationContentPage.page = page;
   }
 
   create = ( form : FormGroup ) => {
+    console.log(form.value)
     const isValid : boolean = this.validateForms( form );
     if ( isValid ) {
       this.pageContentService.create( form.value ).subscribe(
       ( res : PageContent ) => {
         this.contents.push( res ); 
-        this.paginationContentPage.collectionSize ++ ;
-        this.getContentsByPage( this.contents, this.idPage, this.paginationContentPage.status, this.paginationContentPage.page )
+        this.getContentsByPage( this.paginationContentPage.status, this.paginationContentPage.page )
         this.closeModals();
         Swal.fire('Exito!', 'Se ha creado el post exitosamente', 'success');
       }, 
@@ -109,7 +120,7 @@ export class PageContentComponent implements OnInit, OnChanges {
       this.pageContentService.edit( form.value ).subscribe( 
       ( res : PageContent ) => {
         this.contents = this.contents.map( ( c : PageContent) => c.id === res.id ? { ...res } : c );
-        this.getContentsByPage(this.contents, this.idPage, this.paginationContentPage.status, this.paginationContentPage.page)
+        this.getContentsByPage(this.paginationContentPage.status, this.paginationContentPage.page)
         this.closeModals();
         Swal.fire('Exito!', 'Se ha actualizado el post exitosamente!', 'success');
       }, ( error : any ) => { this.errorHandler( error ) });
@@ -138,7 +149,6 @@ export class PageContentComponent implements OnInit, OnChanges {
   }
 
   errorHandler = ( error : any ) => {
-    console.log( error )
     Swal.fire('Error', "Ha ocurrido un error, reintentar operación", 'error');
   }
 

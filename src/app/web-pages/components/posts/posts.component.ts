@@ -1,7 +1,6 @@
 import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { is } from 'date-fns/locale';
 import { PerfectScrollbarConfigInterface } from 'ngx-perfect-scrollbar';
 import Swal from 'sweetalert2';
 import { Page } from '../../interfaces/Page';
@@ -20,8 +19,6 @@ export class PostsComponent implements OnInit, OnChanges {
   @Input() pages : Page[] = [];
 
   posts : Array<Post> = [];
-
-  public postsByPage :  Array<Post> = [];
 
   paginationPosts = new Pagination();
 
@@ -42,19 +39,38 @@ export class PostsComponent implements OnInit, OnChanges {
     this.get();
     this.loadFormCreate();
     this.paginationPosts.pageSize = 3;
-    // this.loadFormEdit();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    this.getPostsByPage( this.posts, this.idPage );
+    // if ( this.posts.length > 0 ){
+    //   this.getPostsByPage();
+    //   return;
+    // } 
+    this.paginationPosts = new Pagination();
+    this.paginationPosts.pageSize = 3;
+    this.get();
   } 
 
-  getPostsByPage = ( posts : Post[], idPage : string, status : boolean = true, page : number = 1 ) => {
-    this.postsByPage = posts.filter( p => p.page === idPage && p.is_active === status);
-    this.paginationPosts.collectionSize = this.postsByPage.length;
-    this.paginationPosts.status = status;
+  onChangePage = ( page : number ) => {
+
     this.paginationPosts.page = page;
+    this.get();
   }
+
+  // getPostsByPage = ( status : boolean = true, page : number = 1 ) => {
+  //   this.paginationPosts.status = status;
+
+  //   if ( this.posts.length > 0 ) {
+  //     this.postsByPage = this.posts.filter( p => p.page_id === this.idPage && p.is_active === status);
+  //     this.paginationPosts.collectionSize = this.postsByPage.length;
+  //     this.paginationPosts.page = page;
+  //     return;
+  //   }
+
+  //   this.paginationPosts.collectionSize = 0;
+  //   this.paginationPosts.page = 1;
+    
+  // }
 
   loadFormCreate = () => {
     this.formCreate = this.formBuilder.group({
@@ -69,7 +85,7 @@ export class PostsComponent implements OnInit, OnChanges {
   loadFormEdit = ( post : Post ) => {
     this.formEdit = this.formBuilder.group({
       id     : [ post?.id || null , [ Validators.required ] ],
-      page   : [ post?.page || null , [ Validators.required ] ],
+      page_id   : [ post?.page_id || null , [ Validators.required ] ],
       title  : [ post?.title || null , [ Validators.required, Validators.minLength( 5 ), Validators.maxLength( 200 ) ] ],
       slug   : [ post?.slug || null , [ Validators.required] ],
       body   : [ post?.body || null , [ Validators.required, Validators.minLength(5), Validators.maxLength(15000) ] ],
@@ -86,28 +102,38 @@ export class PostsComponent implements OnInit, OnChanges {
     return false;
   }
 
-  get(){
-    this.postService.get().subscribe(
-    ( res : Post[] ) => { 
-      this.posts = res ;
-      this.getPostsByPage( this.posts, this.idPage, this.paginationPosts.status );
+  get( isShowLoading : boolean = false ){
+    console.log( this.paginationPosts.status )
+    this.postService.get( this.idPage,this.paginationPosts.page, this.paginationPosts.pageSize, this.paginationPosts.status ).subscribe(
+    ( res : any ) => { 
+      console.log(res)
+      this.posts = res.results ;
+      this.paginationPosts.collectionSize = res.count;
+      
+      // this.getPostsByPage();
     },
     ( error : any ) => { this.errorHandler( error ) });
   }
 
+  getPostsByStatus = () => {
+    this.paginationPosts.page = 1;
+    this.get();
+  }
+
   create = ( form : FormGroup ) => {
+    
     const isValid : boolean = this.validateForms( form );
     if ( isValid ) {
       this.postService.create( form.value ).subscribe(
       ( res : Post ) => {
         this.posts.push( res ); 
-        this.paginationPosts.collectionSize ++ ;
-        this.getPostsByPage( this.posts, this.idPage, this.paginationPosts.status, this.paginationPosts.page )
+        // this.getPostsByPage( this.paginationPosts.status, this.paginationPosts.page )
         this.closeModals();
         Swal.fire('Exito!', 'Se ha creado el post exitosamente', 'success');
       }, 
       ( error : any ) => { this.errorHandler( error ) });
     }
+    
   }
 
   edit = ( form : FormGroup ) => {
@@ -115,11 +141,19 @@ export class PostsComponent implements OnInit, OnChanges {
     if ( isValid ) {
       this.postService.edit( form.value ).subscribe( 
       ( res : Post ) => {
-        this.posts = this.posts.map( ( post : Post) => post.id === res.id ? { ...res } : post );
-        this.getPostsByPage(this.posts, this.idPage, this.paginationPosts.status, this.paginationPosts.page)
+        this.onFixPagination( res );
+        this.get()
         this.closeModals();
         Swal.fire('Exito!', 'Se ha actualizado el post exitosamente!', 'success');
       }, ( error : any ) => { this.errorHandler( error ) });
+    }
+  }
+
+  onFixPagination = ( res : Post ) => {
+    if ( (this.posts.length === 1 && this.paginationPosts.page > 1)){
+      if ( res.page_id !== this.idPage || res.is_active !== this.paginationPosts.status ){
+        this.paginationPosts.page --;
+      }
     }
   }
 
@@ -145,7 +179,6 @@ export class PostsComponent implements OnInit, OnChanges {
   }
 
   errorHandler = ( error : any ) => {
-    console.log( error )
     Swal.fire('Error', "Ha ocurrido un error, reintentar operación", 'error');
   }
 

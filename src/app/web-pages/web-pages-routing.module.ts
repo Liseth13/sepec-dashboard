@@ -9,16 +9,16 @@ const routes: Routes = [
     redirectTo: 'pages',
   },
   {
-		path: '',
-		children: [
-			{
-				path: 'pages',
-				component: WebPagesComponent,
-			},
-			{
-				path: 'banner',
-				component: BannerComponent,
-			},
+	path: '',
+	children: [
+		{
+			path: 'pages',
+			component: WebPagesComponent,
+		},
+		{
+			path: 'banner',
+			component: BannerComponent,
+		},
     ]
   }
 ];

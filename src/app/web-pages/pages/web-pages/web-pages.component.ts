@@ -123,10 +123,11 @@ export class WebPagesComponent implements OnInit {
     if ( isValid ) {
      this.webPageService.create( this.formCreate.value ).subscribe(
        ( res : Page ) => {
-        this.webPages.push( res );
+        // this.webPages.push( res );
+        this.webPages =  [...this.webPages, res];
+        this.showPages( this.paginationPages.status )
         this.closeRightSidebar();
-        Swal.fire('Exito!', 'La página se ha creado exitosamente', 'success');
-        
+        Swal.fire('Exito!', 'La página se ha creado exitosamente', 'success');      
        }
      ), ( error : any ) => { this.errorHandler( error ) }
     }
@@ -192,7 +193,6 @@ export class WebPagesComponent implements OnInit {
   }
 
   errorHandler = ( error : any ) => {
-    console.log( error )
     Swal.fire('Error', "Ha ocurrido un error, reintentar operación", 'error');
   }
 
@@ -206,8 +206,6 @@ export class WebPagesComponent implements OnInit {
       this.showMode = mode;
       this.idPageSelected = pageId;
     }
-
-    console.log(this.showMode)
   }
 
   showPages = ( status : boolean = true, page : number = 1 ) => {

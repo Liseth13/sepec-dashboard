@@ -90,7 +90,7 @@
                 <span>Posts</span>
             </div>
             <div class="ml-auto align-self-center">
-                <h2 class="font-medium m-b-0 text-white">{{ postsByPage.length }} Totales</h2>
+                <h2 class="font-medium m-b-0 text-white">{{ paginationPosts.collectionSize }} Totales</h2>
             </div>
         </div>
     </div>
@@ -99,17 +99,18 @@
 <div class="d-flex align-items-center justify-content-between px-3 py-4 border-bottom">
     <!-- <app-page-content [pageId]="idPageSelected"></app-page-content> -->
     <div >
-        <select class="form-control" [(ngModel)] ="paginationPosts.status" (change)='getPostsByPage(posts, idPage, paginationPosts.status)'>
+        <select class="form-control" [(ngModel)] ="paginationPosts.status" (change)='getPostsByStatus()'>
             <option [ngValue]="true" [(selected)]="paginationPosts.status"> Posts activos </option>
             <option [ngValue]="false"[(selected)]="!paginationPosts.status">Posts inactivos</option>
         </select>   
         
     </div>
-    <div *ngIf="postsByPage.length > 0" class="mail-pagination ">
+    <div *ngIf="posts.length > 0" class="mail-pagination ">
         <ngb-pagination 
             [collectionSize]="paginationPosts.collectionSize" 
-            [(page)]="paginationPosts.page" 
+            [(page)]="paginationPosts.page"
             [pageSize]="paginationPosts.pageSize"   
+            (pageChange)="onChangePage($event)"
         >
         </ngb-pagination>   
     </div>
@@ -118,21 +119,25 @@
     </div>
 </div>
 
-<div *ngIf="postsByPage.length > 0" >
+<div *ngIf="posts.length > 0" >
     <div class="position-relative" style="height: calc(100vh - 250px);" [perfectScrollbar]="config">
         <!-- <router-outlet></router-outlet> -->
         <!-- POSTS NAVIGATION -->
         <!-- POSTS -->
-        <spam *ngFor="let post of postsByPage | slice: (paginationPosts.page-1) * paginationPosts.pageSize : (paginationPosts.page-1) * paginationPosts.pageSize + paginationPosts.pageSize" >
+        <spam *ngFor="let post of posts ">
             
             <div class="p-3">
                 <div class="mb-3 d-flex align-items-center">
-                    <img src="../../../../assets/images/img1.jpg" class="rounded-circle" alt="userimg" width="35" height="35">
+                    <img src="../../../../assets/images/user.svg" class="rounded-circle" alt="userimg" width="35" height="35">
                     <div class="ml-2">
-                        <h5 class="mb-0">{{ post.author }}</h5>
+                        <!-- <h5 class="mb-0">{{ post.author }}</h5> -->
+                        <h5 class="mb-0">Sepec</h5>
                         <span class="text-muted">Administrador,</span>
                     </div>
             
+                </div>
+                <div class="mb-3">
+                    <h3 class="text-black fs-5">{{ post.title }}</h3>
                 </div>
                 <div class="mb-4">
                     {{ post.body }}
@@ -156,7 +161,7 @@
     </div>
 </div>
 
-<div *ngIf="postsByPage.length === 0 " class="position-relative" style="height: calc(100vh - 220px);" [perfectScrollbar]="config">
+<div *ngIf="posts.length === 0 " class="position-relative" style="height: calc(100vh - 220px);" [perfectScrollbar]="config">
     <div class="d-flex align-items-center justify-content-center h-100" (click)="openModals( modalCreatePost, 'create' )">
         <div class="text-center" >
             

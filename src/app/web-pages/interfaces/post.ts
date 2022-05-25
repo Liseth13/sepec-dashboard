@@ -1,6 +1,6 @@
 export interface Post {
     id        : string,
-    page      : string,  //  Id page
+    page_id   : string,  //  Id page
     title     : string,
     slug      : string,
     body      : string,

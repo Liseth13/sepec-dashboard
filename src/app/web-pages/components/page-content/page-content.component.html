@@ -101,7 +101,7 @@
 <div class="d-flex align-items-center justify-content-between px-3 py-4 border-bottom">
     <!-- <app-page-content [pageId]="idPageSelected"></app-page-content> -->
     <div >
-        <select class="form-control" [(ngModel)] ="paginationContentPage.status" (change)='getContentsByPage(contents, idPage, paginationContentPage.status)'>
+        <select class="form-control" [(ngModel)] ="paginationContentPage.status" (change)='getContentsByPage(paginationContentPage.status)'>
             <option [ngValue]="true" [(selected)]="paginationContentPage.status"> Contenido activo </option>
             <option [ngValue]="false"[(selected)]="!paginationContentPage.status">Contenido inactivo</option>
         </select>   
@@ -120,20 +120,19 @@
 
 <div *ngIf='contentsByPage.length > 0 '>
     <div class="position-relative" style="height: calc(100vh - 250px);" [perfectScrollbar]="config">
-        <!-- <router-outlet></router-outlet> -->
         <!-- POSTS NAVIGATION -->
         <!-- POSTS -->
         <spam *ngFor="let content of contentsByPage | slice: (paginationContentPage.page-1) * paginationContentPage.pageSize : (paginationContentPage.page-1) * paginationContentPage.pageSize + paginationContentPage.pageSize" >
             
             <div class="p-3">
-                <div class="mb-3 d-flex align-items-center">
+                <!-- <div class="mb-3 d-flex align-items-center">
                     <img src="../../../../assets/images/img1.jpg" class="rounded-circle" alt="userimg" width="35" height="35">
                     <div class="ml-2">
                         <h5 class="mb-0">Autor</h5>
                         <span class="text-muted">Administrador,</span>
                     </div>
             
-                </div>
+                </div> -->
                 <div class="mb-4">
                     {{ content.body }}
                 </div>

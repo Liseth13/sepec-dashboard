@@ -11,7 +11,7 @@ export class PostsService {
 
   constructor( private httpClient : HttpClient ) { }
 
-  get = () => this.httpClient.get(`${this.url}/api/v1/website/posts/`);
+  get = ( pageId : string, page : number, pagesize : number = 3, status : boolean = true ) => this.httpClient.get(`${this.url}/api/v1/website/posts/?page_id=${pageId}&page=${page}&page_size=${pagesize}&is_active=${status}`);
 
   create = ( post : any ) => this.httpClient.post(`${this.url}/api/v1/website/posts/`, post );
 
