@@ -10,6 +10,7 @@ import { FootersSitesComponent } from './pages/footers-sites/footers-sites.compo
 import { BannerComponent } from './pages/banner/banner.component';
 import { ItemBannerComponent } from './pages/item-banner/item-banner.component';
 import { BannerNamePipe } from './pipes/banner-name.pipe';
+import { MenuComponent } from './pages/menu/menu.component';
 
 @NgModule({
   declarations: [
@@ -17,7 +18,8 @@ import { BannerNamePipe } from './pipes/banner-name.pipe';
     FootersSitesComponent,
     BannerComponent,
     ItemBannerComponent,
-    BannerNamePipe
+    BannerNamePipe,
+    MenuComponent
   ],
   imports: [
     CommonModule,

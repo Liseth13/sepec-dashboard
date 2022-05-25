@@ -30,6 +30,16 @@ export const ROUTES: RouteInfo[] = [
         extralink: false,
         submenu: [],
       },
+      {
+        path: "/dash/sites/menu",
+        title: "Menu",
+        icon: "Layout",
+        class: "",
+        label: "",
+        labelClass: "",
+        extralink: false,
+        submenu: [],
+      },
     ],
   },
   {

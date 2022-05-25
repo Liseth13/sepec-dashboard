@@ -76,20 +76,16 @@ export class BannerComponent implements OnInit {
       Swal.fire('Error','Faltan Campos Por Validar','warning')
     }else{
 
-      console.log(this.formBannerEdit.value);
       const { ...data } = this.formBannerEdit.value;
       // is_active === 'true' ? data.is_active = true : data.is_active = false;
-      console.log(data);
 
       this.BannerService.updateBanner(data, this.formBannerEdit.value.id).subscribe(
         (res:any)=>{
-          console.log(res);
           this.getWebBanner();
           this.closeModal();
           Swal.fire(' Success','Editado correctamente','success');
         },
         (error:any)=>{
-          console.log(error)
           Swal.fire('Error','vuelva a intentarlo','error');
         }
       )
@@ -98,21 +94,19 @@ export class BannerComponent implements OnInit {
 
   create(){
       
-    console.log (this.formBannerCreate.value)
+
     if(this.formBannerCreate.invalid){
       Swal.fire('Error','Faltan Campos Por Validar','warning')    
     }else{
       
       this.BannerService.createBanner(this.formBannerCreate.value).subscribe(
         (res:any)=>{
-          console.log(res)
           
           this.getWebBanner()
           this.closeRightMenu();
           Swal.fire(' Success','Guardado correctamente','success')
         },
         (error:any)=>{
-          console.log(error)
           Swal.fire('Error','vuelva a intentarlo','error')
         }
       )
@@ -136,7 +130,6 @@ export class BannerComponent implements OnInit {
         this.collectionSize = this.webBanner.length;
         this.charging = false;
         Swal.close();
-        console.log(res);
       },
     (error:any) =>{})
   }
@@ -160,7 +153,6 @@ export class BannerComponent implements OnInit {
         this.collectionSizePage = this.webPages.length;
         this.charging = false;
         Swal.close();
-        console.log(res);
       },
     (error:any) =>{})
   }
@@ -178,7 +170,6 @@ export class BannerComponent implements OnInit {
   }
 
   openModalEdit(content1: string, data: any) {
-    console.log(data);
     this.formBannerEdit.patchValue({
       id: data.id,
       page: data.page,
@@ -237,7 +228,6 @@ export class BannerComponent implements OnInit {
   }
 
   seleccionar(Page){
-    console.log(Page);
     if (this.idView == 'create') {
       this.formBannerCreate.get('page').setValue(Page.id);
       this.modalService.dismissAll();

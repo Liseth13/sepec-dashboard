@@ -11,9 +11,10 @@ import { BannerService } from '../../services/banner.service';
   styleUrls: ['./item-banner.component.scss']
 })
 export class ItemBannerComponent implements OnInit {
-  private totalWebItemBanner : number = 0;
+  public totalWebItemBanner : number = 0;
   formItemBannerCreate:  FormGroup;
   formItemBannerEdit:  FormGroup;
+  public formSubmitted = false;
 
   public charging : boolean = true;
 
@@ -59,91 +60,7 @@ export class ItemBannerComponent implements OnInit {
     this.getWebBanner();
   }
 
-  loadformItemBannerCreate(){
-    this.formItemBannerCreate = this.formBuilder.group({ 
-      banner:['',[Validators.required, Validators.maxLength(20),Validators.minLength(3)]],
-      name:['',[Validators.required, Validators.maxLength(20),Validators.minLength(3)]],
-      url:['',[Validators.required, Validators.maxLength(20),Validators.minLength(3)]],
-      text:['',[Validators.required, Validators.maxLength(20),Validators.minLength(3)]],
-      img:[null],
-    })
-  }
-
-  loadformItemBannerEdit(){
-    this.formItemBannerEdit = this.formBuilder.group({
-      banner:[0],
-      name:['',[Validators.required, Validators.maxLength(20),Validators.minLength(3)]],
-      url:['',[Validators.required, Validators.maxLength(20),Validators.minLength(3)]],
-      text:['',[Validators.required, Validators.maxLength(20),Validators.minLength(3)]],
-      img:[null],
-      is_active:[null,[Validators.required]],
-    })
-  }
-  
-  edit(){
-
-    if(this.formItemBannerEdit.invalid){
-      Swal.fire('Error','Faltan Campos Por Validar','warning')
-    }else{
-
-      const { ...data } = this.formItemBannerEdit.value;
-      const dataForm = new FormData();
-      for (var key in data) {
-        if(key === 'img'){
-          dataForm.append('img', this.imageUpload);
-        }else{
-          dataForm.append(key, data[key]);
-        }
-      }
-
-      this.bannerItemService.updateItemBanner(dataForm, this.webItemBannerId).subscribe(
-        (res:any)=>{
-          console.log(res);
-          this.getWebItemBanner();
-          Swal.fire(' Success','Editado correctamente','success');
-        },
-        (error:any)=>{
-          console.log(error)
-          Swal.fire('Error','vuelva a intentarlo','error');
-        }
-      )
-    }
-  }
-
-   create(){ 
-
-        if(this.formItemBannerCreate.invalid){
-          Swal.fire('Error','Faltan Campos Por Validar','warning')
-        }else{
-
-          const { ...data } = this.formItemBannerCreate.value;
-          const dataForm = new FormData();
-          for (var key in data) {
-            if(key === 'img'){
-              dataForm.append('img', this.imageUpload);
-            }else{
-              dataForm.append(key, data[key]);
-            }
-          }
-          
-          this.bannerItemService.createItemBanner(dataForm).subscribe(
-            (res:any)=>{
-              console.log(res)
-              
-              this.getWebItemBanner()
-              this.closeRightMenu();
-              Swal.fire(' Success','Guardado correctamente','success')
-            },
-            (error:any)=>{
-              console.log(error)
-              Swal.fire('Error','vuelva a intentarlo','error')
-            }
-          )
-        }
-   }
-
-
-   getWebItemBanner = () =>{
+  getWebItemBanner = () =>{
     Swal.fire({
       title: 'Cargando',
       html: 'Por favor espera un momento...',
@@ -161,16 +78,120 @@ export class ItemBannerComponent implements OnInit {
         this.collectionSize = this.webItemBanner.length;
         this.charging = false;
         Swal.close();
-        console.log(res);
       },
     (error:any) =>{})
   }
 
+  loadformItemBannerCreate(){
+    this.formItemBannerCreate = this.formBuilder.group({ 
+      banner:['',[Validators.required, Validators.maxLength(100),Validators.minLength(3)]],
+      name:['',[Validators.required, Validators.maxLength(100),Validators.minLength(3)]],
+      url:['',[Validators.required, Validators.maxLength(300),Validators.minLength(3)]],
+      text:['',[Validators.required, Validators.maxLength(100),Validators.minLength(3)]],
+      img:[null],
+    })
+  }
+
+  loadformItemBannerEdit(){
+    this.formItemBannerEdit = this.formBuilder.group({
+      banner:[0],
+      name:['',[Validators.required, Validators.maxLength(100),Validators.minLength(3)]],
+      url:['',[Validators.required, Validators.maxLength(300),Validators.minLength(3)]],
+      text:['',[Validators.required, Validators.maxLength(100),Validators.minLength(3)]],
+      img:[null],
+      is_active:[null,[Validators.required]],
+    })
+  }
+  
+  edit(){
+
+    this.formSubmitted = true;
+
+    if(this.formItemBannerEdit.invalid){
+      Swal.fire('Error','Faltan Campos Por Validar','warning');
+    }else{
+
+      if( !this.validImageExtension || !this.allowedFileSize ){
+        return Swal.fire('Error','Verifica la extensión y el tamaño de la imagen','warning');
+      }
+
+      const { ...data } = this.formItemBannerEdit.value;
+      const dataForm = new FormData();
+      for (var key in data) {
+        if(key === 'img' && this.imageUpload !== null){
+          dataForm.append('img', this.imageUpload);
+        }else{
+          if(key !== 'img'){
+            dataForm.append(key, data[key]);
+          }
+        }
+      }
+
+      this.bannerItemService.updateItemBanner(dataForm, this.webItemBannerId).subscribe(
+        (res:any)=>{
+          this.getWebItemBanner();
+          Swal.fire(' Success','Editado correctamente','success');
+        },
+        (error:any)=>{
+          Swal.fire('Error','vuelva a intentarlo','error');
+        }
+      )
+    }
+  }
+
+   create(){ 
+
+      this.formSubmitted = true;
+
+      if(this.formItemBannerCreate.invalid){
+        Swal.fire('Error','Faltan Campos Por Validar','warning')
+      }else{
+
+        if( this.imageUpload === null ){
+          return Swal.fire('Error','Debes seleccionar una imagen','warning');
+        }
+
+        if( !this.validImageExtension || !this.allowedFileSize ){
+          return Swal.fire('Error','Verifica la extensión y el tamaño de la imagen','warning');
+        }
+
+        const { ...data } = this.formItemBannerCreate.value;
+        const dataForm = new FormData();
+        for (var key in data) {
+          if(key === 'img'){
+            dataForm.append('img', this.imageUpload);
+          }else{
+            dataForm.append(key, data[key]);
+          }
+        }
+        
+        this.bannerItemService.createItemBanner(dataForm).subscribe(
+          (res:any)=>{
+            
+            this.getWebItemBanner()
+            this.closeRightMenu();
+            Swal.fire('Guardado','Guardado correctamente','success')
+          },
+          (error:any)=>{
+            Swal.fire('Error','vuelva a intentarlo','error')
+          }
+        )
+      }
+  }
+
   openModal(content1: string, data: any) {
-    
+    this.imageUpload = null;
+    this.formSubmitted = false; 
     if(data === 0){
-      this.imageUpload = null;
       this.idView = 'create';
+      this.formItemBannerCreate.patchValue({
+        banner: '',
+        name: '',
+        url: '',
+        text: '',
+        img: null,
+        is_active: null
+      });
     }
 
     this.tempImg = data.img;
@@ -211,18 +232,14 @@ export class ItemBannerComponent implements OnInit {
     this.bannerService.getBanner().subscribe(
       (res:any) =>{
         this.banners = res;
-        console.log(res)
       },
     (error:any) =>{})
   }
 
   seleccionar(banner:any){
-    console.log(banner);
     if (this.idView == 'create') {
       this.formItemBannerCreate.get('banner').setValue(banner.id);
-      console.log('Creating new banner');
     } else {
-      console.log('edit new banner');
       var x = 1
       this.formItemBannerEdit.get('banner').setValue(banner.id);
     }
