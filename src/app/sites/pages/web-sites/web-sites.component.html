@@ -140,7 +140,7 @@
                                     <img *ngIf="tempImg" [src]="tempImg" class="add-modal-image">
                                 </div>
                 
-                                <input type="file" class="" (change)="changeImage($event.target.files[0])" formControlName="icon">
+                                <input type="file" class="" (change)="changeImage($event.target.files[0])">
                 
                                 <div *ngIf="!validImageExtension" class="mb-2 mr-3">
                                     <p class="text-danger">La extensión de este archivo no está permitida, cargue un archivo con la extensión jpg, jpe, png.</p>

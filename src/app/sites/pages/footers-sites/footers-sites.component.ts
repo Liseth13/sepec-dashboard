@@ -24,7 +24,7 @@ export class FootersSitesComponent implements OnInit {
   public totalFooterSite:number = 0;
   private webFooterId: number = 0;
   private formFooterCreate: FormGroup;
-  formFooterEdit: FormGroup;
+  private formFooterEdit: FormGroup;
   websiteId: any;
   closeResult: string;
   count = 0;
@@ -47,7 +47,6 @@ export class FootersSitesComponent implements OnInit {
    this.loadformSiteCreate();
    this.loadformSiteEdit();
    this.getWebSite();
-   console.log(this.selectedST);
    
   }
 
@@ -75,7 +74,6 @@ export class FootersSitesComponent implements OnInit {
     if ( form.valid ) {
       return true;
     }
-    // this.alerts.basic('error', 'Error!', 'Los datos del formulario no son validos');
     return false
   };
 
@@ -87,7 +85,7 @@ export class FootersSitesComponent implements OnInit {
     this.collectionSize = this.footers.length;
     this.charging = false;
     Swal.close();
-    console.log(res);
+
     },
     (error:any) =>{})
   }
@@ -98,7 +96,6 @@ export class FootersSitesComponent implements OnInit {
         this.webSites = res;
       },
       (error) => {
-        console.log(error);
         
       }
     )
@@ -106,7 +103,6 @@ export class FootersSitesComponent implements OnInit {
 
 
   openModal(content1: string, data: any) {
-    console.log(data.site);
     
     if (data != 0) {
       this.formFooterEdit.patchValue({
@@ -169,20 +165,15 @@ export class FootersSitesComponent implements OnInit {
       Swal.fire('Error','Faltan Campos Por Validar','warning')
     }else{
       this.webFooterId=this.formFooterEdit.value.id;
-      console.log(this.formFooterEdit.value);
       const { ...data } = this.formFooterEdit.value;
-      // is_active === 'true' ? data.is_active = true : data.is_active = false;
-      console.log(data);
 
       this.footerSiteService.updateFootersSites(data, this.webFooterId).subscribe(
         (res:any)=>{
-          console.log(res);
           this.getWebFooters();
           this.closeModal();
           Swal.fire(' Success','Editado correctamente','success');
         },
         (error:any)=>{
-          console.log(error)
           Swal.fire('Error','vuelva a intentarlo','error');
         }
       )
@@ -191,28 +182,24 @@ export class FootersSitesComponent implements OnInit {
 
   create(){
       
-    console.log (this.formFooterCreate.value)
     if(this.formFooterCreate.invalid){
       Swal.fire('Error','Faltan Campos Por Validar','warning')
     }else{
       
       this.footerSiteService.createFootersSites(this.formFooterCreate.value).subscribe(
         (res:any)=>{
-          console.log(res)
           
           this.getWebFooters()
           this.closeRightMenu();
           Swal.fire(' Success','Guardado correctamente','success')
         },
         (error:any)=>{
-          console.log(error)
           Swal.fire('Error','vuelva a intentarlo','error')
         }
       )
     }
 }
   seleccionar(site){
-    console.log(site);
     
       this.formFooterCreate.get('site').setValue(site.id);
       this.closeModal()
@@ -229,7 +216,5 @@ export class FootersSitesComponent implements OnInit {
       return siteName;
     }
   }
-
-
 }
 

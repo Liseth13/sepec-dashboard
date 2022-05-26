@@ -5,17 +5,21 @@ import { WebSitesRoutingModule } from './web-sites-routing.module';
 import { WebSitesComponent } from './pages/web-sites/web-sites.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { FootersSitesComponent } from './pages/footers-sites/footers-sites.component';
 import { BannerComponent } from './pages/banner/banner.component';
-
-
+import { ItemBannerComponent } from './pages/item-banner/item-banner.component';
+import { BannerNamePipe } from './pipes/banner-name.pipe';
+import { MenuComponent } from './pages/menu/menu.component';
 
 @NgModule({
   declarations: [
     WebSitesComponent,
     FootersSitesComponent,
-    BannerComponent
+    BannerComponent,
+    ItemBannerComponent,
+    BannerNamePipe,
+    MenuComponent
   ],
   imports: [
     CommonModule,
@@ -24,6 +28,6 @@ import { BannerComponent } from './pages/banner/banner.component';
     NgbModule,
     FormsModule,
     HttpClientModule,
-  ]
+  ],  
 })
 export class WebSitesModule { }

@@ -17,7 +17,7 @@ export class WebSitesComponent implements OnInit {
   selectedST: Site | undefined = Object.create(null);
   sectionTask: Site[] | null = null;
   public webSites    : Array <any> = [];
-  private totalWebSites : number = 0;
+  public totalWebSites : number = 0;
   public charging : boolean = true;
   public formSiteCreate      : FormGroup;
   private formSiteEdit        : FormGroup;
@@ -139,20 +139,15 @@ export class WebSitesComponent implements OnInit {
       Swal.fire('Error','Faltan Campos Por Validar','warning')
     }else{
 
-      console.log(this.formSiteEdit.value);
       const { ...data } = this.formSiteEdit.value;
-      // is_active === 'true' ? data.is_active = true : data.is_active = false;
-      console.log(data);
 
       this.webSiteService.updateWebSite(data, this.websiteId).subscribe(
         (res:any)=>{
-          console.log(res);
           this.getWebSite();
           this.closeModal();
           Swal.fire(' Success','Editado correctamente','success');
         },
         (error:any)=>{
-          console.log(error)
           Swal.fire('Error','vuelva a intentarlo','error');
         }
       )
@@ -161,21 +156,18 @@ export class WebSitesComponent implements OnInit {
 
    create(){
       
-        console.log (this.formSiteCreate.value)
         if(this.formSiteCreate.invalid){
           Swal.fire('Error','Faltan Campos Por Validar','warning')
         }else{
           
           this.webSiteService.createWebSite(this.formSiteCreate.value).subscribe(
             (res:any)=>{
-              console.log(res)
               
               this.getWebSite()
               this.closeRightMenu();
               Swal.fire(' Success','Guardado correctamente','success')
             },
             (error:any)=>{
-              console.log(error)
               Swal.fire('Error','vuelva a intentarlo','error')
             }
           )
@@ -211,7 +203,6 @@ export class WebSitesComponent implements OnInit {
         this.collectionSize = this.webSites.length;
         this.charging = false;
         Swal.close();
-        console.log(res);
       },
     (error:any) =>{})
   }
@@ -225,8 +216,6 @@ export class WebSitesComponent implements OnInit {
       });
 
       this.websiteId = data.id;
-
-      // console.log(this.formSiteEdit.value);
       
     }
 		this.modalService.open(content1, { ariaLabelledBy: 'modal-basic-title', size: 'lg' }).result.then((result) => {
@@ -252,13 +241,11 @@ export class WebSitesComponent implements OnInit {
   }
 
   uploadImage(event) {
-    console.log(event.target.files);
     if (event.target.files.length > 0){
       this.formSiteEdit.get('icon').setValue(event.target.files[0])
     }else{
       this.formSiteEdit.get('icon').setValue('')
     }
-    console.log(this.formSiteEdit.value)
   }
 
   addTaskSection() {

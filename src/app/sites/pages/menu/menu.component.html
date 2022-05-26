@@ -1,0 +1,219 @@
+<p> </p>
+<div class="col-12 mb-3 table-users" >
+    <div class="card">
+        <div class="card-body">
+            <div class="row bd-highlight mb-2">
+                <div class="col-12">
+                    
+                        <div class="float-left align-center justify-content-center">
+                            <h1 class="h3 mb-0 text-gray-800 pt-2">Total: {{ totalMenu }}</h1>
+                        </div>
+                    
+                    <div class="float-right bd-highlight">
+                        <button class="btn btn-info cursor" (click)="addTaskSection()">
+                            <i class="fas fa-plus-circle"></i> Agregar
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Sitio</th>
+                            <th>Titulo</th>
+                            <th>Slug</th>
+                            <th>Nivel</th>
+                            <th>Peso</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                        <tr *ngFor="let menu of menus |slice: (page-1) * pageSize : (page-1) * pageSize + pageSize">
+                            <td>{{ menu.site }}</td>
+                            <td>{{ menu.title }}</td>
+                            <td>{{ menu.slug }}</td>
+                            <td>{{ menu.level }}</td>
+                            <td>{{ menu.weight }}</td>
+                            <td *ngIf="menu.is_active"><span class="label label-success">Activo</span></td>
+                            <td *ngIf="!menu.is_active"><span class="label label-danger">No activo</span></td>
+                            <td class="text-center">
+                                <div class="row">
+                                    <div class="col-12 action-btn">
+                                        <a class="btn btn-warning ml-1 action-text cursor" (click)="openModal(modalEditMenu ,menu)">
+                                            <i class="far fa-edit"></i>
+                                        </a>
+                                    </div>  
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="d-flex justify-content-center mt-5">
+                <ngb-pagination [collectionSize]="collectionSize" [(page)]="page" [pageSize]="pageSize">
+                </ngb-pagination>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Crear Menu -->
+<div class="app-sidebar card" id="rightMenu">
+    <!-- Header -->
+   <div class="d-flex p-3 border-bottom card-header">
+       <div class="d-flex align-items-center">
+           AGREGAR MENU
+       </div>
+       <div class="ml-auto">
+           <a href="javascript:void(0)" class="text-danger" (click)='closeRightMenu()'>
+               X
+           </a>
+       </div>
+   </div>
+
+   <!-- Body -->
+   <div class="row">
+       <div class="p-4">
+           <div class="card card-body">
+               <form *ngIf='selectedST' [formGroup]="formMenuCreate"  (ngSubmit)="create()">
+                   <div class="form-group">
+                       <label> Site</label>
+                       <input type="text" disabled value="{{ getName(formMenuCreate.value.site) || ''}}" >
+                       <input type="hidden" class="form-control" formControlName="site">
+                       <button type="button" class="btn btn-primary mt-2" (click)="openModal(modalMostrarSitios, 0)">
+                           Buscar
+                       </button>
+                   </div>
+                   <div class="form-group">
+                       <label> Titulo</label>
+                       <input type="text" class="form-control" formControlName="title" placeholder="Escribir Email" >
+                   </div>
+                   <div class="form-group">
+                       <label>
+                           <span class="help"> Slug</span>
+                       </label>
+                       <input type="text" class="form-control" formControlName="slug" placeholder="Digite Numero de Telefono" >
+                   </div>
+                   <div class="form-group">
+                       <label >Peso</label>
+                       <input type="number" class="form-control" formControlName="weight" placeholder="Digite el peso" >
+                   </div>
+                   <div class="form-group" >
+                    <label>Nivel</label>
+                    <select class="custom-select col-12" id="inlineFormCustomSelect" formControlName="level" >
+                        <option value="" selected>--Seleccione una Opcion</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                    </select>
+                </div>
+                   <div class="modal-footer" >
+                       <button type="submit" class="btn btn-success" >Guardar</button>
+                   </div>
+               </form>
+           </div>
+       </div>
+   </div>
+</div>
+
+ <!-- mostrar sitios -->
+ <ng-template #modalMostrarSitios let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title" id="modal-basic-title"> Editar Sitio Web</h4>
+        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <div class="table-responsive" > 
+        
+            <table class="table table-bordered table-hover">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Sitio</th>
+                        <th>Seleccionar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let item of webSites |slice: (page-1) * pageSize : (page-1) * pageSize + pageSize">
+                        <td>{{ item.name }}</td>
+                        <td>
+                            <div class="col">
+                                <button class="btn btn-info" (click)="seleccionar(item, modal.dismiss('Cross click'))">
+                                    <span>
+                                        <i class="fas fa-chevron-circle-right"></i>
+                                    </span> Seleccionar
+                       
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="modal-footer">
+    </div>
+</ng-template>
+<!-- modal Editar Menu -->
+<ng-template #modalEditMenu let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title" id="modal-basic-title"> Editar Menu</h4>
+        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    
+    <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-12">
+            <div class="card card-body">
+                <form class="form-group" [formGroup]="formMenuEdit" (ngSubmit)="edit()">
+                    
+                    <div class="form-group">
+                        <label> Sitios</label>
+                        <input type="text" class="form-control" disabled value="{{ getName(formMenuEdit.value.page) || ''}}" >
+                        <button type="button" class="btn btn-primary" (click)="openModal(modalMostrarSitios, 1)">
+                            Buscar
+                        </button>
+                        <div class="form-group">
+                            <label> Titulo</label>
+                            <input type="text" class="form-control" formControlName="title" placeholder="Escribir Email" >
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <span class="help"> Slug</span>
+                            </label>
+                            <input type="text" class="form-control" formControlName="slug" placeholder="Digite Numero de Telefono" >
+                        </div>
+                        <div class="form-group">
+                            <label >Peso</label>
+                            <input type="number" class="form-control" formControlName="weight" placeholder="Digite el peso" >
+                        </div>
+                        <div class="form-group" >
+                         <label>Nivel</label>
+                         <select class="custom-select col-12" id="inlineFormCustomSelect" formControlName="level" >
+                             <option value="" selected>--Seleccione una Opcion</option>
+                             <option value="1">1</option>
+                             <option value="2">2</option>
+                             <option value="3">3</option>
+                         </select>
+                     </div>
+                    <div class="form-group" >
+                        <label>Estado</label>
+                        <select class="custom-select col-12" id="inlineFormCustomSelect" formControlName="is_active" >
+                            <option value="" selected>--Seleccione una Opcion</option>
+                            <option value="true">Activado</option>
+                            <option value="false">Desactivado</option>
+                        </select>
+                    </div>
+                        <div class="modal-footer" >
+                            <button type="submit" class="btn btn-success" >Guardar</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</ng-template>
