@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { Page } from '../interfaces/Page';
+import { Page } from '../../web-pages/interfaces/Page';
 
 @Pipe({
   name: 'counterStatus'

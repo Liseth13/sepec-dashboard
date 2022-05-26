@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ModalDismissReasons,  NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import Swal from 'sweetalert2';
 import { menuService } from '../../services/menu.service';
@@ -48,10 +48,21 @@ export class MenuComponent implements OnInit {
     this.loadformMenuEdit();
     this.getWebMenu();
     this.getWebSite();
+    this.generateSlug('sdg', this.formMenuCreate)
 
   }
 
-  
+  // generateSlug = ( control : FormControl ) => {
+  //   //const patter
+  //   const urlPrev : string = control.toLowerCase()
+  //   this.formMenuCreate.get('slug').setValue(urlPrev.replace(/\s+/g, '-'))
+  // }
+
+  generateSlug = ( value : string, form : FormGroup ) => {
+    const xvalue : string = value.toLowerCase();
+    form.get('slug').setValue( xvalue.replace(/\s+/g, '-'));
+  }
+
   loadformMenuCreate(){
     this.formMenuCreate = this.formBuilder.group({ 
       site:['',[Validators.required, Validators.maxLength(20),Validators.minLength(3)]],

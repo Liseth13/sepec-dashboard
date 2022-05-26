@@ -110,7 +110,6 @@ export class ItemBannerComponent implements OnInit {
     if(this.formItemBannerEdit.invalid){
       Swal.fire('Error','Faltan Campos Por Validar','warning');
     }else{
-
       if( !this.validImageExtension || !this.allowedFileSize ){
         return Swal.fire('Error','Verifica la extensión y el tamaño de la imagen','warning');
       }
@@ -126,7 +125,6 @@ export class ItemBannerComponent implements OnInit {
           }
         }
       }
-
       this.bannerItemService.updateItemBanner(dataForm, this.webItemBannerId).subscribe(
         (res:any)=>{
           this.getWebItemBanner();
@@ -140,43 +138,38 @@ export class ItemBannerComponent implements OnInit {
   }
 
    create(){ 
-
-      this.formSubmitted = true;
-
-      if(this.formItemBannerCreate.invalid){
-        Swal.fire('Error','Faltan Campos Por Validar','warning')
-      }else{
-
-        if( this.imageUpload === null ){
-          return Swal.fire('Error','Debes seleccionar una imagen','warning');
-        }
-
-        if( !this.validImageExtension || !this.allowedFileSize ){
-          return Swal.fire('Error','Verifica la extensión y el tamaño de la imagen','warning');
-        }
-
-        const { ...data } = this.formItemBannerCreate.value;
-        const dataForm = new FormData();
-        for (var key in data) {
-          if(key === 'img'){
-            dataForm.append('img', this.imageUpload);
-          }else{
-            dataForm.append(key, data[key]);
-          }
-        }
-        
-        this.bannerItemService.createItemBanner(dataForm).subscribe(
-          (res:any)=>{
-            
-            this.getWebItemBanner()
-            this.closeRightMenu();
-            Swal.fire('Guardado','Guardado correctamente','success')
-          },
-          (error:any)=>{
-            Swal.fire('Error','vuelva a intentarlo','error')
-          }
-        )
+    this.formSubmitted = true;
+    if(this.formItemBannerCreate.invalid){
+      Swal.fire('Error','Faltan Campos Por Validar','warning')
+    }else{
+      if( this.imageUpload === null ){
+        return Swal.fire('Error','Debes seleccionar una imagen','warning');
       }
+      if( !this.validImageExtension || !this.allowedFileSize ){
+        return Swal.fire('Error','Verifica la extensión y el tamaño de la imagen','warning');
+      }
+      const { ...data } = this.formItemBannerCreate.value;
+      const dataForm = new FormData();
+      for (var key in data) {
+        if(key === 'img'){
+          dataForm.append('img', this.imageUpload);
+        }else{
+          dataForm.append(key, data[key]);
+        }
+      }
+      
+      this.bannerItemService.createItemBanner(dataForm).subscribe(
+        (res:any)=>{
+          
+          this.getWebItemBanner()
+          this.closeRightMenu();
+          Swal.fire('Guardado','Guardado correctamente','success')
+        },
+        (error:any)=>{
+          Swal.fire('Error','vuelva a intentarlo','error')
+        }
+      );
+    }
   }
 
   openModal(content1: string, data: any) {

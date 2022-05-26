@@ -110,12 +110,6 @@
                                         </div>
                                     </a>
                                 </div>
-                                <!-- <div class="p-3 border-top">
-                                    <h6 class="font-weight-normal text-muted text-uppercase mb-0">FILTERS</h6>
-                                </div> -->
-                                <!-- <div class="p-3 border-top">
-                                    <h6 class="font-weight-normal text-muted text-uppercase mb-0">LABELS</h6>
-                                </div> -->
                             </div>
                         </li>
                     </ul>
@@ -254,7 +248,7 @@
                 <form *ngIf="sidebarMode === 'create'" [formGroup] = "formCreate" (ngSubmit)="create( formCreate )">
 
                     <div class="form-group">
-                        <label for="siteNameCreate">Sitio web</label>
+                        <label for="siteNameCreate">Sitio web:</label>
                         <div class="input-group mb-3">    
                             <button type = "button" class=" ml-1 btn btn-info" (click) ="openModal( modalWebSites, 'md' )" >
                                 <i class="fa fa-search me-1"></i>
@@ -264,15 +258,15 @@
                     </div>
                     <input type="hidden" class="form-control"  formControlName = "site" >
                     <div class="form-group">
-                        <label for="name">Nombre de la página</label>     
-                        <input type="text" class="form-control"  id="name" formControlName = "name">
+                        <label for="name">Nombre de la página:</label>     
+                        <input type="text" class="form-control"  id="name" formControlName = "name" (keyup)="generateSlug( formCreate.get('name').value, formCreate )">
                     </div>
                     <div class="form-group">
-                        <label for="slug">Dirección de la página </label>
-                        <input type="text" class="form-control"  id="slug" formControlName = "slug">                      
+                        <label for="slug">Url: </label>
+                        <input type="text" class="form-control"  id="slug" value="{{ formCreate.get('slug').value }}" disabled>                      
                     </div>
                     <div class="form-group">
-                        <label for="weight">Peso</label>                 
+                        <label for="weight">Peso:</label>                 
                         <input type="number" class="form-control"  id="weight" formControlName = "weight">
                     </div>
                     <div class="form-group">

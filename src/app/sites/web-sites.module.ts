@@ -7,19 +7,15 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { FootersSitesComponent } from './pages/footers-sites/footers-sites.component';
-import { BannerComponent } from './pages/banner/banner.component';
-import { ItemBannerComponent } from './pages/item-banner/item-banner.component';
-import { BannerNamePipe } from './pipes/banner-name.pipe';
 import { MenuComponent } from './pages/menu/menu.component';
+import { SiteNamePipe } from './pipes/site-name.pipe';
 
 @NgModule({
   declarations: [
     WebSitesComponent,
     FootersSitesComponent,
-    BannerComponent,
-    ItemBannerComponent,
-    BannerNamePipe,
-    MenuComponent
+    MenuComponent,
+    SiteNamePipe
   ],
   imports: [
     CommonModule,
@@ -29,5 +25,8 @@ import { MenuComponent } from './pages/menu/menu.component';
     FormsModule,
     HttpClientModule,
   ],  
+  exports : [
+    SiteNamePipe
+  ]
 })
 export class WebSitesModule { }

@@ -71,8 +71,8 @@ export class WebPagesComponent implements OnInit {
 
   loadFormCreate = () => {
     this.formCreate = this.formBuilder.group({
-      site   : [null, [Validators.required]],
-      name   : ['', [ Validators.required, Validators.minLength(2), Validators.maxLength(20) ] ],
+      site   : ['', [Validators.required]],
+      name   : ['', [ Validators.required, Validators.minLength(2), Validators.maxLength(100) ] ],
       slug   : ['', [ Validators.required] ],
       weight : ['', [ Validators.required] ],
     })
@@ -82,10 +82,10 @@ export class WebPagesComponent implements OnInit {
     this.formEdit = this.formBuilder.group({
       site     : [webPage.site , [Validators.required]],
       id       : [webPage.id, [Validators.required]],
-      name     : [webPage.name, [ Validators.required, Validators.minLength(2), Validators.maxLength(20) ] ],
+      name     : [webPage.name, [ Validators.required, Validators.minLength(2), Validators.maxLength(100) ] ],
       slug     : [webPage.slug, [ Validators.required] ],
       weight   : [webPage.weight, [ Validators.required] ],
-      is_active : [webPage.is_active, [ Validators.required] ],
+      is_active: [webPage.is_active, [ Validators.required] ],
     });
   }
 
@@ -95,6 +95,11 @@ export class WebPagesComponent implements OnInit {
     }
     Swal.fire('Error!', 'Los campos del formulario no son validos','error');
     return false;
+  }
+
+  generateSlug = ( value : string, form : FormGroup ) => {
+    const xvalue : string = value.toLowerCase();
+    form.get('slug').setValue( xvalue.replace(/\s+/g, '-'));
   }
 
   get = ( isShowLoading : boolean = false ) => {

@@ -26,7 +26,7 @@
                     </thead>
                     <tbody>
                         <tr *ngFor="let data of webBanner |slice: (page-1) * pageSize : (page-1) * pageSize + pageSize">
-                            <td>{{ data.page }}</td>
+                            <td>{{ data.page | pageName : webPages }}</td>
                             <td>{{ data.name }}</td>
                             <td *ngIf="data.is_active"><span class="label label-success">Activo</span></td>
                             <td *ngIf="!data.is_active"><span class="label label-danger">No activo</span></td>

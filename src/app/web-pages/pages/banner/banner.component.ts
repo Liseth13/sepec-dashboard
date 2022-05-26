@@ -3,6 +3,7 @@ import {FormBuilder, FormGroup, Validators,} from '@angular/forms';
 import { NgbModal, ModalDismissReasons, NgbActiveModal, NgbModalOptions, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { WebPagesService } from 'src/app/web-pages/services/web-pages.service';
 import Swal from 'sweetalert2';
+import { Page } from '../../interfaces/Page';
 import { BannerService }  from '../../services/banner.service'
 import { Banner } from './banner';
 
@@ -15,7 +16,7 @@ export class BannerComponent implements OnInit {
 
   selectedST: Banner | undefined = Object.create(null);
   titleTaskSection = '';
-  public webPages : Array <any> = [];
+  public webPages : Array <Page> = [];
   public webBanner    : Array <any> = [];
   public formBannerCreate      : FormGroup;
   private formBannerEdit        : FormGroup;
@@ -146,7 +147,7 @@ export class BannerComponent implements OnInit {
       }
     });
     this.webPagesService.get().subscribe(
-      (res:any) =>{
+      (res:Page[]) =>{
         this.webPages = res;
         
         this.totalWebPage = res.length;

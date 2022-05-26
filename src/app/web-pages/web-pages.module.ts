@@ -10,22 +10,27 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { QuillModule } from 'ngx-quill';
 import { FeatherModule } from 'angular-feather';
 import { HttpClientModule } from '@angular/common/http';
-import { SiteNamePipe } from './pipes/site-name.pipe';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { PageNamePipe } from './pipes/page-name.pipe';
 import { PageContentComponent } from './components/page-content/page-content.component';
-import { CounterStatusPipe } from './pipes/counter-status.pipe';
+import { CounterStatusPipe } from '../shared/pipes/counter-status.pipe';
 import { PostsComponent } from './components/posts/posts.component';
+import { BannerComponent } from './pages/banner/banner.component';
+import { ItemBannerComponent } from './pages/item-banner/item-banner.component';
+import { BannerNamePipe } from './pipes/banner-name.pipe';
+import { WebSitesModule } from '../sites/web-sites.module';
 
 
 @NgModule({
   declarations: [
     WebPagesComponent,
-    SiteNamePipe,
     PageNamePipe,
     PageContentComponent,
     CounterStatusPipe,
     PostsComponent,
+    BannerComponent,
+    ItemBannerComponent,
+    BannerNamePipe
   ],
   imports: [
     CommonModule,
@@ -40,6 +45,7 @@ import { PostsComponent } from './components/posts/posts.component';
     FormsModule,
     NgbModalModule,
     PerfectScrollbarModule,
+    WebSitesModule
   ]
 })
 export class WebPagesModule { }

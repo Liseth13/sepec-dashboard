@@ -30,7 +30,7 @@
                     <tbody>
                         <tr>
                         <tr *ngFor="let footer of footers |slice: (page-1) * pageSize : (page-1) * pageSize + pageSize">
-                            <td>{{ footer.id }}</td>
+                            <td>{{ footer.site | siteName : webSites }}</td>
                             <td>{{ footer.email }}</td>
                             <td>{{ footer.address }}</td>
                             <td>{{ footer.phone }}</td>
