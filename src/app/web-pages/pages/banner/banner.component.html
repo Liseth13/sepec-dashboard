@@ -3,6 +3,7 @@
         <div class="card-body">
             <div class="row bd-highlight mb-2">
                 <div class="col-12">
+                    <h1 class="fant"> Banner </h1>
                     <div class="float-left align-center justify-content-center">
                         <h1 class="h3 mb-0 text-gray-800 pt-2">Total: {{ totalWebBanner }}</h1>
                     </div>
@@ -18,7 +19,7 @@
                 <table class="table table-bordered table-hover">
                     <thead class="thead-dark">
                         <tr>
-                            <th>Pagina</th>
+                            <th>Página</th>
                             <th>Nombre</th>
                             <th>Estado</th>
                             <th>Acciones</th>
@@ -57,7 +58,7 @@
     <!-- Header -->
    <div class="d-flex p-3 border-bottom card-header">
        <div class="d-flex align-items-center">
-           AGREGAR BANNER
+           Agregar Banner
        </div>
        <div class="ml-auto">
            <a href="javascript:void(0)" class="text-danger" (click)='closeRightMenu()'>
@@ -73,10 +74,12 @@
                <form *ngIf='selectedST' [formGroup]="formBannerCreate"  (ngSubmit)="create()">
                    <div class="form-group">
                        <label> Page</label>
-                       <input type="text" disabled value="{{ getName(formBannerCreate.value.page) || ''}}" >
-                       <button type="button" class="btn btn-primary" (click)="openModal(modalMostrarPages, 0)">
-                           Buscar
+                       <div class="input-group mb-3">
+                       <input type="text" class="form-control" disabled value="{{ getName(formBannerCreate.value.page) || ''}}" >
+                       <button type="button" class=" ml-1 btn btn-info" (click)="openModal(modalMostrarPages, 0)">
+                        <i class="fa fa-search me-1"></i>
                        </button>
+                    </div>
                    </div>
                    <div class="form-group">
                        <label> Nombre</label>
@@ -158,10 +161,12 @@
                     
                     <div class="form-group">
                         <label> Page</label>
+                        <div class="input-group mb-3"> 
                         <input type="text" class="form-control" disabled value="{{ getName(formBannerEdit.value.page) || ''}}" >
-                        <button type="button" class="btn btn-primary" (click)="openModal(modalMostrarPages, 1)">
-                            Buscar
+                        <button type="button" class=" ml-1 btn btn-info" (click)="openModal(modalMostrarPages, 1)">
+                            <i class="fa fa-search me-1"></i>
                         </button>
+                        </div>
                     </div>
                         <div class="form-group">
                             <label> Nombre</label>

@@ -3,6 +3,7 @@
     <div class="card-body">
         <div class="row bd-highlight mb-2">
             <div class="col-12">
+                <h1 class="fant"> Item Banner </h1>
                 <div class="float-left align-center justify-content-center">
                     <h1 class="h3 mb-0 text-gray-800 pt-2">Total: {{ totalWebItemBanner }}</h1>
                 </div>
@@ -76,10 +77,12 @@
                     
                     <div class="form-group">
                         <label> Banner</label>
+                        <div class="input-group mb-3">   
                         <input type="text" class="form-control" disabled value="{{ formItemBannerCreate.value.banner | bannerName: banners}}" >
-                        <button type="button" class="btn btn-primary mt-2" (click)="openModal(modalMostrarBanner,0)">
-                            Buscar
+                        <button type="button"  class=" ml-1 btn btn-info" (click)="openModal(modalMostrarBanner,0)">
+                            <i class="fa fa-search me-1"></i>
                         </button>
+                        </div>
                     </div>
                         <div class="form-group">
                             <label> Nombre</label>
@@ -180,10 +183,12 @@
                     
                     <div class="form-group">
                         <label> Banner</label>
+                        <div class="input-group mb-3"> 
                         <input type="text" class="form-control" disabled value="{{ formItemBannerEdit.value.banner | bannerName: banners}}" >
-                        <button type="button" class="btn btn-primary mt-2" (click)="openModal(modalMostrarBanner,1)">
-                            Buscar
+                        <button type="button" class=" ml-1 btn btn-info" (click)="openModal(modalMostrarBanner,1)">
+                            <i class="fa fa-search me-1"></i>
                         </button>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label> Nombre</label>
