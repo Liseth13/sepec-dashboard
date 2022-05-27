@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ModalDismissReasons,  NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Pagination } from 'src/app/shared/interfaces/Pagination';
 import Swal from 'sweetalert2';
 import { menuService } from '../../services/menu.service';
 import { WebSitesService } from '../../services/web-sites.service';
@@ -13,31 +14,24 @@ import { Menu } from './menu';
 })
 export class MenuComponent implements OnInit {
 
-  private webMenuId: number = 0;
-  selectedST: Menu | undefined = Object.create(null);
   formMenuCreate: FormGroup;
   formMenuEdit: FormGroup;
-  menus: Array <any> = [];
-  totalMenu: number = 0;
-  charging: boolean= true;
-  titleTaskSection: string = '';
-  sectionTask: Menu[] | null = null;
+  formSubmenuCreate : FormGroup;
+  formSubmenuEdit : FormGroup;
+
+  menus : Array <any> = [];
+  submenus : Array <any> = [];
+  fathers : Array <any> = [];
   webSites: Array <any> = [];
 
-  //Paginación
-  page =1;
-  pageSize = 8;
-  pageP = 1;
-  pageSizeP = 8;
-  collectionSize = 0;
-  collectionSizePage = 0;
-  _searchTerm = '';
-  closeResult: string;
-  idView: string;
-  modal: any;
 
+  paginationMenu = new Pagination();
+  paginationSites = new Pagination();
+  paginationSubmenus = new Pagination();
+  paginationFathers = new Pagination();
 
-
+  mode : 'create' | 'edit' | 'subCreate' | 'subEdit' | string = '';
+  
   constructor(
     private formBuilder : FormBuilder, private menuService : menuService,
     private webSiteService: WebSitesService,private modalService: NgbModal
@@ -48,8 +42,6 @@ export class MenuComponent implements OnInit {
     this.loadformMenuEdit();
     this.getWebMenu();
     this.getWebSite();
-    this.generateSlug('sdg', this.formMenuCreate)
-
   }
 
   // generateSlug = ( control : FormControl ) => {
@@ -66,43 +58,34 @@ export class MenuComponent implements OnInit {
   loadformMenuCreate(){
     this.formMenuCreate = this.formBuilder.group({ 
       site:['',[Validators.required, Validators.maxLength(20),Validators.minLength(3)]],
-      title:['',[Validators.required, Validators.maxLength(40),Validators.minLength(4)]],
-      slug:['',[Validators.required, Validators.maxLength(40),Validators.minLength(3)]],
-      level:['',[Validators.required]],
-      weight:['',[Validators.required]]
+      title:['',[Validators.required, Validators.maxLength(100),Validators.minLength(4)]],
+      slug:['',[Validators.required, Validators.maxLength(100),Validators.minLength(3)]],
+      weight : ['', Validators.required ],
+      level:['',[Validators.required, Validators.min(1), Validators.max(3)]],
+      order:['',[Validators.required]],
+      father:[null]
     })
   }
+
+
 
   loadformMenuEdit(){
     this.formMenuEdit = this.formBuilder.group({
       site:['',[Validators.required, Validators.maxLength(20),Validators.minLength(3)]],
-      title:['',[Validators.required, Validators.maxLength(40),Validators.minLength(4)]],
-      slug:['',[Validators.required, Validators.maxLength(40),Validators.minLength(3)]],
+      title:['',[Validators.required, Validators.maxLength(100),Validators.minLength(4)]],
+      slug:['',[Validators.required, Validators.maxLength(100),Validators.minLength(3)]],
       level:['',[Validators.required]],
       weight:['',[Validators.required]],
-      is_active:[null,[Validators.required,]],
+      order:['',[Validators.required]],
+      is_active:['',[Validators.required,]],
     })
   }
 
   getWebMenu = () =>{
-    Swal.fire({
-      title: 'Cargando',
-      html: 'Por favor espera un momento...',
-      showCancelButton: false,
-      showConfirmButton: false,
-      allowOutsideClick: false,
-      didOpen: () => {
-        Swal.showLoading()
-      }
-    });
     this.menuService.getMenu().subscribe(
       (res:any) =>{
     this.menus = res;
-    this.totalMenu = res.length;
-    this.collectionSize = this.menus.length;
-    this.charging = false;
-    Swal.close();
-
+    this.paginationMenu.collectionSize = this.menus.length;
     },
     (error:any) =>{})
   }
@@ -117,7 +100,15 @@ export class MenuComponent implements OnInit {
       }
     )
   }
-  addTaskSection() {
+
+  getSubMenus = (fatherId  :string) => {
+    this.submenus = this.menus.filter(m => m.father === fatherId);
+    this.paginationSubmenus.collectionSize = this.submenus.length;
+  }
+
+  openSidebar( mode : 'create' | 'edit' | string ) {
+
+    this.mode = mode;
 
     this.formMenuCreate.reset();
 
@@ -127,25 +118,18 @@ export class MenuComponent implements OnInit {
     }
     (document.getElementById('rightMenu')as HTMLFormElement).style.width = '300px';
 
-    this.titleTaskSection = 'Task';
-
-    const menu = new Menu();
-    menu.title = 'bla@bla.com';
-    menu.slug = 'bla@bla.com';
-    menu.level = 'bla@bla.com';
-    menu.weight = '';
-    menu.status = true;
-
   }
 
-  openModal(content1: string, data: any) {
+  openModal (content1: string, mode : 'sites' | 'father' | 'edit' | string, data : any ) {
 
-    if(data === 0){
-      this.idView = 'create';
+    if ( mode === 'father' ) {
+      const arr : any [] = this.menus.filter( m => m.level === this.formMenuCreate.get('level').value -1)
+      this.paginationMenu.collectionSize = arr.length;
+      this.paginationMenu.page = 1;
+      this.paginationMenu.pageSize=2;
     }
 
-    if (data != 0) {
-      this.idView = 'edit';
+    if (mode === 'edit' && data) {
       this.formMenuEdit.patchValue({
         id: data.id,
         site: data.site,
@@ -156,27 +140,13 @@ export class MenuComponent implements OnInit {
         is_active: data.is_active,
       })
     }
-    
-    this.modalService.open(content1, { ariaLabelledBy: 'modal-basic-title', size: 'lg' }).result.then((result) => {
-			this.closeResult = `Closed with: ${result}`;
-		}, (reason) => {
-			this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-		});
+
+    this.modalService.open(content1)
   }
   closeModal() { 
     this.modalService.dismissAll()
   }
 
-
-  getDismissReason(reason: any) {
-    if (reason === ModalDismissReasons.ESC) {
-			return 'by pressing ESC';
-		} else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
-			return 'by clicking on a backdrop';
-		} else {
-			return `with: ${reason}`;
-		}
-  }
   closeRightMenu() {
     (document.getElementById('rightMenu')as HTMLFormElement).style.width = '0';
   }
@@ -201,10 +171,11 @@ export class MenuComponent implements OnInit {
     }
 }
 
-seleccionar(site){
-  if (this.idView == 'create') {
+selectSite(site : any, mode : string){
+  if (mode== 'create') {
     this.formMenuCreate.get('site').setValue(site.id);
-  } else {
+  }
+  if(mode== 'edit'){
     this.formMenuEdit.get('site').setValue(site.id);
   }
 }
@@ -223,20 +194,31 @@ edit(){
   if(this.formMenuEdit.invalid){
     Swal.fire('Error','Faltan Campos Por Validar','warning')
   }else{
-    this.webMenuId=this.formMenuEdit.value.id;
-    const { ...data } = this.formMenuEdit.value;
 
-    this.menuService.updateMenu(data, this.webMenuId).subscribe(
+
+    this.menuService.updateMenu('data', 555).subscribe(
       (res:any)=>{
         this.getWebMenu();
         this.closeModal();
         Swal.fire(' Success','Editado correctamente','success');
       },
-      (error:any)=>{
+      (error : any)=>{
         Swal.fire('Error','vuelva a intentarlo','error');
       }
-    )
+      )
+    }
   }
-}
 
+  changeLevel = ( level : number, form : FormGroup ) => {
+    const validLevels : number[] =  [ 1, 2, 3 ];
+    if ( validLevels.includes( level ) && level === 1 ){
+      form.get('father').setValue(null);
+    } 
+  }
+
+  linkMenu = ( menu : any, form : FormGroup ) => {
+    form.get('father').setValue( menu.id );
+    this.modalService.dismissAll();
+    
+  }
 }
