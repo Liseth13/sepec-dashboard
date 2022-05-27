@@ -44,12 +44,7 @@ export class MenuComponent implements OnInit {
     this.getWebSite();
   }
 
-  // generateSlug = ( control : FormControl ) => {
-  //   //const patter
-  //   const urlPrev : string = control.toLowerCase()
-  //   this.formMenuCreate.get('slug').setValue(urlPrev.replace(/\s+/g, '-'))
-  // }
-
+  
   generateSlug = ( value : string, form : FormGroup ) => {
     const xvalue : string = value.toLowerCase();
     form.get('slug').setValue( xvalue.replace(/\s+/g, '-'));
