@@ -5,7 +5,7 @@ import { WebSitesService }  from '../../services/web-sites.service';
 import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 
 import Swal from 'sweetalert2';
-import { Site } from './site';
+
 
 @Component({
   selector: 'app-web-sites',
@@ -14,8 +14,6 @@ import { Site } from './site';
 })
 
 export class WebSitesComponent implements OnInit {
-  selectedST: Site | undefined = Object.create(null);
-  sectionTask: Site[] | null = null;
   public webSites    : Array <any> = [];
   public totalWebSites : number = 0;
   public charging : boolean = true;
@@ -259,12 +257,6 @@ export class WebSitesComponent implements OnInit {
     (document.getElementById('rightMenu')as HTMLFormElement).style.width = '300px';
 
     this.titleTaskSection = 'Task';
-
-    const data = new Site();
-    data.name = 'bla@bla.com';
-    data.slogan = 'bla@bla.com';
-    data.status = true;
-    this.tempImg = null;
 
   }
   closeRightMenu() {

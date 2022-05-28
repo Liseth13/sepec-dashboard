@@ -16,9 +16,8 @@ export class menuService {
   configUrl = 'https://sepec-backend.herokuapp.com';
   // port = 443
 
-  getMenu(from?: number, limit?: number, active?: boolean) {
-    return this.http.get(`${this.configUrl}/api/v1/website/menus/`);
-  }
+  get = () => this.http.get(`${this.configUrl}/api/v1/website/menus/`);
+  
 
   createMenu(data: any) {
     

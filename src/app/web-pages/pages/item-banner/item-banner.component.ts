@@ -271,7 +271,7 @@ export class ItemBannerComponent implements OnInit {
 
   checkFileSize( file: File ){
     // Validar tamaño del archivo a subir
-    if (file.size > 5242880 ) {
+    if (file.size > 10485760 ) {
         //False es para indicar que el tamaño del archivo subido no es permitido
         this.allowedFileSize = false;
     } else {

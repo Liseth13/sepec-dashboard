@@ -180,6 +180,7 @@ export class WebPagesComponent implements OnInit {
     }
 
     const rightMenu : HTMLFormElement = document.getElementById('rightMenu') as HTMLFormElement ;
+    
     if ( rightMenu.style.width === '285px' ) {
         this.closeRightSidebar();
         return;
@@ -225,6 +226,5 @@ export class WebPagesComponent implements OnInit {
 
     this.paginationPages = new Pagination();
   }
-
 }
  

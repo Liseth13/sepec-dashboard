@@ -6,13 +6,13 @@ import { Page } from '../../web-pages/interfaces/Page';
 })
 export class CounterStatusPipe implements PipeTransform {
 
-  transform(pages: Page[], statusToCount : boolean ): number {
+  transform(items : any[], statusToCount : boolean ) : number {
 
     let actives   : number = 0;
     let inactives : number = 0;
 
-    pages.forEach(page => {
-      page.is_active? actives ++ : inactives ++ ;
+    items.forEach(i => {
+      i.is_active? actives ++ : inactives ++ ;
     });
     return statusToCount? actives : inactives ;
   }

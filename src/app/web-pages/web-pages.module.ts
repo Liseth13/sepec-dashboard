@@ -13,12 +13,12 @@ import { HttpClientModule } from '@angular/common/http';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { PageNamePipe } from './pipes/page-name.pipe';
 import { PageContentComponent } from './components/page-content/page-content.component';
-import { CounterStatusPipe } from '../shared/pipes/counter-status.pipe';
 import { PostsComponent } from './components/posts/posts.component';
 import { BannerComponent } from './pages/banner/banner.component';
 import { ItemBannerComponent } from './pages/item-banner/item-banner.component';
 import { BannerNamePipe } from './pipes/banner-name.pipe';
 import { WebSitesModule } from '../sites/web-sites.module';
+import { SharedModule } from '../shared/shared.module';
 
 
 @NgModule({
@@ -26,11 +26,10 @@ import { WebSitesModule } from '../sites/web-sites.module';
     WebPagesComponent,
     PageNamePipe,
     PageContentComponent,
-    CounterStatusPipe,
     PostsComponent,
     BannerComponent,
     ItemBannerComponent,
-    BannerNamePipe
+    BannerNamePipe,
   ],
   imports: [
     CommonModule,
@@ -45,7 +44,8 @@ import { WebSitesModule } from '../sites/web-sites.module';
     FormsModule,
     NgbModalModule,
     PerfectScrollbarModule,
-    WebSitesModule
+    WebSitesModule,
+    SharedModule
   ]
 })
 export class WebPagesModule { }

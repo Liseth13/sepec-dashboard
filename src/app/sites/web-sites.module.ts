@@ -11,6 +11,8 @@ import { MenuComponent } from './pages/menu/menu.component';
 import { SiteNamePipe } from './pipes/site-name.pipe';
 import { MenuNamePipe } from './pipes/menu-name.pipe';
 import { LevelMenuPipe } from './pipes/level-menu.pipe';
+import { FirstLevelMenusComponent } from './components/first-level-menus/first-level-menus.component';
+import { SharedModule } from '../shared/shared.module';
 
 @NgModule({
   declarations: [
@@ -19,7 +21,8 @@ import { LevelMenuPipe } from './pipes/level-menu.pipe';
     MenuComponent,
     SiteNamePipe,
     MenuNamePipe,
-    LevelMenuPipe
+    LevelMenuPipe,
+    FirstLevelMenusComponent,
   ],
   imports: [
     CommonModule,
@@ -27,7 +30,8 @@ import { LevelMenuPipe } from './pipes/level-menu.pipe';
     ReactiveFormsModule,
     NgbModule,
     FormsModule,
-    HttpClientModule,
+    HttpClientModule, 
+    SharedModule
   ],  
   exports : [
     SiteNamePipe

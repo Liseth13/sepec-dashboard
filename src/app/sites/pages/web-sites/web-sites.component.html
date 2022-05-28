@@ -121,7 +121,7 @@
         <div class="row">
             <div class="p-2">
                 <div class="card card-body">
-                    <form  *ngIf='selectedST' [formGroup]="formSiteCreate" (ngSubmit)="create()">
+                    <form  [formGroup]="formSiteCreate" (ngSubmit)="create()">
                         <div class="row">
                             <div class="form-group">
                                 <label><span class="help"> Escriba Nombre del Sitio Web</span></label>
