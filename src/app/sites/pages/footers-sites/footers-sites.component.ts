@@ -91,7 +91,7 @@ export class FootersSitesComponent implements OnInit {
   }
 
   getWebSite = () => {
-    this.webSiteService.getWebSites().subscribe(
+    this.webSiteService.get().subscribe(
       (res:any) =>{
         this.webSites = res;
       },

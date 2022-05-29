@@ -11,6 +11,8 @@ export class FirstLevelMenusComponent implements OnInit, OnChanges {
 
   @Input() menus : Array<Menu> = [];
 
+  @Input() sites : Array<any> = [];
+
   menusForTable : Array<Menu> = [];
   
   submenus : Array<Menu> = [];
@@ -27,7 +29,7 @@ export class FirstLevelMenusComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    changes.menus && this.showMenus('all');
+    changes.menus && this.showMenus( this.tableMode );
   }
 
   showMenus = ( mode : string ) => {

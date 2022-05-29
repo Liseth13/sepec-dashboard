@@ -13,6 +13,7 @@ import { MenuNamePipe } from './pipes/menu-name.pipe';
 import { LevelMenuPipe } from './pipes/level-menu.pipe';
 import { FirstLevelMenusComponent } from './components/first-level-menus/first-level-menus.component';
 import { SharedModule } from '../shared/shared.module';
+import { FeatherModule } from 'angular-feather';
 
 @NgModule({
   declarations: [
@@ -31,7 +32,8 @@ import { SharedModule } from '../shared/shared.module';
     NgbModule,
     FormsModule,
     HttpClientModule, 
-    SharedModule
+    SharedModule,
+    FeatherModule
   ],  
   exports : [
     SiteNamePipe

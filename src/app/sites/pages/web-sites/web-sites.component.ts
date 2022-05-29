@@ -1,10 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import {FormBuilder, FormGroup, Validators,} from '@angular/forms';
 import { WebSitesService }  from '../../services/web-sites.service';
-
-import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
-
 import Swal from 'sweetalert2';
+import { Pagination } from 'src/app/shared/interfaces/Pagination';
 
 
 @Component({
@@ -14,22 +12,25 @@ import Swal from 'sweetalert2';
 })
 
 export class WebSitesComponent implements OnInit {
-  public webSites    : Array <any> = [];
-  public totalWebSites : number = 0;
-  public charging : boolean = true;
-  public formSiteCreate      : FormGroup;
-  private formSiteEdit        : FormGroup;
+
+  public sites : Array <any> = [];
+  sitesForTable: Array <any> = [];
+
+  public formCreate : FormGroup;
+  private formEdit  : FormGroup;
+
   alerts: any;
+
   public imageUpload!: File;
   public uploadPdf!: File;
   public tempImg: any = null;
-  private websiteId: number = 0;
+
+  sidebarMode : 'create' | 'edit' | string = 'create';
 
   //Paginación
-  page =1;
-  pageSize = 8;
-  collectionSize = 0;
-  _searchTerm = '';
+  pagination = new Pagination();
+
+  tableMode : 'all' | 'actives' | 'inactives' | string = 'all';
 
 
   //Este validImageExtension para indicar si una extensión es valida o no, true es valida y false es no valida
@@ -38,39 +39,149 @@ export class WebSitesComponent implements OnInit {
   //Variable donde se comprobara el tamaño de un archivo a subir, true es permitido y false es que supera el tamaño
   public allowedFileSize: boolean = true;
 
-  closeResult = '';
-  titleTaskSection: string;
 
-  constructor(
-   private formBuilder : FormBuilder, private webSiteService: WebSitesService,
-   private modalService: NgbModal
-  ){this.loadformSiteCreate(); this.loadformSiteEdit();}
+  constructor
+  (
+   private formBuilder    : FormBuilder, 
+   private webSiteService : WebSitesService
+  )
+  {
+    this.loadFormCreate();
+  }
 
   ngOnInit(): void {
-    this.getWebSite();
+    this.get();
   }
 
 
-  loadformSiteCreate(){
-    this.formSiteCreate = this.formBuilder.group({ 
-      name:['',[Validators.required, Validators.maxLength(20),Validators.minLength(3)]],
-      slogan:['',[Validators.required, Validators.maxLength(40),Validators.minLength(8)]],
-      icon:['']
-    })
-  
+  loadFormCreate(){
+    this.formCreate = this.formBuilder.group({ 
+      name:['',[Validators.required, Validators.maxLength(60),Validators.minLength(3)]],
+      slogan:['',[Validators.required, Validators.maxLength(200),Validators.minLength(8)]],
+      icon:['icon']
+    });
   }
 
-
-  loadformSiteEdit(){
-    this.formSiteEdit = this.formBuilder.group({
-      name:['name',[Validators.required, Validators.maxLength(20),Validators.minLength(3)]],
-      slogan:['slogan',[Validators.required, Validators.maxLength(40),Validators.minLength(8)]],
-      icon:['icon'],
-      is_active:[null,[Validators.required,]],
-    })
+  loadFormEdit( site : any ){
+    this.formEdit = this.formBuilder.group({
+      id    : [ site?.id, [ Validators.required ] ],
+      name  : [ site?.name ,[Validators.required, Validators.maxLength(60),Validators.minLength(3)]],
+      slogan: [ site?.slogan ,[Validators.required, Validators.maxLength(200),Validators.minLength(8)]],
+      // icon  : [ site?.icon ],
+      is_active : [ site?.is_active ,[ Validators.required] ],
+    });
   }
 
-  changeImage( file: File ){
+  get = ( isShowLoading : boolean = false ) => {
+
+    if ( isShowLoading ) {
+      Swal.fire({
+        title: 'Cargando',
+        html: 'Por favor espera un momento...',
+        didOpen: () => {
+          Swal.showLoading()
+        }
+      });
+    }
+
+    this.webSiteService.get().subscribe(
+    ( res : any ) => { this.sites = res },
+    ( error : any ) => { this.errorHandler( error ) },
+    () => { 
+      this.showSites( this.tableMode );
+      isShowLoading && Swal.close() ;
+    });
+  }
+
+  showSites = ( mode : string ) => {
+
+    if ( mode === 'all' ) {
+      this.sitesForTable = this.sites;
+    }
+
+    if ( mode === 'actives' ){
+      this.sitesForTable = this.sites.filter((s:any) => s.is_active);
+    }
+
+    if ( mode === 'inactives' ){
+      this.sitesForTable = this.sites.filter((s:any) => !s.is_active);
+    }
+
+    this.pagination.collectionSize = this.sitesForTable.length;
+    this.pagination.page = 1;
+  }
+
+  create( form : FormGroup ){
+    const isValid : boolean = this.validateForms( form );
+    if( isValid ) { 
+      this.webSiteService.create(this.formCreate.value).subscribe(
+      ( res : any ) => {  
+        this.get()
+        this.closeRightSidebar();
+        Swal.fire('Exito!','Guardado correctamente','success')
+      }, ( error : any ) => { this.errorHandler( error ) });
+    }
+  }
+
+  edit( form : FormGroup ){
+    const isValid : boolean = this.validateForms( form );
+    if ( isValid ){
+      this.webSiteService.update( form.value ).subscribe(
+      ( res : any )=>{
+        this.get();
+        this.closeRightSidebar();
+        Swal.fire(' Success','Editado correctamente','success');
+      }, ( error : any ) => { this.errorHandler( error ) });
+    }
+  }
+
+  validateForms = ( form : FormGroup ) : boolean => {
+    if ( form.valid ) {
+      return true;
+    }
+    Swal.fire('Error','Faltan Campos Por Validar','warning')
+    return false;
+  };
+
+  errorHandler = ( error : any ) => {
+    Swal.fire('Error', "Ha ocurrido un error, reintentar operación", 'error');
+  }
+
+  openRightSidebar( mode: string, site? : any ) {
+    if ( mode === 'edit' && site ){
+      this.sidebarMode = mode;
+      this.loadFormEdit( site );
+    } else if ( mode === 'create' ) {
+      this.sidebarMode = mode;
+      this.loadFormCreate();
+    } else {
+      this.sidebarMode = 'create';
+      return;
+    }
+
+    const rightMenu : HTMLFormElement = document.getElementById('rightMenu') as HTMLFormElement ;
+    
+    if ( rightMenu.style.width === '285px' ) {
+        this.closeRightSidebar();
+        return;
+    }
+    rightMenu.style.width = '285px';
+  }
+
+  closeRightSidebar() {
+    const rightMenu : HTMLFormElement = document.getElementById('rightMenu') as HTMLFormElement ;
+    rightMenu.style.width = '0px';
+  }
+
+  uploadImage(event) {
+    if (event.target.files.length > 0){
+      this.formEdit.get('icon').setValue(event.target.files[0])
+    }else{
+      this.formEdit.get('icon').setValue('')
+    }
+  }
+
+  changeImage( file : File ){
     
     this.imageUpload = file;
 
@@ -95,6 +206,7 @@ export class WebSitesComponent implements OnInit {
     }
 
     const reader = new FileReader();
+
     reader.readAsDataURL( file );
 
     reader.onloadend = () => {
@@ -105,7 +217,7 @@ export class WebSitesComponent implements OnInit {
 
   }
 
-  checkFileSize( file: File ){
+  checkFileSize( file : File ){
     // Validar tamaño del archivo a subir
     if (file.size > 5242880 ) {
         //False es para indicar que el tamaño del archivo subido no es permitido
@@ -130,139 +242,5 @@ export class WebSitesComponent implements OnInit {
         this.validImageExtension = true;
     }
   }
-
-
-  edit(){
-    if(this.formSiteEdit.invalid){
-      Swal.fire('Error','Faltan Campos Por Validar','warning')
-    }else{
-
-      const { ...data } = this.formSiteEdit.value;
-
-      this.webSiteService.updateWebSite(data, this.websiteId).subscribe(
-        (res:any)=>{
-          this.getWebSite();
-          this.closeModal();
-          Swal.fire(' Success','Editado correctamente','success');
-        },
-        (error:any)=>{
-          Swal.fire('Error','vuelva a intentarlo','error');
-        }
-      )
-    }
-  }
-
-   create(){
-      
-        if(this.formSiteCreate.invalid){
-          Swal.fire('Error','Faltan Campos Por Validar','warning')
-        }else{
-          
-          this.webSiteService.createWebSite(this.formSiteCreate.value).subscribe(
-            (res:any)=>{
-              
-              this.getWebSite()
-              this.closeRightMenu();
-              Swal.fire(' Success','Guardado correctamente','success')
-            },
-            (error:any)=>{
-              Swal.fire('Error','vuelva a intentarlo','error')
-            }
-          )
-        }
-   }
-
-
-   validateForms = ( form : FormGroup ) : boolean => {
-    if ( form.valid ) {
-      return true;
-    }
-    // this.alerts.basic('error', 'Error!', 'Los datos del formulario no son validos');
-    return false
-  };
-
-
-
-  getWebSite = () =>{
-    Swal.fire({
-      title: 'Cargando',
-      html: 'Por favor espera un momento...',
-      showCancelButton: false,
-      showConfirmButton: false,
-      allowOutsideClick: false,
-      didOpen: () => {
-        Swal.showLoading()
-      }
-    });
-    this.webSiteService.getWebSites().subscribe(
-      (res:any) =>{
-        this.webSites = res;
-        this.totalWebSites = res.length;
-        this.collectionSize = this.webSites.length;
-        this.charging = false;
-        Swal.close();
-      },
-    (error:any) =>{})
-  }
-
-  openModal(content1: string, data) {
-    if(data != 0){
-      this.formSiteEdit.patchValue({
-        name: data.name,
-        slogan: data.slogan,
-        is_active: data.is_active
-      });
-
-      this.websiteId = data.id;
-      
-    }
-		this.modalService.open(content1, { ariaLabelledBy: 'modal-basic-title', size: 'lg' }).result.then((result) => {
-			this.closeResult = `Closed with: ${result}`;
-		}, (reason) => {
-			this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-		});
-	}
-
-  
-  closeModal(){
-    this.modalService.dismissAll()
-  }
-
-  private getDismissReason(reason: ModalDismissReasons): string {
-		if (reason === ModalDismissReasons.ESC) {
-			return 'by pressing ESC';
-		} else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
-			return 'by clicking on a backdrop';
-		} else {
-			return `with: ${reason}`;
-		}
-  }
-
-  uploadImage(event) {
-    if (event.target.files.length > 0){
-      this.formSiteEdit.get('icon').setValue(event.target.files[0])
-    }else{
-      this.formSiteEdit.get('icon').setValue('')
-    }
-  }
-
-  addTaskSection() {
-
-    this.formSiteCreate.reset();
-
-    if ((document.getElementById('rightMenu')as HTMLFormElement).style.width === '300px') {
-        this.closeRightMenu();
-        return;
-    }
-    (document.getElementById('rightMenu')as HTMLFormElement).style.width = '300px';
-
-    this.titleTaskSection = 'Task';
-
-  }
-  closeRightMenu() {
-    (document.getElementById('rightMenu')as HTMLFormElement).style.width = '0';
-  }
-
- 
 }
 

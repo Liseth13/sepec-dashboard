@@ -1,164 +1,208 @@
-<div class="col-12 mb-3 table-users" *ngIf="!charging">
-    <div class="card">
-        <div class="card-body">
-            <div class="row bd-highlight mb-2">
-                <div class="col-12">
-                    <h1 class="fant"> Sitios Web </h1>
-                    <div class="float-left align-center justify-content-center">
-                        <h1 class="h3 mb-0 text-gray-800 pt-2">Total: {{ totalWebSites }}</h1>
-                    </div>
-                
-                    <div class="float-right bd-highlight">
-                        <button class="btn btn-info cursor" (click)="addTaskSection()">
-                            <i class="fas fa-plus-circle"></i> Agregar
-                        </button>
+<div class="card">
+    <div class="card-body">
+        <h3>
+            Sitios webs
+            <button (click)="openRightSidebar('create')" class="btn btn-primary cursor float-right">
+                <i class="fas fa-plus-circle"></i> Crear sitio web
+            </button>
+            <div class="clearfix"></div>
+        </h3>
+        <hr>
+        <div class="row pt-3">
+            <div class="col-md-6 col-lg-3 col-xlg-3">
+                <div class="card card-hover" (click)="showSites('all')">
+                    <div class="box bg-info cursor-pointer text-center">
+                        <h1 class="fw-light text-white">
+                            {{ sites.length }}
+                        </h1>
+                        <h6 class="text-white">
+                            Sitios sitios
+                        </h6>
                     </div>
                 </div>
             </div>
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover">
-                    <thead class="thead-dark">
-                        <tr>
-                            <th class="w100">Icon</th>
-                            <th>Nombre</th>
-                            <th>Slogan</th>
-                            <th>Activo</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr *ngFor="let data of webSites |slice: (page-1) * pageSize : (page-1) * pageSize + pageSize">
-                            <td class="text-center">
-                                <img [src]="data.icon" alt="Icon" class="avatar cursor">
-                            </td>
-                            <td>{{ data.name }}</td>
-                            <td>{{ data.slogan }}</td>
-                            <td *ngIf="data.is_active"><span class="label label-success">Activo</span></td>
-                            <td *ngIf="!data.is_active"><span class="label label-danger">No activo</span></td>
-                            <td class="text-center">
-                                <div class="row">
-                                    <div class="col-12 action-btn">
-                                        <a class="btn btn-warning ml-1 action-text cursor" (click)="openModal(modalEditSite, data)">
-                                            <i class="far fa-edit"></i>
-                                        </a>
-                                    </div>  
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="col-md-6 col-lg-3 col-xlg-3">
+                <div class="card card-hover" (click)="showSites('actives')">
+                    <div class="box bg-success cursor-pointer text-center">
+                        <h1 class="fw-light text-white">
+                            {{ sites | counterStatus : true }}
+                        </h1>
+                        <h6 class="text-white">
+                            Sitios activos
+                        </h6>
+                    </div>
+                </div>
             </div>
-            <div class="d-flex justify-content-center mt-5">
-                <ngb-pagination [collectionSize]="collectionSize" [(page)]="page" [pageSize]="pageSize">
-
-                </ngb-pagination>
+            <div class="col-md-6 col-lg-3 col-xlg-3">
+                <div class="card card-hover" (click)="showSites('inactives')">
+                    <div class="box bg-danger cursor-pointer text-center">
+                        <h1  class="fw-light text-white">
+                            {{ sites | counterStatus : false }}
+                        </h1>
+                        <h6 class="text-white">
+                            Sitios inactivos
+                        </h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 mb-3 table-users">
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th class="w100">Icon</th>
+                                    <th>Nombre</th>
+                                    <th>Slogan</th>
+                                    <th>Activo</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let site of sitesForTable | slice: (pagination.page-1) * pagination.pageSize : (pagination.page-1) * pagination.pageSize + pagination.pageSize">
+                                    <td class="text-center">
+                                        <img [src]="site.icon" alt="Icon" class="avatar cursor">
+                                    </td>
+                                    <td>{{ site.name }}</td>
+                                    <td>{{ site.slogan }}</td>
+                                    <td *ngIf="site.is_active"><span class="label label-success">Activo</span></td>
+                                    <td *ngIf="!site.is_active"><span class="label label-danger">No activo</span></td>
+                                    <td class="text-center">
+                                        <div class="row">
+                                            <div class="col-12 action-btn">
+                                                <a class="btn btn-warning ml-1 action-text cursor" (click)="openRightSidebar('edit', site)">
+                                                    <i class="far fa-edit"></i>
+                                                </a>
+                                            </div>  
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="d-flex justify-content-center mt-5">
+                        <ngb-pagination 
+                            [collectionSize]="pagination.collectionSize" [(page)]="pagination.page" [pageSize]="pagination.pageSize">
+                        </ngb-pagination>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
-<!-- modal Editar Sitio web -->
-<ng-template #modalEditSite let-modal>
-    <div class="modal-header">
-        <h4 class="modal-title" id="modal-basic-title"> Editar Sitio Web</h4>
-        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
-    
-    <div class="row">
-        <div class="col-sm-12 col-md-12 col-lg-12">
-            <div class="card card-body">
-                <form class="form-group" [formGroup]="formSiteEdit" (ngSubmit)= "edit()">
-                    
-                    <div class="form-group">
-                        <label>
-                            <span class="help"> Escriba Nombre del Sitio Web"</span>
-                        </label>
-                        <input type="text" class="form-control" formControlName="name" value="Escriba Nombre del Sitio Web">
-                    </div>
-                    <div class="form-group">
-                        <label >Escribir Slogan</label>
-                        <textarea class="form-control"  formControlName="slogan" rows="2" placeholder="Escribir Slogan"> </textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>Selecione imagen</label>
 
-                        <input type="file" class="form-control" (change)="uploadImage($event)">
-                    </div>
-
-                    <div class="form-group" >
-                        <label>Estado</label>
-                        <select class="custom-select col-12" id="inlineFormCustomSelect" formControlName="is_active" >
-                            <option value="" selected>--Seleccione una Opcion</option>
-                            <option value="true">Activado</option>
-                            <option value="false">Desactivado</option>
-                        </select>
-                    </div>
-                        <div class="modal-footer" >
-                            <button type="submit" class="btn btn-success" >Guardar</button>
-                        </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</ng-template>
-<!--  Crear Sitio web -->
-<div class="app-sidebar card" id="rightMenu">
-
-        <!-- Header -->
+ <!-- sidebar -->
+ <div class="app-sidebar card" id="rightMenu">
+    <div>
+        <!-- -------------------------------------------------------------------------------------- -->
+        <!-- Header of sidebar -->
+        <!-- -------------------------------------------------------------------------------------- -->
         <div class="d-flex p-3 border-bottom card-header">
-            <div class="d-flex align-items-center">
-                AGREGAR SITIO 
+            <div  class="d-flex align-items-center">
+                <h2 class="text-center text-title"> {{sidebarMode === 'create'? 'Crear sitio web' : 'Editar sitio web'}} </h2>
             </div>
+
             <div class="ml-auto">
-                <a href="javascript:void(0)" class="text-danger" (click)='closeRightMenu()'>
-                    X
+                <a href="javascript:void(0)" class="text-danger" (click)='closeRightSidebar()'>
+                    <i-feather name="x" class="feather-sm"></i-feather>
                 </a>
             </div>
         </div>
-
-        <!-- Body -->
-        <div class="row">
-            <div class="p-2">
-                <div class="card card-body">
-                    <form  [formGroup]="formSiteCreate" (ngSubmit)="create()">
-                        <div class="row">
-                            <div class="form-group">
-                                <label><span class="help"> Escriba Nombre del Sitio Web</span></label>
-                                <input type="text" class="form-control" formControlName="name" value="Escriba Nombre del Sitio Web">
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="form-group"><label >Escribir Slogan</label>
-                                <textarea class="form-control"  formControlName="slogan" rows="5" cols="20" placeholder="Escribir Slogan"> </textarea>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="form-group">
-                                <label>Selecione imagen</label>
-                                <div class="mb-4">
-                                    <img *ngIf="!tempImg" src="../../../../assets/images/big/no-img.png" class="add-modal-image">
-                                    <img *ngIf="tempImg" [src]="tempImg" class="add-modal-image">
-                                </div>
-                
-                                <input type="file" class="" (change)="changeImage($event.target.files[0])">
-                
-                                <div *ngIf="!validImageExtension" class="mb-2 mr-3">
-                                    <p class="text-danger">La extensión de este archivo no está permitida, cargue un archivo con la extensión jpg, jpe, png.</p>
-                                </div>
-                
-                                <div *ngIf="!allowedFileSize" class="mb-2 mr-4">
-                                    <p class="text-danger">Este archivo no está permitido porque excede el tamaño permitido de 5 MB</p>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="row" >
-                            <button type="submit" class="btn btn-success" >Guardar</button>
-                        </div>
-                    </form>
+        <!-- ./  Header of sidebar -->
+        <!-- -------------------------------------------------------------------------------------- -->
+        <!-- Body of sidebar -->
+        <!-- -------------------------------------------------------------------------------------- -->
+        <div class="p-4">
+            <form *ngIf="sidebarMode === 'create'" [formGroup] = "formCreate" (ngSubmit)="create( formCreate )">
+                <div class="form-group">
+                    <label> Nombre</label>
+                    <input type="text" class="form-control" formControlName="name" placeholder="Nombre del Sitio Web">
                 </div>
-            </div>
+                <div class="form-group">
+                    <label >Slogan</label>
+                    <textarea class="form-control"  formControlName="slogan" rows="10" cols="30" placeholder="Escribir Slogan del sitio web"> </textarea>
+                </div>
+                <!-- <div class="form-group">
+                    <label>Selecione imagen</label>
+                    <div class="mb-4">
+                        <img *ngIf="!tempImg" src="../../../../assets/images/big/no-img.png" class="add-modal-image">
+                        <img *ngIf="tempImg" [src]="tempImg" class="add-modal-image">
+                    </div>
+    
+                    <input type="file" class="form-control" (change)="changeImage($event.target.files[0])">
+    
+                    <div *ngIf="!validImageExtension" class="mb-2 mr-3">
+                        <p class="text-danger">La extensión de este archivo no está permitida, cargue un archivo con la extensión jpg, jpe, png.</p>
+                    </div>
+    
+                    <div *ngIf="!allowedFileSize" class="mb-2 mr-4">
+                        <p class="text-danger">Este archivo no está permitido porque excede el tamaño permitido de 5 MB</p>
+                    </div>
+                </div> -->
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success btn-block" >
+                        <i-feather name="save" class="feather-sm mr-2"></i-feather>
+                        Crear sitio web
+                    </button>
+                </div>
+                <div class="form-group">
+                    <button type="button" class="btn btn-danger btn-block" (click)='loadFormCreate()'>
+                        <i-feather name="trash-2" class="feather-sm mr-2"></i-feather>
+                        Limpiar Formulario
+                    </button>
+                </div>
+            </form>
+
+            <form *ngIf="sidebarMode === 'edit'"  [formGroup] = "formEdit" (ngSubmit)="edit( formEdit )">
+                <div class="form-group">
+                    <label>Nombre</label>
+                    <input type="text" class="form-control" formControlName="name" placeholder="Escriba Nombre del Sitio Web">
+                </div>
+                <div class="form-group">
+                    <label >Escribir Slogan</label>
+                    <textarea class="form-control"  formControlName="slogan" rows="5" cols="20" placeholder="Escribir Slogan"> </textarea>
+                </div>
+                <!-- <div class="form-group">
+                    <label>Selecione imagen</label>
+                    <div class="mb-4">
+                        <img *ngIf="!tempImg" src="../../../../assets/images/big/no-img.png" class="add-modal-image">
+                        <img *ngIf="tempImg" [src]="tempImg" class="add-modal-image">
+                    </div>
+    
+                    <input type="file" class="form-control" (change)="changeImage($event.target.files[0])">
+    
+                    <div *ngIf="!validImageExtension" class="mb-2 mr-3">
+                        <p class="text-danger">La extensión de este archivo no está permitida, cargue un archivo con la extensión jpg, jpe, png.</p>
+                    </div>
+    
+                    <div *ngIf="!allowedFileSize" class="mb-2 mr-4">
+                        <p class="text-danger">Este archivo no está permitido porque excede el tamaño permitido de 5 MB</p>
+                    </div>
+                </div> -->
+                <div class="form-group">
+                    <label for="statusEdit">Estado</label>                 
+                    <select id="statusEdit" formControlName = "is_active" class="form-control">
+                        <option value="true" >Activo</option>
+                        <option value="false" >Inactivo</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success btn-block">
+                        <i-feather name="save" class="feather-sm mr-2"></i-feather>
+                        Guardar cambios
+                    </button>
+                </div>
+                <div class="form-group">
+                    <button type="button" class="btn btn-danger btn-block" (click)='closeRightSidebar()'>
+                        <i-feather name="trash-2" class="feather-sm mr-2"></i-feather>
+                        Cancelar
+                    </button>
+                </div>
+            </form>
         </div>
+        <!-- ./ Body of sidebar -->
     </div>
+</div>
 

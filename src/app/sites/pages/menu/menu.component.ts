@@ -18,29 +18,6 @@ export class MenuComponent implements OnInit {
   sites : Array<any>  = [];
 
   level : 1 | 2 | 3 | number = 1;
-
-  //Forms
-
-
-
-
-  // formMenuCreate: FormGroup;
-  // formMenuEdit: FormGroup;
-  // formSubmenuCreate : FormGroup;
-  // formSubmenuEdit : FormGroup;
-
-  // menus : Array <any> = [];
-  // submenus : Array <any> = [];
-  // fathers : Array <any> = [];
-  // webSites: Array <any> = [];
-
-
-  // paginationMenu = new Pagination();
-  // paginationSites = new Pagination();
-  // paginationSubmenus = new Pagination();
-  // paginationFathers = new Pagination();
-
-  // mode : 'create' | 'edit' | 'subCreate' | 'subEdit' | string = '';
   
   constructor(
     private formBuilder : FormBuilder, private menuService : menuService,
@@ -49,10 +26,7 @@ export class MenuComponent implements OnInit {
 
   ngOnInit(): void {
     this.get()
-    // this.loadformMenuCreate();
-    // this.loadformMenuEdit();
-    // this.getWebMenu();
-    // this.getWebSite();
+    this.getSites()
   }
 
   get = () => {
@@ -66,7 +40,10 @@ export class MenuComponent implements OnInit {
   }
 
   getSites = () => {
-
+    this.webSiteService.get()
+    .subscribe(( res : any ) => {
+      this.sites = res;
+    }, ( error : any ) => { this.errorHandler( error ) });
   }
 
   errorHandler = ( error : any ) => {

@@ -53,7 +53,7 @@
                 </thead>
                 <tbody>
                     <tr class="text-center" *ngFor="let menu of menusForTable | slice: (pagMenu.page-1) * pagMenu.pageSize : (pagMenu.page-1) * pagMenu.pageSize + pagMenu.pageSize">
-                        <td class="text-center">{{ menu.site }}</td>
+                        <td class="text-center">{{ menu.site | siteName: sites }}</td>
                         <td class="text-center">{{ menu.title }}</td>
                         <!-- <td>{{ menu.slug }}</td> -->
                         <td >{{ menu.level }}</td>
