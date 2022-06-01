@@ -16,7 +16,7 @@
                             {{ sites.length }}
                         </h1>
                         <h6 class="text-white">
-                            Sitios sitios
+                            Todos
                         </h6>
                     </div>
                 </div>
@@ -53,7 +53,7 @@
                         <table class="table table-bordered table-hover">
                             <thead class="thead-dark">
                                 <tr>
-                                    <th class="w100">Icon</th>
+                                    <!-- <th class="w100">Icon</th> -->
                                     <th>Nombre</th>
                                     <th>Slogan</th>
                                     <th>Activo</th>
@@ -62,9 +62,9 @@
                             </thead>
                             <tbody>
                                 <tr *ngFor="let site of sitesForTable | slice: (pagination.page-1) * pagination.pageSize : (pagination.page-1) * pagination.pageSize + pagination.pageSize">
-                                    <td class="text-center">
+                                    <!-- <td class="text-center">
                                         <img [src]="site.icon" alt="Icon" class="avatar cursor">
-                                    </td>
+                                    </td> -->
                                     <td>{{ site.name }}</td>
                                     <td>{{ site.slogan }}</td>
                                     <td *ngIf="site.is_active"><span class="label label-success">Activo</span></td>

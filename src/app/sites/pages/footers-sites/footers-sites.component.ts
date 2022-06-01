@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ModalDismissReasons, NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { Footer } from './footer';
+import { Pagination } from 'src/app/shared/interfaces/Pagination';
 import Swal from 'sweetalert2';
+import { Footer } from '../../interfaces/footer';
+import { Site } from '../../interfaces/Site';
 import { footerSiteService } from '../../services/footers-sites.service';
 import { WebSitesService } from '../../services/web-sites.service';
 
@@ -15,26 +17,20 @@ import { WebSitesService } from '../../services/web-sites.service';
 })
 export class FootersSitesComponent implements OnInit {
 
-  selectedST: Footer | undefined = Object.create(null);
-  titleTaskSection = '';
+  public sites    : Array <Site> = [];
+  public footers  : Array <Footer> = [];
+  footersForTable : Array <Footer> = [];
 
-  public webSites : Array <any> = [];
-  public footers  : Array <any> = [];
-  public charging : boolean = true;
-  public totalFooterSite:number = 0;
-  private webFooterId: number = 0;
-  private formFooterCreate: FormGroup;
-  private formFooterEdit: FormGroup;
-  websiteId: any;
-  closeResult: string;
-  count = 0;
-  sectionTask: Footer[] | null = null;
+  private formCreate: FormGroup;
+  private formEdit  : FormGroup;
 
-    //Paginación
-    page =1;
-    pageSize = 8;
-    collectionSize = 0;
-    _searchTerm = '';
+  sidebarMode : 'create' | 'edit' | string = 'create';
+
+  //Paginación
+  pagination = new Pagination();
+
+  tableMode : 'all' | 'actives' | 'inactives' | string = 'all';
+
     
 
   constructor(
@@ -43,178 +39,213 @@ export class FootersSitesComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-   this.getWebFooters();
-   this.loadformSiteCreate();
-   this.loadformSiteEdit();
-   this.getWebSite();
-   
+   this.get( true );
+   this.loadFormCreate();
+   this.getSites();  
   }
 
-  loadformSiteCreate(){
-    this.formFooterCreate = this.formBuilder.group({ 
-      site:['',[Validators.required, Validators.maxLength(20),Validators.minLength(3)]],
-      email:['',[Validators.required, Validators.maxLength(40),Validators.minLength(8)]],
-      address:['',[Validators.required, Validators.maxLength(40),Validators.minLength(5)]],
-      phone:['',[Validators.required, Validators.maxLength(40),Validators.minLength(8)]],
+  loadFormCreate(){
+    this.formCreate = this.formBuilder.group({ 
+      site    :['',[Validators.required]],
+      email   :['',[Validators.required, Validators.maxLength(40),Validators.minLength(8)]],
+      address :['',[Validators.required, Validators.maxLength(40),Validators.minLength(5)]],
+      phone   :['',[Validators.required, Validators.maxLength(40),Validators.minLength(8)]],
     })
   }
 
-  loadformSiteEdit(){
-    this.formFooterEdit = this.formBuilder.group({
-      id:[null,[Validators.required,]],
-      site:['',[Validators.required, Validators.maxLength(20),Validators.minLength(3)]],
-      email:['',[Validators.required, Validators.maxLength(40),Validators.minLength(8)]],
-      address:['',[Validators.required, Validators.maxLength(40),Validators.minLength(2)]],
-      phone:['',[Validators.required, Validators.maxLength(40),Validators.minLength(8)]],
-      is_active:[null,[Validators.required,]],
+  loadFormEdit( footer : Footer ){
+    this.formEdit = this.formBuilder.group({
+      id     :[ footer?.id, [Validators.required,]],
+      site   :[ footer?.site ,[Validators.required]],
+      email  :[ footer?.email ,[Validators.required, Validators.maxLength(40),Validators.minLength(8)]],
+      address:[ footer?.address ,[Validators.required, Validators.maxLength(40),Validators.minLength(2)]],
+      phone  :[ footer?.phone ,[Validators.required, Validators.maxLength(40),Validators.minLength(8)]],
+      is_active:[ footer?.is_active ,[Validators.required]],
     })
   }
 
   validateForms = ( form : FormGroup ) : boolean => {
+    console.log(form.value)
     if ( form.valid ) {
       return true;
     }
-    return false
+    Swal.fire('Error','Faltan Campos Por Validar','warning')
+    return false;
   };
 
-  getWebFooters = () =>{
-    this.footerSiteService.getFootersSites().subscribe(
-      (res:any) =>{
-    this.footers = res;
-    this.totalFooterSite = res.length;
-    this.collectionSize = this.footers.length;
-    this.charging = false;
-    Swal.close();
 
-    },
-    (error:any) =>{})
+  get = ( isShowLoading : boolean = false ) => {
+
+    if ( isShowLoading ) {
+      Swal.fire({
+        title: 'Cargando',
+        html: 'Por favor espera un momento...',
+        didOpen: () => {
+          Swal.showLoading()
+        }
+      });
+    }
+
+   this.footerSiteService.get().subscribe(
+    ( res : Footer[] ) => { this.footers = res },
+    ( error : any ) => { this.errorHandler( error ) },
+    () => { 
+      this.showFooters( this.tableMode );
+      isShowLoading && Swal.close() ;
+    });
   }
 
-  getWebSite = () => {
+  getSites = () => {
     this.webSiteService.get().subscribe(
-      (res:any) =>{
-        this.webSites = res;
-      },
-      (error) => {
-        
-      }
-    )
+    ( res : Site[] ) =>{
+      this.sites = res;
+    },
+    ( error : any ) => { this.errorHandler(error) });
   }
 
+  create = ( form : FormGroup ) => {
+    const isValid : boolean = this.validateForms( form );
+    if( isValid ) { 
+      this.footerSiteService.create( form.value ).subscribe(
+      ( res : any ) => {  
+        this.get();
+        this.closeRightSidebar();
+        Swal.fire('Exito!','Guardado correctamente','success')
+      }, ( error : any ) => { this.errorHandler( error ) });
+    }
+  }
 
-  openModal(content1: string, data: any) {
+  edit( form : FormGroup ){
+    const isValid : boolean = this.validateForms( form );
+    if ( isValid ){
+      this.footerSiteService.update( form.value ).subscribe(
+      ( res : any )=>{
+        this.get();
+        this.closeRightSidebar();
+        Swal.fire(' Success','Editado correctamente','success');
+      }, ( error : any ) => { this.errorHandler( error ) });
+    }
+  }
+
+  showFooters = ( mode : string ) => {
+
+    if ( mode === 'all' ) {
+      this.footersForTable = this.footers;
+    }
+
+    if ( mode === 'actives' ){
+      this.footersForTable = this.footers.filter((f:Footer) => f.is_active);
+    }
+
+    if ( mode === 'inactives' ){
+      this.footersForTable = this.footers.filter((f:Footer) => !f.is_active);
+    }
+
+    this.pagination.collectionSize = this.footersForTable.length;
+    this.pagination.page = 1;
+  }
+
+  openRightSidebar( mode: string, footer? : Footer ) {
+    if ( mode === 'edit' && footer ){
+      this.sidebarMode = mode;
+      this.loadFormEdit( footer );
+    } else if ( mode === 'create' ) {
+      this.sidebarMode = mode;
+      this.loadFormCreate();
+    } else {
+      this.sidebarMode = 'create';
+      return;
+    }
+
+    const rightMenu : HTMLFormElement = document.getElementById('rightMenu') as HTMLFormElement ;
     
-    if (data != 0) {
-      this.formFooterEdit.patchValue({
-        id: data.id,
-        site: data.site,
-        email: data.email,
-        address: data.address,
-        phone: data.phone,
-        is_active: data.is_active,
-      })
-    } 
-    
-    this.modalService.open(content1, { ariaLabelledBy: 'modal-basic-title', size: 'lg' }).result.then((result) => {
-			this.closeResult = `Closed with: ${result}`;
-		}, (reason) => {
-			this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-		});
-  }
-
-  closeModal() { 
-    this.modalService.dismissAll()
-  }
-
-
-  getDismissReason(reason: ModalDismissReasons) : string {
-    if (reason === ModalDismissReasons.ESC) {
-			return 'by pressing ESC';
-		} else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
-			return 'by clicking on a backdrop';
-		} else {
-			return `with: ${reason}`;
-		}
-  }
-
-  addTaskSection() {
-
-    this.formFooterCreate.reset();
-
-    if ((document.getElementById('rightMenu')as HTMLFormElement).style.width === '300px') {
-        this.closeRightMenu();
+    if ( rightMenu.style.width === '285px' ) {
+        this.closeRightSidebar();
         return;
     }
-    (document.getElementById('rightMenu')as HTMLFormElement).style.width = '300px';
-
-    this.titleTaskSection = 'Task';
-
-    const footer = new Footer();
-    footer.email = 'bla@bla.com';
-    footer.address = 'bla@bla.com';
-    footer.phone = 'bla@bla.com';
-    footer.status = true;
-
-  }
-  closeRightMenu() {
-    (document.getElementById('rightMenu')as HTMLFormElement).style.width = '0';
+    rightMenu.style.width = '285px';
   }
 
-  edit(){
-    if(this.formFooterEdit.invalid){
-      Swal.fire('Error','Faltan Campos Por Validar','warning')
-    }else{
-      this.webFooterId=this.formFooterEdit.value.id;
-      const { ...data } = this.formFooterEdit.value;
-
-      this.footerSiteService.updateFootersSites(data, this.webFooterId).subscribe(
-        (res:any)=>{
-          this.getWebFooters();
-          this.closeModal();
-          Swal.fire(' Success','Editado correctamente','success');
-        },
-        (error:any)=>{
-          Swal.fire('Error','vuelva a intentarlo','error');
-        }
-      )
-    }
+  closeRightSidebar() {
+    const rightMenu : HTMLFormElement = document.getElementById('rightMenu') as HTMLFormElement ;
+    rightMenu.style.width = '0px';
   }
 
-  create(){
-      
-    if(this.formFooterCreate.invalid){
-      Swal.fire('Error','Faltan Campos Por Validar','warning')
-    }else{
-      
-      this.footerSiteService.createFootersSites(this.formFooterCreate.value).subscribe(
-        (res:any)=>{
-          
-          this.getWebFooters()
-          this.closeRightMenu();
-          Swal.fire(' Success','Guardado correctamente','success')
-        },
-        (error:any)=>{
-          Swal.fire('Error','vuelva a intentarlo','error')
-        }
-      )
-    }
-}
-  seleccionar(site){
+  errorHandler = ( error : any ) => {
+    Swal.fire('Error', "Ha ocurrido un error, reintentar operación", 'error');
+  }
+
+  // openModal(content1: string, data: any) {
     
-      this.formFooterCreate.get('site').setValue(site.id);
-      this.closeModal()
+  //   if (data != 0) {
+  //     this.formEdit.patchValue({
+  //       id: data.id,
+  //       site: data.site,
+  //       email: data.email,
+  //       address: data.address,
+  //       phone: data.phone,
+  //       is_active: data.is_active,
+  //     })
+  //   } 
+    
+  //   this.modalService.open(content1, { ariaLabelledBy: 'modal-basic-title', size: 'lg' }).result.then((result) => {
+	// 		this.closeResult = `Closed with: ${result}`;
+	// 	}, (reason) => {
+	// 		this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+	// 	});
+  // }
 
-  }
+  // closeModal() { 
+  //   this.modalService.dismissAll()
+  // }
 
-  getName(siteId) {
-    let siteName = '';
 
-    if (siteId != '' && siteId != null) {
-      const siteName = this.webSites.find(site => site.id === siteId);
-      return siteName.name
-    } else {
-      return siteName;
-    }
-  }
+  // getDismissReason(reason: ModalDismissReasons) : string {
+  //   if (reason === ModalDismissReasons.ESC) {
+	// 		return 'by pressing ESC';
+	// 	} else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
+	// 		return 'by clicking on a backdrop';
+	// 	} else {
+	// 		return `with: ${reason}`;
+	// 	}
+  // }
+
+
+
+  // edit(){
+  //   if(this.formEdit.invalid){
+  //     Swal.fire('Error','Faltan Campos Por Validar','warning')
+  //   }else{
+
+  //     this.footerSiteService.updateFootersSites('dsfdsf',4).subscribe(
+  //       (res:any)=>{
+  //         this.get();
+  //         Swal.fire(' Success','Editado correctamente','success');
+  //       },
+  //       (error:any)=>{
+  //         Swal.fire('Error','vuelva a intentarlo','error');
+  //       }
+  //     )
+  //   }
+  // }
+
+  // create(){
+      
+  //   if(this.formCreate.invalid){
+  //     Swal.fire('Error','Faltan Campos Por Validar','warning')
+  //   }else{
+      
+  //     this.footerSiteService.createFootersSites(this.formCreate.value).subscribe(
+  //       (res:any)=>{
+          
+  //         this.get()
+  //         // this.closeRightMenu();
+  //         Swal.fire(' Success','Guardado correctamente','success')
+  //       },
+  //       (error:any)=>{
+  //         Swal.fire('Error','vuelva a intentarlo','error')
+  //       }
+  //     )
+  //   }
 }
 

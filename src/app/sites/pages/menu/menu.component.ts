@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { ModalDismissReasons,  NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { Pagination } from 'src/app/shared/interfaces/Pagination';
+import { FormBuilder } from '@angular/forms';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import Swal from 'sweetalert2';
 import { Menu } from '../../interfaces/menu';
 import { menuService } from '../../services/menu.service';
@@ -21,7 +20,7 @@ export class MenuComponent implements OnInit {
   
   constructor(
     private formBuilder : FormBuilder, private menuService : menuService,
-    private webSiteService: WebSitesService,private modalService: NgbModal
+    private webSiteService: WebSitesService, private modalService: NgbModal
   ) { }
 
   ngOnInit(): void {

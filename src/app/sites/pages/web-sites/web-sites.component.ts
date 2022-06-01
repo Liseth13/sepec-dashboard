@@ -3,6 +3,7 @@ import {FormBuilder, FormGroup, Validators,} from '@angular/forms';
 import { WebSitesService }  from '../../services/web-sites.service';
 import Swal from 'sweetalert2';
 import { Pagination } from 'src/app/shared/interfaces/Pagination';
+import { Site } from '../../interfaces/Site';
 
 
 @Component({
@@ -13,8 +14,8 @@ import { Pagination } from 'src/app/shared/interfaces/Pagination';
 
 export class WebSitesComponent implements OnInit {
 
-  public sites : Array <any> = [];
-  sitesForTable: Array <any> = [];
+  public sites : Array <Site> = [];
+  sitesForTable: Array <Site> = [];
 
   public formCreate : FormGroup;
   private formEdit  : FormGroup;
