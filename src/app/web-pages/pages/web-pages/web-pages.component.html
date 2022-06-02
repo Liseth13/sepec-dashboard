@@ -131,7 +131,7 @@
                                         <!-- <h1 *ngIf="pages === undefined && pages.id ==''" >sdfsdffsd</h1> -->
                                     </div>
                                 </div>
-                                <div *ngIf="webPagesFilter.length > 0 " class="position-relative" style="height: calc(100vh - 180px);" [perfectScrollbar]="config" >
+                                <div *ngIf="webPagesFilter.length > 0 " class="position-relative" style="height: calc(100vh - 145px);" [perfectScrollbar]="config" >
                                     <!-- NgFor -->
                                     <div  
                                         *ngFor="let page of webPagesFilter | slice: (paginationPages.page-1) * paginationPages.pageSize : (paginationPages.page-1) * paginationPages.pageSize + paginationPages.pageSize" >
@@ -215,6 +215,7 @@
                 </div>
             </div>
         </div>
+    </div>
 
     <!-- sidebar -->
     <div class="app-sidebar card" id="rightMenu">

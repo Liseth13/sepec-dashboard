@@ -18,17 +18,27 @@
                         <option value="false" select>Inactivo</option>
                     </select>
                 </div>
-                <div class="form-group">
+                <div class="form-group"  >
                     <label for="contentBody">Contenido:</label>
                     <!-- <input type="text" class="form-control"  id="slug" formControlName = "slug">        -->
-                    <textarea 
+                    <!-- <textarea 
                         class="form-control" 
                         name="contentPage" 
                         id="contentPage" 
                         cols="30" rows="10" 
                         formControlName='body'
                         placeholder="Contenido de la página">
-                    </textarea>               
+                    </textarea>                -->
+                    <quill-editor
+                    id="quillEditor"
+                        class="content-editor"
+                        [placeholder]="'Insertar contenido...'" 
+                        [content]="html" 
+                        [modules]="modules" 
+                        [styles]="{'min-height': '100px', 'height' : '250px'}"  
+                        (onEditorChanged)="changeEditor($event)" 
+                        [perfectScrollbar]="config">
+                    </quill-editor>
                 </div> 
                 <div class="form-group ml-p2">
                     <button type ="submmit" class="btn btn-primary">Agregar</button>

@@ -86,7 +86,7 @@ export class WebSitesComponent implements OnInit {
     }
 
     this.webSiteService.get().subscribe(
-    ( res : any ) => { this.sites = res },
+    ( res : Site[] ) => { this.sites = res ; this.showSites(this.tableMode)},
     ( error : any ) => { this.errorHandler( error ) },
     () => { 
       this.showSites( this.tableMode );
@@ -110,6 +110,7 @@ export class WebSitesComponent implements OnInit {
 
     this.pagination.collectionSize = this.sitesForTable.length;
     this.pagination.page = 1;
+    this.tableMode = mode;
   }
 
   create( form : FormGroup ){

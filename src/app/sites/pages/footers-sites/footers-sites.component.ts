@@ -28,6 +28,7 @@ export class FootersSitesComponent implements OnInit {
 
   //Paginación
   pagination = new Pagination();
+  pagSites   = new Pagination();
 
   tableMode : 'all' | 'actives' | 'inactives' | string = 'all';
 
@@ -47,21 +48,23 @@ export class FootersSitesComponent implements OnInit {
   loadFormCreate(){
     this.formCreate = this.formBuilder.group({ 
       site    :['',[Validators.required]],
-      email   :['',[Validators.required, Validators.maxLength(40),Validators.minLength(8)]],
-      address :['',[Validators.required, Validators.maxLength(40),Validators.minLength(5)]],
-      phone   :['',[Validators.required, Validators.maxLength(40),Validators.minLength(8)]],
+      email   :['',[Validators.required, Validators.maxLength(150),Validators.minLength(5)]],
+      address :['',[Validators.required, Validators.maxLength(200),Validators.minLength(2)]],
+      phone   :['',[Validators.required, Validators.maxLength(100),Validators.minLength(2)]],
     })
   }
 
   loadFormEdit( footer : Footer ){
     this.formEdit = this.formBuilder.group({
-      id     :[ footer?.id, [Validators.required,]],
-      site   :[ footer?.site ,[Validators.required]],
-      email  :[ footer?.email ,[Validators.required, Validators.maxLength(40),Validators.minLength(8)]],
-      address:[ footer?.address ,[Validators.required, Validators.maxLength(40),Validators.minLength(2)]],
-      phone  :[ footer?.phone ,[Validators.required, Validators.maxLength(40),Validators.minLength(8)]],
-      is_active:[ footer?.is_active ,[Validators.required]],
-    })
+      id     :[ footer.id, [Validators.required,]],
+      site   :[ footer.site ,[Validators.required]],
+      email  :[ footer.email ,[Validators.required, Validators.maxLength(150),Validators.minLength(5)]],
+      address:[ footer.address ,[Validators.required, Validators.maxLength(200),Validators.minLength(2)]],
+      phone  :[ footer.phone ,[Validators.required, Validators.maxLength(100),Validators.minLength(2)]],
+      is_active:[ footer.is_active ,[Validators.required]],
+    });
+    console.log(this.formEdit.value);
+    
   }
 
   validateForms = ( form : FormGroup ) : boolean => {
@@ -87,7 +90,7 @@ export class FootersSitesComponent implements OnInit {
     }
 
    this.footerSiteService.get().subscribe(
-    ( res : Footer[] ) => { this.footers = res },
+    ( res : Footer[] ) => { this.footers = res ; this.showFooters( this.tableMode ) },
     ( error : any ) => { this.errorHandler( error ) },
     () => { 
       this.showFooters( this.tableMode );
@@ -99,6 +102,7 @@ export class FootersSitesComponent implements OnInit {
     this.webSiteService.get().subscribe(
     ( res : Site[] ) =>{
       this.sites = res;
+      this.pagSites.collectionSize = this.sites.length;
     },
     ( error : any ) => { this.errorHandler(error) });
   }
@@ -107,7 +111,7 @@ export class FootersSitesComponent implements OnInit {
     const isValid : boolean = this.validateForms( form );
     if( isValid ) { 
       this.footerSiteService.create( form.value ).subscribe(
-      ( res : any ) => {  
+      ( res : Footer ) => {  
         this.get();
         this.closeRightSidebar();
         Swal.fire('Exito!','Guardado correctamente','success')
@@ -143,6 +147,13 @@ export class FootersSitesComponent implements OnInit {
 
     this.pagination.collectionSize = this.footersForTable.length;
     this.pagination.page = 1;
+    this.tableMode = mode;
+  }
+
+  selectSite = ( form : FormGroup, site : Site ) => {
+    form.get('site').setValue(site?.id || '');
+    this.closeModals();
+    
   }
 
   openRightSidebar( mode: string, footer? : Footer ) {
@@ -169,6 +180,18 @@ export class FootersSitesComponent implements OnInit {
   closeRightSidebar() {
     const rightMenu : HTMLFormElement = document.getElementById('rightMenu') as HTMLFormElement ;
     rightMenu.style.width = '0px';
+  }
+
+  openModal( targetModal: NgbModal, size : string = 'md', ) {  
+    this.modalService.open( targetModal , {
+      size : size ,
+      centered: true,
+      backdrop: 'static',
+    });
+  }
+
+  closeModals = () => {
+    this.modalService.dismissAll();
   }
 
   errorHandler = ( error : any ) => {

@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { PerfectScrollbarConfigInterface } from 'ngx-perfect-scrollbar';
@@ -7,6 +7,7 @@ import { Page } from '../../interfaces/Page';
 import { PageContent } from '../../interfaces/PageContent';
 import { Pagination } from '../../../shared/interfaces/Pagination';
 import { pageContentService } from '../../services/page-content.service';
+import { EditorChangeContent, EditorChangeSelection, QuillEditorComponent } from 'ngx-quill';
 
 @Component({
   selector: 'app-page-content',
@@ -17,6 +18,7 @@ export class PageContentComponent implements OnInit, OnChanges {
 
   @Input() idPage : string = '';
   @Input() pages : Page[] = [];
+  @ViewChild ('quillEditor') public editor : ElementRef
 
   contents : Array<PageContent> = [];
 
@@ -34,7 +36,7 @@ export class PageContentComponent implements OnInit, OnChanges {
   ( 
     private formBuilder        : FormBuilder, 
     private modalSv            : NgbModal, 
-    private pageContentService : pageContentService 
+    private pageContentService : pageContentService
   ) { 
     this.loadFormCreate();
   }
@@ -152,4 +154,36 @@ export class PageContentComponent implements OnInit, OnChanges {
     Swal.fire('Error', "Ha ocurrido un error, reintentar operación", 'error');
   }
 
+  changeEditor = ( event : EditorChangeContent | EditorChangeSelection ) => {
+   //editor.innerHTML = this.html;
+   //console.log(this.editorhtml)
+   //console.log(event)
+   console.log(this.editor);
+   
+  }
+
+  html = '<h1>Holalaaa</h1>'
+  modules = {
+    toolbar: [
+      ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+      ['blockquote', 'code-block'],
+
+      [{ 'header': 1 }, { 'header': 2 }],               // custom button values
+      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+      [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
+      [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
+      [{ 'direction': 'rtl' }],                         // text direction
+
+      [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
+      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+
+      [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
+      [{ 'font': [] }],
+      [{ 'align': [] }],
+
+      ['clean'],                                         // remove formatting button
+
+      // ['link', 'image', 'video']                         // link and image, video
+    ],
+  };
 }

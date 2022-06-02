@@ -202,7 +202,6 @@ export class WebPagesComponent implements OnInit {
     Swal.fire('Error', "Ha ocurrido un error, reintentar operación", 'error');
   }
 
-
   showData = ( pageId : string, mode : 'contents' | 'posts' | string  ) => {
     if ( mode === 'contents' || mode === 'posts' ){
       if ( pageId === '' ) {
