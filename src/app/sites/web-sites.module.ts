@@ -14,6 +14,8 @@ import { LevelMenuPipe } from './pipes/level-menu.pipe';
 import { FirstLevelMenusComponent } from './components/first-level-menus/first-level-menus.component';
 import { SharedModule } from '../shared/shared.module';
 import { FeatherModule } from 'angular-feather';
+import { SecondLevelMenusComponent } from './components/second-level-menus/second-level-menus.component';
+import { ThirdLevelMenusComponent } from './components/third-level-menus/third-level-menus.component';
 
 @NgModule({
   declarations: [
@@ -24,6 +26,8 @@ import { FeatherModule } from 'angular-feather';
     MenuNamePipe,
     LevelMenuPipe,
     FirstLevelMenusComponent,
+    SecondLevelMenusComponent,
+    ThirdLevelMenusComponent,
   ],
   imports: [
     CommonModule,

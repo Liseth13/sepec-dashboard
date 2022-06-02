@@ -19,10 +19,23 @@
         </div>
         <app-first-level-menus 
             *ngIf = 'level === 1'
-            [menus] = 'menus'
+            [menus] = 'menus | levelMenu: 1'
             [sites] = 'sites'
         >
         </app-first-level-menus>
+        <app-second-level-menus
+            *ngIf = 'level === 2'
+            [menus] = 'menus |levelMenu : 2'
+            [sites] = 'sites'
+        >
+        </app-second-level-menus>
+        <app-third-level-menus
+        *ngIf = 'level === 3'
+            [menus] = 'menus |levelMenu : 3'
+            [sites] = 'sites'
+        >
+
+        </app-third-level-menus>
     </div>
 </div>
 
