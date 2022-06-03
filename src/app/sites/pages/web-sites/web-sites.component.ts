@@ -51,7 +51,7 @@ export class WebSitesComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.get();
+    this.get( true );
   }
 
 
@@ -68,7 +68,6 @@ export class WebSitesComponent implements OnInit {
       id    : [ site?.id, [ Validators.required ] ],
       name  : [ site?.name ,[Validators.required, Validators.maxLength(60),Validators.minLength(3)]],
       slogan: [ site?.slogan ,[Validators.required, Validators.maxLength(200),Validators.minLength(8)]],
-      // icon  : [ site?.icon ],
       is_active : [ site?.is_active ,[ Validators.required] ],
     });
   }

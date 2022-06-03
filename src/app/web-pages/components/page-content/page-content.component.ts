@@ -7,7 +7,7 @@ import { Page } from '../../interfaces/Page';
 import { PageContent } from '../../interfaces/PageContent';
 import { Pagination } from '../../../shared/interfaces/Pagination';
 import { pageContentService } from '../../services/page-content.service';
-import { EditorChangeContent, EditorChangeSelection, QuillEditorComponent } from 'ngx-quill';
+import { QuillModules } from 'src/app/shared/configs/quillModule';
 
 @Component({
   selector: 'app-page-content',
@@ -31,6 +31,8 @@ export class PageContentComponent implements OnInit, OnChanges {
   //fORMULARIOS DE CONTENIDO DE PÁGINAS
   formCreate : FormGroup;
   formEdit   : FormGroup;
+
+  quillModule = QuillModules;
 
   constructor
   ( 
@@ -58,7 +60,7 @@ export class PageContentComponent implements OnInit, OnChanges {
   loadFormCreate= ( ) => {
     this.formCreate = this.formBuilder.group({
       page      : [ this.idPage , [Validators.required ] ],
-      body      : [ '', [ Validators.required, Validators.minLength(5), Validators.maxLength(15000) ] ],
+      body      : [ '', [ Validators.required, Validators.minLength(5), Validators.maxLength(150000) ] ],
       is_active : ['', [ Validators.required ] ]
     });
   }
@@ -67,7 +69,7 @@ export class PageContentComponent implements OnInit, OnChanges {
     this.formEdit = this.formBuilder.group({
       id        : [ pageContent.id, [ Validators.required ] ],
       page      : [ pageContent.page , [Validators.required ] ],
-      body      : [ pageContent.body, [ Validators.required, Validators.minLength(5), Validators.maxLength(15000) ] ],
+      body      : [ pageContent.body, [ Validators.required, Validators.minLength(5), Validators.maxLength(150000) ] ],
       is_active : [ pageContent.is_active, [ Validators.required ] ]
     });
   }
@@ -111,8 +113,7 @@ export class PageContentComponent implements OnInit, OnChanges {
         this.getContentsByPage( this.paginationContentPage.status, this.paginationContentPage.page )
         this.closeModals();
         Swal.fire('Exito!', 'Se ha creado el post exitosamente', 'success');
-      }, 
-      ( error : any ) => { this.errorHandler( error ) });
+      }, ( error : any ) => { this.errorHandler( error ) });
     }
   }
 
@@ -154,36 +155,4 @@ export class PageContentComponent implements OnInit, OnChanges {
     Swal.fire('Error', "Ha ocurrido un error, reintentar operación", 'error');
   }
 
-  changeEditor = ( event : EditorChangeContent | EditorChangeSelection ) => {
-   //editor.innerHTML = this.html;
-   //console.log(this.editorhtml)
-   //console.log(event)
-   console.log(this.editor);
-   
-  }
-
-  html = '<h1>Holalaaa</h1>'
-  modules = {
-    toolbar: [
-      ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
-      ['blockquote', 'code-block'],
-
-      [{ 'header': 1 }, { 'header': 2 }],               // custom button values
-      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-      [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
-      [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
-      [{ 'direction': 'rtl' }],                         // text direction
-
-      [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
-      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-
-      [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
-      [{ 'font': [] }],
-      [{ 'align': [] }],
-
-      ['clean'],                                         // remove formatting button
-
-      // ['link', 'image', 'video']                         // link and image, video
-    ],
-  };
 }

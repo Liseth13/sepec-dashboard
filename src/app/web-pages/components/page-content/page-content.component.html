@@ -19,24 +19,13 @@
                     </select>
                 </div>
                 <div class="form-group"  >
-                    <label for="contentBody">Contenido:</label>
-                    <!-- <input type="text" class="form-control"  id="slug" formControlName = "slug">        -->
-                    <!-- <textarea 
-                        class="form-control" 
-                        name="contentPage" 
-                        id="contentPage" 
-                        cols="30" rows="10" 
-                        formControlName='body'
-                        placeholder="Contenido de la página">
-                    </textarea>                -->
+                    <label for="contentBody">Contenido:</label> 
                     <quill-editor
-                    id="quillEditor"
-                        class="content-editor"
+                        id="contentBody"
+                        formControlName = 'body'
                         [placeholder]="'Insertar contenido...'" 
-                        [content]="html" 
-                        [modules]="modules" 
+                        [modules]="quillModule" 
                         [styles]="{'min-height': '100px', 'height' : '250px'}"  
-                        (onEditorChanged)="changeEditor($event)" 
                         [perfectScrollbar]="config">
                     </quill-editor>
                 </div> 
@@ -71,19 +60,17 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="contentBody">Contenido:</label>
-                    <!-- <input type="text" class="form-control"  id="slug" formControlName = "slug">        -->
-                    <textarea 
-                        class="form-control" 
-                        name="contentPage" 
-                        id="contentPage" 
-                        cols="30" rows="10"  
-                        formControlName='body'
-                        placeholder="Contenido de la página">
-                    </textarea>               
+                    <label for="contentBodyEdit">Contenido:</label>
+                    <quill-editor
+                        id="contentBodyEdit"
+                        formControlName = 'body'
+                        [placeholder]="'Insertar contenido...'" 
+                        [modules]="quillModule" 
+                        [perfectScrollbar]="config">
+                    </quill-editor>             
                 </div>
                 <div class="form-group ml-p2">
-                    <button type ="submmit" class="btn btn-primary" >Editar</button>
+                    <button type ="submmit" class="btn btn-primary" >Guardar cambios</button>
                     <button type ="button" class="btn btn-danger" (click)="modal.dismiss()">Cancelar</button>
                 </div>
             </form>
@@ -136,17 +123,8 @@
         <spam *ngFor="let content of contentsByPage | slice: (paginationContentPage.page-1) * paginationContentPage.pageSize : (paginationContentPage.page-1) * paginationContentPage.pageSize + paginationContentPage.pageSize" >
             
             <div class="p-3">
-                <!-- <div class="mb-3 d-flex align-items-center">
-                    <img src="../../../../assets/images/img1.jpg" class="rounded-circle" alt="userimg" width="35" height="35">
-                    <div class="ml-2">
-                        <h5 class="mb-0">Autor</h5>
-                        <span class="text-muted">Administrador,</span>
-                    </div>
-            
-                </div> -->
-                <div class="mb-4">
-                    {{ content.body }}
-                </div>
+                <quill-view-html [style]="{'max-width' : 'calc(100vw - 10vw)', 'overflow' : 'hidden', 'display':'block', 'max-heigth' : '100px'}"  [format]="text" [theme]="bubble" [content]="content.body" class="mb-4"></quill-view-html>
+                <!-- <quill-view [content]="content.body" format="text" theme="snow"></quill-view> -->
                 <div class="mb-3">
                     <div *ngIf='true'>
                         <button type="button" class="btn btn-outline-primary btn-sm" (click)="openModals(modalEditContentPage, 'edit', content)" >
