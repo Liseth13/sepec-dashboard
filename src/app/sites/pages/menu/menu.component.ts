@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Pagination } from 'src/app/shared/interfaces/Pagination';
 import Swal from 'sweetalert2';
 import { Menu } from '../../interfaces/menu';
 import { menuService } from '../../services/menu.service';
@@ -13,10 +14,21 @@ import { WebSitesService } from '../../services/web-sites.service';
 })
 export class MenuComponent implements OnInit {
 
+
+
+  private formMenuCreate: FormGroup;
+  private formMenuEdit: FormGroup;
+
   menus : Array<Menu> = [];
   sites : Array<any>  = [];
 
   level : 1 | 2 | 3 | number = 1;
+
+  sidebarMode : 'create' | 'edit' | string = 'create';
+  public webSites: Array<any> = [];
+  
+  //Paginación
+  paginacionSites = new Pagination();
   
   constructor(
     private formBuilder : FormBuilder, private menuService : menuService,
@@ -25,7 +37,8 @@ export class MenuComponent implements OnInit {
 
   ngOnInit(): void {
     this.get()
-    this.getSites()
+    this.getSites();
+    this.loadformMenuCreate();
   }
 
   get = () => {
@@ -49,38 +62,94 @@ export class MenuComponent implements OnInit {
     Swal.fire('Error', "Ha ocurrido un error, reintentar operación", 'error');
   }
 
+  closeRightSidebar() {
+    const rightMenu : HTMLFormElement = document.getElementById('rightMenu') as HTMLFormElement ;
+   rightMenu.style.width = '0px';
+  }
+  validateForms(form: FormGroup): boolean {
+   if ( form.valid ) {
+     return true;
+   }
+   Swal.fire('Error','Faltan Campos Por Validar','warning')
+   return false;
+  }
+
   
 //   generateSlug = ( value : string, form : FormGroup ) => {
 //     const xvalue : string = value.toLowerCase();
 //     form.get('slug').setValue( xvalue.replace(/\s+/g, '-'));
 //   }
 
-//   loadformMenuCreate(){
-//     this.formMenuCreate = this.formBuilder.group({ 
-//       site:['',[Validators.required, Validators.maxLength(20),Validators.minLength(3)]],
-//       title:['',[Validators.required, Validators.maxLength(100),Validators.minLength(4)]],
-//       slug:['',[Validators.required, Validators.maxLength(100),Validators.minLength(3)]],
-//       weight : ['', Validators.required ],
-//       level:['',[Validators.required, Validators.min(1), Validators.max(3)]],
-//       order:['',[Validators.required]],
-//       father:[null]
-//     })
-//   }
+  loadformMenuCreate(){
+    this.formMenuCreate = this.formBuilder.group({ 
+      site:['',[Validators.required, Validators.maxLength(20),Validators.minLength(3)]],
+      title:['',[Validators.required, Validators.maxLength(100),Validators.minLength(4)]],
+      slug:['',[Validators.required, Validators.maxLength(100),Validators.minLength(3)]],
+      level:['',[Validators.required, Validators.min(1), Validators.max(3)]],
+      weight:['',[Validators.required, Validators.min(0)]],
+      father:[null]
+    })
+  }
 
 
 
-//   loadformMenuEdit(){
-//     this.formMenuEdit = this.formBuilder.group({
-//       site:['',[Validators.required, Validators.maxLength(20),Validators.minLength(3)]],
-//       title:['',[Validators.required, Validators.maxLength(100),Validators.minLength(4)]],
-//       slug:['',[Validators.required, Validators.maxLength(100),Validators.minLength(3)]],
-//       level:['',[Validators.required]],
-//       weight:['',[Validators.required]],
-//       order:['',[Validators.required]],
-//       is_active:['',[Validators.required,]],
-//     })
-//   }
+  loadformMenuEdit(){
+    this.formMenuEdit = this.formBuilder.group({
+      site:['',[Validators.required, Validators.maxLength(20),Validators.minLength(3)]],
+      title:['',[Validators.required, Validators.maxLength(100),Validators.minLength(4)]],
+      slug:['',[Validators.required, Validators.maxLength(100),Validators.minLength(3)]],
+      level:['',[Validators.required]],
+      weight:['',[Validators.required, Validators.min(0)]],
+      is_active:['',[Validators.required,]],
+    })
+  }
 
+  create = ( form : FormGroup ) => {
+    console.log(form);
+    console.log(form.value);
+    
+    const isValid : boolean = this.validateForms( form );
+    if( isValid ) { 
+      this.menuService.createMenu( form.value ).subscribe(
+      ( res : any ) => {  
+        this.get();
+        this.closeRightSidebar();
+        Swal.fire('Exito!','Guardado correctamente','success')
+      }, ( error : any ) => { this.errorHandler( error ) });
+    }
+  }
+  
+  edit( form : FormGroup ){
+    const isValid : boolean = this.validateForms( form );
+    if ( isValid ){
+      this.menuService.updateMenu(form.value.id, form.value).subscribe(
+      ( res : any )=>{
+        this.get();
+        this.closeRightSidebar();
+        Swal.fire(' Success','Editado correctamente','success');
+      }, ( error : any ) => { this.errorHandler( error ) });
+    }
+  }
+  openRightSidebar( mode: string) {
+    if ( mode === 'edit' ){
+      this.sidebarMode = mode;
+      this.loadformMenuEdit();
+    } else if ( mode === 'create' ) {
+      this.sidebarMode = mode;
+      this.loadformMenuCreate();
+    } else {
+      this.sidebarMode = 'create';
+      return;
+    }
+
+    const rightMenu : HTMLFormElement = document.getElementById('rightMenu') as HTMLFormElement ;
+    
+    if ( rightMenu.style.width === '285px' ) {
+        this.closeRightSidebar();
+        return;
+    }
+    rightMenu.style.width = '285px';
+  }
 //   getWebMenu = () =>{
 //     this.menuService.getMenu().subscribe(
 //       (res:any) =>{
@@ -88,17 +157,6 @@ export class MenuComponent implements OnInit {
 //     this.paginationMenu.collectionSize = this.menus.length;
 //     },
 //     (error:any) =>{})
-//   }
-
-//   getWebSite = () => {
-//     this.webSiteService.getWebSites().subscribe(
-//       (res:any) =>{
-//         this.webSites = res;
-//       },
-//       (error) => {
-        
-//       }
-//     )
 //   }
 
 //   getSubMenus = (fatherId  :string) => {
@@ -120,32 +178,30 @@ export class MenuComponent implements OnInit {
 
 //   }
 
-//   openModal (content1: string, mode : 'sites' | 'father' | 'edit' | string, data : any ) {
+  openModal (content1: string, mode : 'sites' | 'father' | 'edit' | string, data : any ) {
 
-//     if ( mode === 'father' ) {
-//       const arr : any [] = this.menus.filter( m => m.level === this.formMenuCreate.get('level').value -1)
-//       this.paginationMenu.collectionSize = arr.length;
-//       this.paginationMenu.page = 1;
-//       this.paginationMenu.pageSize=2;
-//     }
+    if (mode === 'sites') {
+      this.paginacionSites.collectionSize = this.sites.length;
+      this.paginacionSites.page = 1;
+      this.paginacionSites.pageSize=5;
+    }
 
-//     if (mode === 'edit' && data) {
-//       this.formMenuEdit.patchValue({
-//         id: data.id,
-//         site: data.site,
-//         title: data.title,
-//         slug: data.slug,
-//         level: data.level,
-//         weight: data.weight,
-//         is_active: data.is_active,
-//       })
-//     }
+    if (mode === 'edit' && data) {
+      this.formMenuEdit.patchValue({
+        id: data.id,
+        site: data.site,
+        title: data.title,
+        slug: data.slug,
+        level: data.level,
+        is_active: data.is_active,
+      })
+    }
 
-//     this.modalService.open(content1)
-//   }
-//   closeModal() { 
-//     this.modalService.dismissAll()
-//   }
+    this.modalService.open(content1)
+  }
+  closeModal() { 
+    this.modalService.dismissAll()
+  }
 
 //   closeRightMenu() {
 //     (document.getElementById('rightMenu')as HTMLFormElement).style.width = '0';
@@ -171,24 +227,15 @@ export class MenuComponent implements OnInit {
 //     }
 // }
 
-// selectSite(site : any, mode : string){
-//   if (mode== 'create') {
-//     this.formMenuCreate.get('site').setValue(site.id);
-//   }
-//   if(mode== 'edit'){
-//     this.formMenuEdit.get('site').setValue(site.id);
-//   }
-// }
-// getName(siteId) {
-//   let siteName = '';
-
-//   if (siteId != '' && siteId != null) {
-//     const siteName = this.webSites.find(site => site.id === siteId);
-//     return siteName.name
-//   } else {
-//     return siteName;
-//   }
-// }
+    selectSite(site : any, mode : string){
+      if (mode== 'create') {
+        this.formMenuCreate.get('site').setValue(site.id);
+      }
+      if(mode== 'edit'){
+        this.formMenuEdit.get('site').setValue(site.id);
+      }
+      this.closeModal();
+    }
 
 // edit(){
 //   if(this.formMenuEdit.invalid){
@@ -216,9 +263,14 @@ export class MenuComponent implements OnInit {
 //     } 
 //   }
 
+  changeLevel = ( option ) => {
+    this.formMenuCreate.get('level').setValue(option);
+  }
+
 //   linkMenu = ( menu : any, form : FormGroup ) => {
 //     form.get('father').setValue( menu.id );
 //     this.modalService.dismissAll();
     
 //   }
 }
+

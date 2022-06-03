@@ -2,46 +2,149 @@
     <div class="card-body">
         <h3>
             Menús
-        <button class="btn btn-primary float-right">
-            Nuevo menú
-        </button>
-        <div class="clearfix"></div>
+            <button (click)="openRightSidebar('create')" class="btn btn-primary cursor float-right">
+                Nuevo Menú
+            </button>
+            <div class="clearfix"></div>
         </h3>
         <hr>
-        <div class="pt-3 pb-5 row">   
+        <div class="pt-3 pb-5 row">
             <div class="col-md-6 text-left">
                 <div class="btn-group">
-                    <div class="btn btn-info"    [class.active]="level === 1" (click)="level = 1"> Primer Nivel </div>
+                    <div class="btn btn-info" [class.active]="level === 1" (click)="level = 1"> Primer Nivel </div>
                     <div class="btn btn-success" [class.active]="level === 2" (click)="level = 2"> Segundo Nivel </div>
                     <div class="btn btn-warning" [class.active]="level === 3" (click)="level = 3"> Tercer Nivel </div>
                 </div>
             </div>
         </div>
-        <app-first-level-menus 
-            *ngIf = 'level === 1'
-            [menus] = 'menus | levelMenu: 1'
-            [sites] = 'sites'
-        >
+        <app-first-level-menus *ngIf='level === 1' [menus]='menus | levelMenu: 1' [sites]='sites'>
         </app-first-level-menus>
-        <app-second-level-menus
-            *ngIf = 'level === 2'
-            [menus] = 'menus |levelMenu : 2'
-            [sites] = 'sites'
-        >
+        <app-second-level-menus *ngIf='level === 2' [menus]='menus |levelMenu : 2' [sites]='sites'>
         </app-second-level-menus>
-        <app-third-level-menus
-        *ngIf = 'level === 3'
-            [menus] = 'menus |levelMenu : 3'
-            [sites] = 'sites'
-        >
+        <app-third-level-menus *ngIf='level === 3' [menus]='menus |levelMenu : 3' [sites]='sites'>
 
         </app-third-level-menus>
     </div>
 </div>
+<!-- sidebar -->
+<div class="app-sidebar card" id="rightMenu">
+    <div>
+        <!-- -------------------------------------------------------------------------------------- -->
+        <!-- Header of sidebar -->
+        <!-- -------------------------------------------------------------------------------------- -->
+        <div class="d-flex p-3 border-bottom card-header">
+            <div class="d-flex align-items-center">
+                <h2 class="text-center text-title"> {{sidebarMode === 'create'? 'Crear menu' : 'Editar menu'}} </h2>
+            </div>
+
+            <div class="ml-auto">
+                <a href="javascript:void(0)" class="text-danger" (click)='closeRightSidebar()'>
+                    <i-feather name="x" class="feather-sm"></i-feather>
+                </a>
+            </div>
+        </div>
+        <!-- ./  Header of sidebar -->
+        <!-- -------------------------------------------------------------------------------------- -->
+        <!-- Body of sidebar -->
+        <!-- -------------------------------------------------------------------------------------- -->
+        <div class="p-4">
+            <form *ngIf="sidebarMode === 'create'" [formGroup]="formMenuCreate" (ngSubmit)="create( formMenuCreate )">
+                <div class="form-group">
+                    <label for="siteNameCreate">Sitio web</label>
+                    <div class="input-group mb-3">
+                        <button type="button" class=" ml-1 btn btn-info" (click)="openModal( modalWebSites, 'sites' )">
+                            <i class="fa fa-search me-1"></i>
+
+                        </button>
+                        <input type="text" value="{{ formMenuCreate.controls['site'].value | siteName : sites }}" class="form-control" id="siteNameCreate" disabled>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label> Titulo</label>
+                    <input type="text" class="form-control" formControlName="title" placeholder="Titulo del Menú">
+                </div>
+                <div class="form-group">
+                    <label>Slug</label>
+                    <textarea class="form-control" formControlName="slug" rows="10" cols="30"
+                    placeholder="Escribir Slogan del sitio web"> </textarea>
+                </div>
+                <div class="form-group">
+                    <label> Peso</label>
+                    <input type="number" class="form-control" formControlName="weight" placeholder="Peso del Menú" min="0">
+                </div>
+                <div class="form-group">
+                    <label>Nivel</label>
+                    <select formControName="level" class="form-control" (change)="changeLevel($event.target.value)">
+                        <option value=""> -- Seleccionar estado --</option>
+                        <option value="1">Nivel 1</option>
+                        <option value="2">Nivel 2</option>
+                        <option value="3">Nivel 3</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success btn-block">
+                        <i-feather name="save" class="feather-sm mr-2"></i-feather>
+                        Crear sitio web
+                    </button>
+                </div>
+                <div class="form-group">
+                    <button type="button" class="btn btn-danger btn-block" (click)='loadFormMenuCreate()'>
+                        <i-feather name="trash-2" class="feather-sm mr-2"></i-feather>
+                        Limpiar Formulario
+                    </button>
+                </div>
+                <!-- Modal web side -->
+                <ng-template #modalWebSites let-modal>
+                    <div class="modal-header">
+                        <h3 class="modal-title font-weight-bold" id="taskLabel">
+                            Seleccionar sitio web
+                        </h3>
+                        <button type="button" class="close" (click)="modal.dismiss()" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>Sitio web</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr
+                                            *ngFor="let site of sites | slice: (paginacionSites.page-1) * paginacionSites.pageSize : (paginacionSites.page-1) * paginacionSites.pageSize + paginacionSites.pageSize">
+                                            <td>{{site.name}}</td>
+                                            <td class="text-center">
+                                                <div class="row">
+                                                    <div class="col-12 action-btn">
+                                                        <button class="btn btn-info ml-1 action-text cursor-pointer"
+                                                            (click)="sidebarMode === 'create'? selectSite(site, 'create') : selectSite(site, 'edit')">
+                                                            <i class="fas fa-chevron-circle-right"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="d-flex justify-content-center mt-2">
+                                <ngb-pagination [collectionSize]="paginacionSites.collectionSize"
+                                    [(page)]="paginacionSites.page" [pageSize]="paginacionSites.pageSize">
+                                </ngb-pagination>
+                            </div>
+                        </div>
+                    </div>
+                </ng-template>
+            </form>
+        </div>
 
 
 
-<!-- <ul ngbNav #nav="ngbNav" class="nav-tabs">
+                <!-- <ul ngbNav #nav="ngbNav" class="nav-tabs">
     <li ngbNavItem>
         <a ngbNavLink>Nivel Uno</a>
         <ng-template ngbNavContent >
@@ -58,10 +161,10 @@
   <div [ngbNavOutlet]="nav"></div> -->
 
 
-<!-- Crear Menu -->
-<!-- <div class="app-sidebar card" id="rightMenu"> -->
-    <!-- Header -->
-   <!-- <div class="d-flex p-3 border-bottom card-header">
+                <!-- Crear Menu -->
+                <!-- <div class="app-sidebar card" id="rightMenu"> -->
+                <!-- Header -->
+                <!-- <div class="d-flex p-3 border-bottom card-header">
        <div class="d-flex align-items-center">
            Crear menú
        </div>
@@ -72,8 +175,8 @@
        </div>
    </div> -->
 
-   <!-- Body -->
-   <!-- <div class="row">
+                <!-- Body -->
+                <!-- <div class="row">
        <div class="p-4">
            <div class="card card-body">
                <form *ngIf='mode === "create"' [formGroup]="formMenuCreate"  (ngSubmit)="create()">
@@ -135,8 +238,8 @@
    </div>
 </div> -->
 
- <!-- mostrar sitios -->
-<!-- <ng-template #modalMostrarSitios let-modal>
+                <!-- mostrar sitios -->
+                <!-- <ng-template #modalMostrarSitios let-modal>
     <div class="modal-header">
         <h4 class="modal-title" id="modal-basic-title"> Sitios webs</h4>
         <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
@@ -173,8 +276,8 @@
     </div>
 </ng-template> -->
 
-<!-- modalSelectFather -->
-<!-- <ng-template #modalSelectFather let-modal>
+                <!-- modalSelectFather -->
+                <!-- <ng-template #modalSelectFather let-modal>
     <div class="modal-header">
         <h4 class="modal-title" id="modal-basic-title"> Enlazar menú </h4>
         <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
@@ -217,8 +320,8 @@
         </div>
     </div>
 </ng-template> -->
-<!-- modal Editar Menu -->
-<!-- <ng-template #modalEditMenu let-modal>
+                <!-- modal Editar Menu -->
+                <!-- <ng-template #modalEditMenu let-modal>
     <div class="modal-header">
         <h4 class="modal-title" id="modal-basic-title"> Editar Menu</h4>
         <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">

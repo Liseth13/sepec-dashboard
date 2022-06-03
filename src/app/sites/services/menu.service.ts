@@ -30,4 +30,7 @@ export class menuService {
     return this.http.put(`${this.configUrl}/api/v1/website/menus/${menuId}/`, data);
 
   }
+
+  getWebSites = () => this.http.get(`${this.configUrl}/api/v1/website/sites/`);
+  
 }
