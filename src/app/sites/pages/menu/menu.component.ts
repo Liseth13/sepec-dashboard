@@ -18,17 +18,19 @@ export class MenuComponent implements OnInit {
 
   private formMenuCreate: FormGroup;
   private formMenuEdit: FormGroup;
-
+  
+  menusPadre : Array<Menu> =[];
   menus : Array<Menu> = [];
   sites : Array<any>  = [];
 
   level : 1 | 2 | 3 | number = 1;
-
+  levelFather : boolean= false;
   sidebarMode : 'create' | 'edit' | string = 'create';
   public webSites: Array<any> = [];
   
   //Paginación
-  paginacionSites = new Pagination();
+  paginationSites = new Pagination();
+  paginationMenu = new Pagination();
   
   constructor(
     private formBuilder : FormBuilder, private menuService : menuService,
@@ -75,19 +77,14 @@ export class MenuComponent implements OnInit {
   }
 
   
-//   generateSlug = ( value : string, form : FormGroup ) => {
-//     const xvalue : string = value.toLowerCase();
-//     form.get('slug').setValue( xvalue.replace(/\s+/g, '-'));
-//   }
-
   loadformMenuCreate(){
     this.formMenuCreate = this.formBuilder.group({ 
       site:['',[Validators.required, Validators.maxLength(20),Validators.minLength(3)]],
       title:['',[Validators.required, Validators.maxLength(100),Validators.minLength(4)]],
-      slug:['',[Validators.required, Validators.maxLength(100),Validators.minLength(3)]],
       level:['',[Validators.required, Validators.min(1), Validators.max(3)]],
       weight:['',[Validators.required, Validators.min(0)]],
-      father:[null]
+      father:[null],
+      page:[null]
     })
   }
 
@@ -97,9 +94,10 @@ export class MenuComponent implements OnInit {
     this.formMenuEdit = this.formBuilder.group({
       site:['',[Validators.required, Validators.maxLength(20),Validators.minLength(3)]],
       title:['',[Validators.required, Validators.maxLength(100),Validators.minLength(4)]],
-      slug:['',[Validators.required, Validators.maxLength(100),Validators.minLength(3)]],
       level:['',[Validators.required]],
       weight:['',[Validators.required, Validators.min(0)]],
+      father:[null],
+      page:[null],
       is_active:['',[Validators.required,]],
     })
   }
@@ -150,40 +148,19 @@ export class MenuComponent implements OnInit {
     }
     rightMenu.style.width = '285px';
   }
-//   getWebMenu = () =>{
-//     this.menuService.getMenu().subscribe(
-//       (res:any) =>{
-//     this.menus = res;
-//     this.paginationMenu.collectionSize = this.menus.length;
-//     },
-//     (error:any) =>{})
-//   }
 
-//   getSubMenus = (fatherId  :string) => {
-//     this.submenus = this.menus.filter(m => m.father === fatherId);
-//     this.paginationSubmenus.collectionSize = this.submenus.length;
-//   }
-
-//   openSidebar( mode : 'create' | 'edit' | string ) {
-
-//     this.mode = mode;
-
-//     this.formMenuCreate.reset();
-
-//     if ((document.getElementById('rightMenu')as HTMLFormElement).style.width === '300px') {
-//         this.closeRightMenu();
-//         return;
-//     }
-//     (document.getElementById('rightMenu')as HTMLFormElement).style.width = '300px';
-
-//   }
-
-  openModal (content1: string, mode : 'sites' | 'father' | 'edit' | string, data : any ) {
+  openModal (content1: string, mode : 'sites' | 'father' | 'edit' | 'menu' | string, data : any ) {
 
     if (mode === 'sites') {
-      this.paginacionSites.collectionSize = this.sites.length;
-      this.paginacionSites.page = 1;
-      this.paginacionSites.pageSize=5;
+      this.paginationSites.collectionSize = this.sites.length;
+      this.paginationSites.page = 1;
+      this.paginationSites.pageSize=5;
+    }
+
+    if (mode === 'menu') {
+      this.paginationMenu.collectionSize = this.menusPadre.length;
+      this.paginationMenu.page = 1;
+      this.paginationMenu.pageSize=5;
     }
 
     if (mode === 'edit' && data) {
@@ -191,7 +168,6 @@ export class MenuComponent implements OnInit {
         id: data.id,
         site: data.site,
         title: data.title,
-        slug: data.slug,
         level: data.level,
         is_active: data.is_active,
       })
@@ -203,29 +179,7 @@ export class MenuComponent implements OnInit {
     this.modalService.dismissAll()
   }
 
-//   closeRightMenu() {
-//     (document.getElementById('rightMenu')as HTMLFormElement).style.width = '0';
-//   }
 
-//   create(){
-      
-//     if(this.formMenuCreate.invalid){
-//       Swal.fire('Error','Faltan Campos Por Validar','warning')
-//     }else{
-      
-//       this.menuService.createMenu(this.formMenuCreate.value).subscribe(
-//         (res:any)=>{
-          
-//           this.getWebMenu()
-//           this.closeRightMenu();
-//           Swal.fire(' Success','Guardado correctamente','success')
-//         },
-//         (error:any)=>{
-//           Swal.fire('Error','vuelva a intentarlo','error')
-//         }
-//       )
-//     }
-// }
 
     selectSite(site : any, mode : string){
       if (mode== 'create') {
@@ -237,40 +191,50 @@ export class MenuComponent implements OnInit {
       this.closeModal();
     }
 
-// edit(){
-//   if(this.formMenuEdit.invalid){
-//     Swal.fire('Error','Faltan Campos Por Validar','warning')
-//   }else{
+    selectMenu(menu : any, mode : string){
+      console.log(menu);
+      
+      if (mode== 'create') {
+        this.formMenuCreate.get('father').setValue(menu.id);
+      }
+      if(mode== 'edit'){
+        this.formMenuEdit.get('father').setValue(menu.id);
+      }
+      this.closeModal();
+    }
 
 
-//     this.menuService.updateMenu('data', 555).subscribe(
-//       (res:any)=>{
-//         this.getWebMenu();
-//         this.closeModal();
-//         Swal.fire(' Success','Editado correctamente','success');
-//       },
-//       (error : any)=>{
-//         Swal.fire('Error','vuelva a intentarlo','error');
-//       }
-//       )
-//     }
-//   }
+  changeLevel = ( level ) => {
 
-//   changeLevel = ( level : number, form : FormGroup ) => {
-//     const validLevels : number[] =  [ 1, 2, 3 ];
-//     if ( validLevels.includes( level ) && level === 1 ){
-//       form.get('father').setValue(null);
-//     } 
-//   }
+    this.formMenuCreate.get('father').setValue(null)
+    this.formMenuCreate.get('level').setValue(level);
+    if (level === "2"){
+      this.menusPadre = this.menus.filter( m => m.level === 1);
+      this.levelFather= true;
+    }else if(level == "3"){
+      this.menusPadre = this.menus.filter( m => m.level === 2);
+      this.levelFather= true;
+    } else {
+      this.levelFather= false;
+    }
 
-  changeLevel = ( option ) => {
-    this.formMenuCreate.get('level').setValue(option);
   }
 
-//   linkMenu = ( menu : any, form : FormGroup ) => {
-//     form.get('father').setValue( menu.id );
-//     this.modalService.dismissAll();
-    
-//   }
+  changeView = ( level ) => {
+    if (level === "1") {
+      this.level  = 1
+    }else
+    if (level === "2") {
+      this.level = 2
+    }else
+    if (level === "3") {
+      this.level = 3
+    }
+  }
+
+
+   
 }
+
+
 
