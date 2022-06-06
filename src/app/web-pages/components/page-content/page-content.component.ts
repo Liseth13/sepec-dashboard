@@ -32,7 +32,7 @@ export class PageContentComponent implements OnInit, OnChanges {
   formCreate : FormGroup;
   formEdit   : FormGroup;
 
-  quillModule = QuillModules;
+  quillModule : any = QuillModules;
 
   constructor
   ( 

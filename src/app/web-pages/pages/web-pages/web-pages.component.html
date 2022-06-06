@@ -147,20 +147,26 @@
                                                     </div>
                                                     <!-- <h4 class="text-muted"> {{ page.name }} </h4> -->
                                                     <div class="text-white d-flex mt-2">
-                                                        <span class="badge  bg-primary">Sitio web:</span>
-                                                        <span class="text-muted ml-2">{{ page.site | siteName : webSites }}</span>
+                                                        <span class="badge  bg-info text-white">Sitio web</span>
+                                                        <span class="text-dark ml-2">{{ page.site | siteName : webSites }}</span>
                                                     </div>
                                                     <div class="text-white d-flex mt-2">
-                                                        <span  class="badge bg-info">Url:</span>
-                                                        <span class="text-muted ml-2">{{ page.slug }}</span>
+                                                        <span  class="badge bg-light text-dark">Url</span>
+                                                        <span class="text-dark ml-2">{{ page.slug }}</span>
                                                     </div>
                                                     <div class="text-white d-flex mt-2">
-                                                        <span _ngcontent-sbc-c141="" class="badge bg-info">Peso:</span>
-                                                        <span class="text-muted ml-2">{{ page.weight }}</span>
+                                                        <span _ngcontent-sbc-c141="" class="badge bg-light text-dark">Peso</span>
+                                                        <span class="text-dark ml-1">{{ page.weight }}</span>
                                                     </div>
                                                     <div class="text-white d-flex mt-2" >
-                                                        <button class="btn btn-sm btn-outline-primary " (click)="showData( page.id, 'contents' )">Mostrar contenido</button>
-                                                        <button class="btn btn-sm btn-outline-info" (click)="showData( page.id, 'posts' )">Mostrar posts</button>
+                                                        <button class="btn btn-sm btn-light" (click)="showData( page.id, 'contents' )">
+                                                            <i class="fa fa-eye text-info"></i>
+                                                            contenidos     
+                                                        </button>
+                                                        <button class="btn btn-sm btn-light " (click)="showData( page.id, 'posts' )">
+                                                            <i class="fa fa-eye text-info"></i>
+                                                            posts
+                                                        </button>
                                                     </div>
                                                 </div>
                                                 <!-- <div class="ml-auto">

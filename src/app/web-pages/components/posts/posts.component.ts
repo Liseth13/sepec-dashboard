@@ -7,6 +7,7 @@ import { Page } from '../../interfaces/Page';
 import { Pagination } from '../../../shared/interfaces/Pagination';
 import { Post } from '../../interfaces/post';
 import { PostsService } from '../../services/posts.service';
+import { QuillModules } from 'src/app/shared/configs/quillModule';
 
 @Component({
   selector: 'app-posts',
@@ -27,6 +28,8 @@ export class PostsComponent implements OnInit, OnChanges {
   formEdit   : FormGroup;
 
   public config: PerfectScrollbarConfigInterface = {};
+
+  quillModule : any = QuillModules;
 
   constructor
   ( 
@@ -62,7 +65,7 @@ export class PostsComponent implements OnInit, OnChanges {
       page_id   : [ this.idPage, [ Validators.required ] ],
       title  : [ '', [ Validators.required, Validators.minLength( 5 ), Validators.maxLength( 200 ) ] ],
       slug   : ['', [ Validators.required] ],
-      body   : [ '', [ Validators.required, Validators.minLength(5), Validators.maxLength(15000) ] ],
+      body   : [ '', [ Validators.required, Validators.minLength(5), Validators.maxLength(150000) ] ],
       author : [ '1', [ Validators.required] ]
     });
   }
@@ -73,7 +76,7 @@ export class PostsComponent implements OnInit, OnChanges {
       page_id   : [ post?.page_id || null , [ Validators.required ] ],
       title  : [ post?.title || null , [ Validators.required, Validators.minLength( 5 ), Validators.maxLength( 200 ) ] ],
       slug   : [ post?.slug || null , [ Validators.required] ],
-      body   : [ post?.body || null , [ Validators.required, Validators.minLength(5), Validators.maxLength(15000) ] ],
+      body   : [ post?.body || null , [ Validators.required, Validators.minLength(5), Validators.maxLength(150000) ] ],
       author : [ post?.author || null , [ Validators.required ] ],
       is_active : [ post.is_active, [ Validators.required ] ]
     });
@@ -116,8 +119,7 @@ export class PostsComponent implements OnInit, OnChanges {
         // this.getPostsByPage( this.paginationPosts.status, this.paginationPosts.page )
         this.closeModals();
         Swal.fire('Exito!', 'Se ha creado el post exitosamente', 'success');
-      }, 
-      ( error : any ) => { this.errorHandler( error ) });
+      },  ( error : any ) => { this.errorHandler( error ) });
     }
     
   }
@@ -128,6 +130,7 @@ export class PostsComponent implements OnInit, OnChanges {
       this.postService.edit( form.value ).subscribe( 
       ( res : Post ) => {
         this.onFixPagination( res, 'edit' );
+        //this.onFixPagination()
         this.get()
         this.closeModals();
         Swal.fire('Exito!', 'Se ha actualizado el post exitosamente!', 'success');
@@ -135,7 +138,7 @@ export class PostsComponent implements OnInit, OnChanges {
     }
   }
 
-  onFixPagination = ( res : Post, mode : 'edit' | 'create'| string ) => {
+  onFixPagination = ( res : Post, mode? : 'edit' | 'create') => {
     if ( mode === 'create' ){
 
     }
