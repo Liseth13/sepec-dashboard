@@ -17,7 +17,7 @@ import { QuillModules } from 'src/app/shared/configs/quillModule';
 export class PostsComponent implements OnInit, OnChanges {
 
   @Input() idPage : string = '';
-  @Input() pages : Page[] = [];
+  @Input() pages  : Page[] = [];
 
   posts : Array<Post> = [];
 

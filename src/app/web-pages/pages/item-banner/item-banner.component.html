@@ -10,7 +10,7 @@
             
                 <div class="float-right bd-highlight">
                     <button class="btn btn-info cursor" (click)="openModal(modalAddItemBanner,0)">
-                        <i class="fas fa-plus-circle"></i> Agregar
+                        <i class="fas fa-plus-circle ml-1"></i> Crear item banner
                     </button>
                 </div>
             </div>
@@ -64,7 +64,7 @@
 <!-- Modal agregar item Banner -->
 <ng-template #modalAddItemBanner let-modal>
     <div class="modal-header">
-        <h4 class="modal-title" id="modal-basic-title"> Agregar Item Banner</h4>
+        <h4 class="modal-title" id="modal-basic-title"> Crear item Banner</h4>
         <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
             <span aria-hidden="true">&times;</span>
         </button>
@@ -113,7 +113,7 @@
                             </div>
                         </div>
                         <div class="modal-footer" >
-                            <button type="submit" class="btn btn-success" >Guardar</button>
+                            <button type="submit" class="btn btn-success" >Crear item</button>
                         </div>
                 </form>
             </div>
@@ -139,12 +139,14 @@
                 <thead class="thead-dark">
                     <tr>
                         <th>Banner</th>
+                        <th>Estado</th>
                         <th>Seleccionar</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let banner of banners |slice: (pageP-1) * pageSizeP : (pageP-1) * pageSizeP + pageSizeP">
+                    <tr class="text-center" *ngFor="let banner of banners |slice: (pageP-1) * pageSizeP : (pageP-1) * pageSizeP + pageSizeP">
                         <td>{{ banner.name }}</td>
+                        <td><span class="label" [ngClass]="{'label-success' : banner.is_active, 'label-danger' : !banner.is_active }">{{ banner.is_active? 'Activo' : 'Inactivo' }}</span></td>
                         <td>
                             <div class="col">
                                 <button  class="btn btn-info" (click)="seleccionar(banner, modal.dismiss('Cross click'))">

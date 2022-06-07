@@ -1,5 +1,5 @@
 <ng-template #modalCreateContent let-modal>
-    <div class="modal-header bg-primary">
+    <div class="modal-header bg-info">
         <h3 class="modal-title font-weight-bold text-white" id="taskLabel">
             Nuevo contenido para {{ idPage | pageName : pages }}
         </h3>
@@ -30,7 +30,7 @@
                     </quill-editor>
                 </div> 
                 <div class="form-group ml-p2">
-                    <button type ="submmit" class="btn btn-primary">Agregar</button>
+                    <button type ="submmit" class="btn btn-info">Agregar</button>
                     <button type ="button" class="btn btn-danger" (click)="modal.dismiss()">Cancelar</button>
                 </div>
             </form>
@@ -40,7 +40,7 @@
 
 <!-- Modal editar contenido de página -->
 <ng-template #modalEditContentPage let-modal>
-    <div class="modal-header bg-primary">
+    <div class="modal-header bg-info">
         <h3 class="modal-title font-weight-bold text-white" id="taskLabel">
             Editando contenido de {{ idPage | pageName : pages }}
         </h3>
@@ -72,7 +72,7 @@
                     </quill-editor>             
                 </div>
                 <div class="form-group ml-p2">
-                    <button type ="submmit" class="btn btn-primary" >Guardar cambios</button>
+                    <button type ="submmit" class="btn btn-info" >Guardar cambios</button>
                     <button type ="button" class="btn btn-danger" (click)="modal.dismiss()">Cancelar</button>
                 </div>
             </form>
@@ -81,18 +81,18 @@
 </ng-template>
 
 
-<div class="card border-left border-primary">
+<div class="card border-left border-info">
     <div class="card-body">
         <div class="d-flex no-block align-items-center">
             <div>
-                <span class="text-primary display-6">
+                <span class="text-info display-6">
                     <i class="ti-layout-media-left-alt"></i>
                     <h3>Contenido | {{ idPage | pageName : pages }}</h3>
                 </span>
             </div>
             <div class="ml-auto">
                 <h2>{{ contentsByPage.length }} Totales</h2>
-                <h6 class="text-primary">Contenidos</h6>
+                <h6 class="text-info">Contenidos</h6>
             </div>
         </div>
     </div>
@@ -114,7 +114,7 @@
         </ngb-pagination>   
     </div>
     <div  class="text-left">
-        <button  class="btn btn-primary text-white" (click)='openModals(modalCreateContent, "create")' ><i  class="fa fa-plus-square me-2 mr-1"></i>Nuevo contenido</button> 
+        <button  class="btn btn-info text-white" (click)='openModals(modalCreateContent, "create")' ><i  class="fa fa-plus-square me-2 mr-1"></i>Nuevo contenido</button> 
     </div>
 </div>
 
@@ -125,9 +125,9 @@
         <spam *ngFor="let content of contentsByPage | slice: (paginationContentPage.page-1) * paginationContentPage.pageSize : (paginationContentPage.page-1) * paginationContentPage.pageSize + paginationContentPage.pageSize" >
             
             <div class="p-3">
-                <div class="mb-3 mt-2">
+                <div class="mb-2 mt-2">
                     <div *ngIf='true'>
-                        <button type="button" class="btn btn-outline-primary btn-sm" (click)="openModals(modalEditContentPage, 'edit', content)" >
+                        <button type="button" class="btn btn-outline-info btn-sm" (click)="openModals(modalEditContentPage, 'edit', content)" >
                             <i class="me-2 fas fa-edit"></i> Editar
                         </button>
                     </div>

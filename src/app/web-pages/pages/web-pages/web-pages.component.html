@@ -15,12 +15,14 @@
                         <thead class = "table-dark">
                             <tr>
                                 <th>Sitio web</th>
+                                <th>Estado</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr *ngFor="let site of webSites | slice: (paginacionSites.page-1) * paginacionSites.pageSize : (paginacionSites.page-1) * paginacionSites.pageSize + paginacionSites.pageSize">
+                            <tr class="text-center" *ngFor="let site of webSites | slice: (paginacionSites.page-1) * paginacionSites.pageSize : (paginacionSites.page-1) * paginacionSites.pageSize + paginacionSites.pageSize">
                                 <td>{{site.name}}</td>
+                                <td ><span class="label" [ngClass]="{'label-success' : site.is_active, 'label-danger' : !site.is_active }">{{ site.is_active? 'Activo' : 'Inactivo' }}</span></td>
                                 <td class ="text-center">
                                     <div class="row">
                                         <div class="col-12 action-btn">
@@ -28,7 +30,8 @@
                                                 class="btn btn-info ml-1 action-text cursor-pointer"
                                                 (click)="sidebarMode === 'create'? selectSite(formCreate, site.id) : selectSite(formEdit, site.id)"
                                             >
-                                                <i class="fas fa-chevron-circle-right"></i>
+                                                Seleccionar
+                                                <i class="fas fa-chevron-circle-right ml-1"></i>
                                             </button>
                                         </div>
                                     </div>
@@ -66,6 +69,7 @@
                             class="btn btn-info btn-block"
                             (click) = 'openRightSidebar("create")'
                         > 
+                        <i class="fa fa-plus mr-2"></i>
                             Agregar páginas
                         </button>
                     </div>
@@ -158,14 +162,12 @@
                                                         <span _ngcontent-sbc-c141="" class="badge bg-light text-dark">Peso</span>
                                                         <span class="text-dark ml-1">{{ page.weight }}</span>
                                                     </div>
-                                                    <div class="text-white d-flex mt-2" >
-                                                        <button class="btn btn-sm btn-light" (click)="showData( page.id, 'contents' )">
-                                                            <i class="fa fa-eye text-info"></i>
-                                                            contenidos     
+                                                    <div class="text-white d-flex mt-3" >
+                                                        <button type="button" (click)="showData( page.id, 'contents' )" class="btn btn-sm btn-outline-info ng-star-inserted">
+                                                            <i class="fa fa-eye me-1"></i> Contenidos 
                                                         </button>
-                                                        <button class="btn btn-sm btn-light " (click)="showData( page.id, 'posts' )">
-                                                            <i class="fa fa-eye text-info"></i>
-                                                            posts
+                                                        <button type="button" (click)="showData( page.id, 'posts' )" class="btn btn-sm btn-outline-info ng-star-inserted ml-2">
+                                                            <i class="fa fa-eye me-1"></i> Posts 
                                                         </button>
                                                     </div>
                                                 </div>
@@ -176,7 +178,7 @@
                                                 </div> -->
                                                 <div class="d-flex ml-auto">
                                                    
-                                                    <button type="button" class=" btn btn-circle rounded-circle btn-warning" (click) = 'openRightSidebar( "edit", page)' >
+                                                    <button type="button" class=" btn btn-circle rounded-circle btn-lg btn-warning mt-3 mr-3" (click) = 'openRightSidebar( "edit", page)' >
                                                         <i class="fas fa-edit"></i>
                                                     </button>
                                                 </div>
@@ -253,7 +255,7 @@
                     <div class="form-group">
                         <label for="siteNameCreate">Sitio web</label>
                         <div class="input-group mb-3">    
-                            <button type = "button" class=" ml-1 btn btn-info" (click) ="openModal( modalWebSites, 'md' )" >
+                            <button type = "button" class=" ml-1 btn btn-info" (click) ="openModal( modalWebSites, 'lg' )" >
                                 <i class="fa fa-search me-1"></i>
                                 
                             </button>      
@@ -267,7 +269,8 @@
                     </div>
                     <div class="form-group">
                         <label for="slug">Url </label>
-                        <input type="text" class="form-control"  id="slug" value="{{ formCreate.get('slug').value }}" disabled>                      
+                        <!-- <input type="text" class="form-control"  id="slug" value="{{ formCreate.get('slug').value }}" disabled>                       -->
+                        <span> {{ formCreate.get('slug').value || 'Generado automaticamente' }} </span>
                     </div>
                     <div class="form-group">
                         <label for="weight">Peso</label>                 

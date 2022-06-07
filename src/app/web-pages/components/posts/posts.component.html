@@ -15,8 +15,9 @@
                     <input class="form-control" type="text" formControlName = "title" id="title" placeholder="Título del post">
                 </div>
                 <div class="form-group">
-                    <label for="title">Url</label>
-                    <input class="form-control" type="text" formControlName = "slug" id="slug" placeholder="Dirección url">
+                    <label for="slug">Url</label>
+                    <!-- <input class="form-control" type="text" formControlName = "slug" id="slug" placeholder="Dirección url"> -->
+                    <span id="slug" class="ml-2">Generado automaticamente</span>
                 </div>
                 <!-- <div class="form-group">
                     <label for="title">Autor:</label>
@@ -141,32 +142,35 @@
         <!-- POSTS -->
         <spam *ngFor="let post of posts ">
            <div class="p-3">
-            <div class="mb-3 mt-2 ">
-                <button 
-                    (click)="openModals( modalEditPost, 'edit', post )"
-                    type="button" class="btn btn-outline-info btn-sm" 
-                >
-                    <i class="me-2 fas fa-edit"></i> Editar
-                </button>
-            </div>
+                <div class="mb-0  ml-1 ">
+                    <button 
+                        (click)="openModals( modalEditPost, 'edit', post )"
+                        type="button" class="btn btn-sm btn-outline-info" 
+                    >
+                        <i class="me-2 fas fa-edit"></i> Editar
+                    </button>
+                </div>
            </div>
             <div class="p-3">
-                <div class="mb-3 d-flex align-items-center">
+                <div class="mb-2 d-flex align-items-center ml-1">
                     <img src="../../../../assets/images/user.svg" class="rounded-circle" alt="userimg" width="35" height="35">
                     <div class="ml-2">
                         <!-- <h5 class="mb-0">{{ post.author }}</h5> -->
                         <h5 class="mb-0">Sepec</h5>
                         <span class="text-muted">Administrador,</span>
                     </div>
-            
                 </div>
                 <div class="mb-3">
-                    <div class="text-white d-flex mt-2">
-                        <span class="badge badge-light  p-2 text-center">Título</span>
-                        <h3 class="text-black mt-1 ml-1">{{ post.title }}</h3>
+                    <div class="text-white  mt-2 p-0">          
+                        <h4 class="text-dark mt-1 ml-1">
+                            <span class="badge badge-pill badge-cyan  text-white ml-1 font-12 font-medium">
+                                Título
+                            </span>
+                            {{ post.title }}
+                        </h4>   
                     </div> 
                 </div>
-                <div class="mb-2" [perfectScrollbar]="config"  >
+                <div class="mb-2" [perfectScrollbar]="config">
                     <quill-view-html 
                         [format]="json" 
                         [theme]="bubble" 
@@ -174,7 +178,6 @@
                     ></quill-view-html>
                     <h1  (click)="openModals( modalEditPost, 'edit', post )" class="ml-3">...</h1>
                 </div>  
-                
             </div>
             <div class = 'border-bottom mb-2'></div>
         </spam>

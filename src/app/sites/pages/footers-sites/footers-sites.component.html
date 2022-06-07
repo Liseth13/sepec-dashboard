@@ -22,7 +22,7 @@
                     <tbody>
                         <tr *ngFor="let site of sites | slice: (pagSites.page-1) * pagSites.pageSize : (pagSites.page-1) * pagSites.pageSize + pagSites.pageSize">
                             <td>{{site.name}}</td>
-                            <td><span class="label" [ngClass]="{'label-success' : site.is_active, 'label-danger' : !site.is_active }">Activo</span></td>
+                            <td><span class="label" [ngClass]="{'label-success' : site.is_active, 'label-danger' : !site.is_active }">{{ site.is_active? 'Activo' : 'Inactivo' }}</span></td>
                             <td class ="text-center">
                                 <div class="row">
                                     <div class="col-12 action-btn">
@@ -30,7 +30,8 @@
                                             class="btn btn-info ml-1 action-text cursor-pointer"
                                             (click)="sidebarMode === 'create'? selectSite(formCreate, site) : selectSite(formEdit, site)"
                                         >
-                                            <i class="fas fa-chevron-circle-right"></i>
+                                            Seleccionar
+                                            <i class="fas fa-chevron-circle-right ml-1"></i>
                                         </button>
                                     </div>
                                 </div>
@@ -166,7 +167,7 @@
                 <div class="form-group">
                     <label for="siteNameCreate">Sitio web</label>
                     <div class="input-group mb-3">    
-                        <button type = "button" (click) ="openModal(modalWebSites)" class=" ml-1 btn btn-info"  >
+                        <button type = "button" (click) ="openModal(modalWebSites,'lg')" class=" ml-1 btn btn-info"  >
                             <i class="fa fa-search me-1"></i>          
                         </button>      
                         <input type="text" value="{{ formCreate.get('site').value | siteName : sites }}" class="form-control"  id="siteNameCreate" disabled>
@@ -188,7 +189,7 @@
                 <div class="form-group">
                     <button type="submit" class="btn btn-success btn-block" >
                         <i-feather name="save" class="feather-sm mr-2"></i-feather>
-                        Crear sitio web
+                        Crear footer
                     </button>
                 </div>
                 <div class="form-group">

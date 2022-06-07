@@ -103,14 +103,23 @@ export class WebPagesComponent implements OnInit {
   }
 
   get = ( isShowLoading : boolean = false ) => {
-    this.webPageService.get().subscribe(
-      ( res : Page[] ) => {
+
+    if ( isShowLoading ){
+      Swal.fire({ title : 'Cargando...', html : 'Por favor, espere un momento', didOpen : () => { Swal.showLoading() } })
+    }
+
+    this.webPageService.get()
+    .subscribe({ 
+      next : ( res : Page[] ) => {
         this.webPages = res;
         this.paginationPages.collectionSize = this.webPages.length;
         this.showPages( this.paginationPages.status );
       },
-      ( error : any ) => { this.errorHandler( error ) }
-    );
+      error : ( error : any ) => { this.errorHandler( error ) },
+      complete : () => {
+        isShowLoading && Swal.close();
+      }
+    });
   }
 
   getWebSites = () => {
