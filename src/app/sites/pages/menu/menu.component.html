@@ -2,7 +2,8 @@
     <div class="card-body">
         <h3>
             Menús
-            <button (click)="openRightSidebar('create')" class="btn btn-primary cursor float-right">
+            <button (click)="openRightSidebar('create')" class="btn btn-info cursor float-right">
+                <i class="fas fa-plus-circle"></i>
                 Nuevo Menú
             </button>
             <div class="clearfix"></div>
@@ -22,11 +23,11 @@
                 </div>
             </div>
         </div>
-        <app-first-level-menus *ngIf='level === 1' [menus]='menus | levelMenu: 1' [sites]='sites'>
+        <app-first-level-menus *ngIf='level === 1' [menus]='menus | levelMenu: 1' [sites]='sites' [pages]='pages' [allMenus] = 'menus'>
         </app-first-level-menus>
-        <app-second-level-menus *ngIf='level === 2' [menus]='menus |levelMenu : 2' [sites]='sites'>
+        <app-second-level-menus *ngIf='level === 2' [menus]='menus |levelMenu : 2' [sites]='sites' [pages]='pages' [allMenus] = 'menus'>
         </app-second-level-menus>
-        <app-third-level-menus *ngIf='level === 3' [menus]='menus |levelMenu : 3' [sites]='sites'>
+        <app-third-level-menus *ngIf='level === 3' [menus]='menus |levelMenu : 3' [sites]='sites' [pages]='pages' [allMenus] = 'menus'>
 
         </app-third-level-menus>
     </div>
@@ -72,18 +73,26 @@
                     <input class="form-control" formControlName="weight" placeholder="Peso del Menú" min="0">
                 </div>
                 <div class="form-group">
+                    <label for="levelMenuCreate">Pagina</label>
+                    <div class="input-group mb-3">
+                        <button type="button" class=" ml-1 btn btn-info" (click)="openModal( modalPagina, 'pages' )" [disabled]="formMenuCreate.controls['site'].value == ''">
+                            <i class="fa fa-search me-1"></i>
+
+                        </button>
+                        <input  value="{{ formMenuCreate.controls['page'].value | pageNameTwo: pages }}" class="form-control" id="pageNameCreate" disabled>
+                    </div>
+                </div>
+
+                <div class="form-group">
                     <label>Nivel</label>
-                    <select formControName="level" class="form-control" (change)="changeLevel($event.target.value)">
+                    <select formControlName="level" class="form-control" (change)="changeLevel($event.target.value)">
                         <option value=""> -- Seleccionar nivel --</option>
                         <option value="1">Nivel 1</option>
                         <option value="2">Nivel 2</option>
                         <option value="3">Nivel 3</option>
                     </select>
                 </div>
-                <div class="form-group" *ngIf="levelFather">
-                    <label> Pagina </label>
-                    <input  class="form-control" formControlName="page" placeholder="Página del Menú" min="0">
-                </div>
+                
                 <div class="form-group" *ngIf="levelFather">
                     <label for="levelMenuCreate">Padre</label>
                     <div class="input-group mb-3">
@@ -101,7 +110,7 @@
                     </button>
                 </div>
                 <div class="form-group">
-                    <button type="button" class="btn btn-danger btn-block" (click)='loadFormMenuCreate()'>
+                    <button type="button" class="btn btn-danger btn-block" (click)="loadFormMenuCreate()">
                         <i-feather name="trash-2" class="feather-sm mr-2"></i-feather>
                         Limpiar Formulario
                     </button>
@@ -199,10 +208,61 @@
                 </table>
             </div>
             <div class="d-flex justify-content-center mt-2">
-                <ngb-pagination [collectionSize]="paginationSites.collectionSize"
-                    [(page)]="paginationSites.page" [pageSize]="paginationSites.pageSize">
+                <ngb-pagination [collectionSize]="paginationMenu.collectionSize"
+                    [(page)]="paginationMenu.page" [pageSize]="paginationMenu.pageSize">
                 </ngb-pagination>
             </div>
+        </div>
+    </div>
+</ng-template>
+
+<!-- Modal Pagina -->
+<ng-template #modalPagina let-modal>
+    <div class="modal-header">
+        <h3 class="modal-title font-weight-bold" id="taskLabel">
+            Seleccionar pagina
+        </h3>
+        <button type="button" class="close" (click)="modal.dismiss()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="card">
+        <div class="card-body" *ngIf="pageFilter.length > 0">
+            <div class="table-responsive" >
+                <table class="table table-bordered table-hover" >
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Pagina</th>
+                            <th>Seleccionar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr
+                            *ngFor="let page of pageFilter | slice: (paginationPage.page-1) * paginationPage.pageSize : (paginationPage.page-1) * paginationPage.pageSize + paginationPage.pageSize">
+                            <td>{{page.name}}</td>
+                            <td class="text-center">
+                                <div class="row">
+                                    <div class="col-12 action-btn">
+                                        <button class="btn btn-info ml-1 action-text cursor-pointer"
+                                            (click)="sidebarMode === 'create'? selectPage(page, 'create') : selectPage(page, 'edit')">
+                                            <i class="fas fa-chevron-circle-right"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="d-flex justify-content-center mt-2">
+                <ngb-pagination [collectionSize]="paginationPage.collectionSize"
+                    [(page)]="paginationPage.page" [pageSize]="paginationPage.pageSize">
+                </ngb-pagination>
+            </div>
+        </div>
+
+        <div class="card-body" *ngIf="pageFilter.length == 0">
+            <h2>No hay páginas asociadas a este sitio</h2>
         </div>
     </div>
 </ng-template>

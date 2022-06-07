@@ -46,6 +46,6 @@ import { SharedModule } from '../shared/shared.module';
     PerfectScrollbarModule,
     WebSitesModule,
     SharedModule
-  ]
+  ],
 })
 export class WebPagesModule { }

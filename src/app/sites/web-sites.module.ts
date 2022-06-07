@@ -16,6 +16,8 @@ import { SharedModule } from '../shared/shared.module';
 import { FeatherModule } from 'angular-feather';
 import { SecondLevelMenusComponent } from './components/second-level-menus/second-level-menus.component';
 import { ThirdLevelMenusComponent } from './components/third-level-menus/third-level-menus.component';
+import { WebPagesModule } from '../web-pages/web-pages.module';
+import { PageNameTwoPipe } from './pipes/page-name.pipe';
 
 @NgModule({
   declarations: [
@@ -25,6 +27,7 @@ import { ThirdLevelMenusComponent } from './components/third-level-menus/third-l
     SiteNamePipe,
     MenuNamePipe,
     LevelMenuPipe,
+    PageNameTwoPipe,
     FirstLevelMenusComponent,
     SecondLevelMenusComponent,
     ThirdLevelMenusComponent,
@@ -37,7 +40,7 @@ import { ThirdLevelMenusComponent } from './components/third-level-menus/third-l
     FormsModule,
     HttpClientModule, 
     SharedModule,
-    FeatherModule
+    FeatherModule,
   ],  
   exports : [
     SiteNamePipe

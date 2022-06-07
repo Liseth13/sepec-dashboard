@@ -12,6 +12,10 @@ export class FirstLevelMenusComponent implements OnInit, OnChanges {
   @Input() menus : Array<Menu> = [];
 
   @Input() sites : Array<any> = [];
+  
+  @Input() pages : Array<any> = [];
+
+  @Input() allMenus : Array<any> = [];
 
   menusForTable : Array<Menu> = [];
   
