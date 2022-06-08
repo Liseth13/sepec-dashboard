@@ -1,4 +1,4 @@
-<div class="col-12 mb-3 table-users" *ngIf="!charging">
+<div class="col-12 mb-3 table-users">
 <div class="card">
     <div class="card-body">
         <div class="row bd-highlight mb-2">
@@ -29,22 +29,22 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let data of webItemBanner | slice: (page-1) * pageSize : (page-1) * pageSize + pageSize">
-                        <td>{{ data.banner | bannerName : banners}}</td>
-                        <td>{{ data.name }}</td>
-                        <td>{{ data.url }}</td>
-                        <td>{{ data.text }}</td>
+                    <tr *ngFor="let item of itemsBannerForTable | slice: (pagItems.page-1) * pagItems.pageSize : (pagItems.page-1) * pagItems.pageSize + pagItems.pageSize">
+                        <td>{{ item.banner | bannerName : banners}}</td>
+                        <td>{{ item.name }}</td>
+                        <td>{{ item.url }}</td>
+                        <td>{{ item.text }}</td>
                         <td>
                           <div>
-                            <img [src]="data.img" alt="imagen" class="img-banner">
+                            <img [src]="item.img" alt="imagen" class="img-banner">
                           </div>
                         </td>
-                        <td *ngIf="data.is_active"><span class="label label-success">Activo</span></td>
-                        <td *ngIf="!data.is_active"><span class="label label-danger">No activo</span></td>
+                        <td *ngIf="item.is_active"><span class="label label-success">Activo</span></td>
+                        <td *ngIf="!item.is_active"><span class="label label-danger">No activo</span></td>
                         <td class="text-center">
                             <div class="row">
                                 <div class="col-12 action-btn">
-                                    <a class="btn btn-warning ml-1 action-text cursor" (click)="openModal(modalEditItemBanner, data)">
+                                    <a class="btn btn-warning ml-1 action-text cursor" (click)="openModal(modalEditItemBanner, item)">
                                         <i class="far fa-edit"></i>
                                     </a>
                                 </div>  
@@ -55,7 +55,7 @@
             </table>
         </div>
         <div class="d-flex justify-content-center mt-2">
-            <ngb-pagination [collectionSize]="collectionSize" [(page)]="page" [pageSize]="pageSize">
+            <ngb-pagination [collectionSize]="pagItems.collectionSize" [(page)]="pagItems.page" [pageSize]="pagItems.pageSize">
             </ngb-pagination>
         </div>
     </div>
@@ -99,8 +99,8 @@
                         <div class="form-group">
                             <label> Imagen</label>
                             <div class="mb-4">
-                                <img *ngIf="!tempImg" src="../../../../assets/images/big/no-img.png" class="modal-image">
-                                <img *ngIf="tempImg" [src]="tempImg" class="modal-image">
+                                <img *ngIf="!formCreate.get('img').value" src="../../../../assets/images/big/no-img.png" class="modal-image">
+                                <img *ngIf="formCreate.get('img').value" [src]="formCreate.get('img').value" class="modal-image">
                             </div>
                             <input type="file" class="" (change)="changeImage($event.target.files[0])">
 

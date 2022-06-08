@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import {FormBuilder, FormGroup, Validators,} from '@angular/forms';
 import { NgbModal, ModalDismissReasons, NgbActiveModal, NgbModalOptions, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { Pagination } from 'src/app/shared/interfaces/Pagination';
 import { WebPagesService } from 'src/app/web-pages/services/web-pages.service';
 import Swal from 'sweetalert2';
+import { Banner } from '../../interfaces/banner';
 import { Page } from '../../interfaces/Page';
 import { BannerService }  from '../../services/banner.service'
-import { Banner } from './banner';
 
 @Component({
   selector: 'app-banner',
@@ -14,227 +15,186 @@ import { Banner } from './banner';
 })
 export class BannerComponent implements OnInit {
 
-  selectedST: Banner | undefined = Object.create(null);
-  titleTaskSection = '';
-  public webPages : Array <Page> = [];
-  public webBanner    : Array <any> = [];
-  public formBannerCreate      : FormGroup;
-  private formBannerEdit        : FormGroup;
-  private totalWebBanner: number = 0;
-  private totalWebPage: number = 0;
-  charging: boolean = true;
+  public pages   : Array <Page> = [];
+  public banners : Array <Banner> = [];
+  public bannersForTable : Array <Banner> = [];
+  public formCreate : FormGroup;
+  private formEdit  : FormGroup;
 
-  closeResult: string;
-
-  idView: string = '';
-  modal: NgbModalRef;
+  tableMode : 'all' | 'actives' | 'inactives' | string = 'all';
+  sidebarMode : 'create' | 'edit' | string = 'create';
 
   //Paginación
-  page =1;
-  pageSize = 8;
-  pageP = 1;
-  pageSizeP = 8;
-  collectionSize = 0;
-  collectionSizePage = 0;
-  _searchTerm = '';
+  pagBanners = new Pagination();
+  pagPages   = new Pagination();
 
   constructor(
 
     private formBuilder : FormBuilder, private BannerService: BannerService,
     private modalService: NgbModal, private webPagesService: WebPagesService,
-    private activeModal: NgbActiveModal
 
-  ) {{this.loadformBannerCreate(); this.loadformBannerEdit();}}
-
-  ngOnInit(): void {
-    this.getWebBanner();
-    this.getWebPages();
-    this.loadformBannerCreate();
-   this.loadformBannerEdit();
+  ) {
+    this.loadFormCreate();
   }
 
-  loadformBannerCreate(){
-    this.formBannerCreate = this.formBuilder.group({ 
-      page:['',[Validators.required, Validators.maxLength(20),Validators.minLength(3)]],
-      name:['',[Validators.required, Validators.maxLength(20),Validators.minLength(3)]],
+  ngOnInit(): void {
+    this.get( true );
+    this.getPages();
+  }
+
+  loadFormCreate(){
+    this.formCreate = this.formBuilder.group({ 
+      page:['',[Validators.required]],
+      name:['',[Validators.required, Validators.maxLength(100),Validators.minLength(3)]],
     })
   
   }
 
-
-  loadformBannerEdit(){
-    this.formBannerEdit = this.formBuilder.group({
-      id: [''],
-      page:['',[Validators.required, Validators.maxLength(20),Validators.minLength(3)]],
-      name:['name',[Validators.required, Validators.maxLength(20),Validators.minLength(3)]],
-      is_active:[null,[Validators.required,]],
+  loadFormEdit( banner : Banner ){
+    this.formEdit = this.formBuilder.group({
+      id  : [ banner.id || null, [ Validators.required ] ],
+      page:[banner.page || null,[Validators.required]],
+      name:[banner.name || null,[Validators.required, Validators.maxLength(100),Validators.minLength(3)]],
+      is_active:[banner.is_active,[Validators.required,]],
     })
   }
 
+  validateForms = ( form : FormGroup ) : boolean => {
+    if ( form.valid ) {
+      return true;
+    }
+    Swal.fire('Error','Faltan Campos Por Validar','warning');
+    return false;
+  };
 
-  edit(){
-    if(this.formBannerEdit.invalid){
-      Swal.fire('Error','Faltan Campos Por Validar','warning')
-    }else{
+  get = ( isShowLoading : boolean = false ) =>{
 
-      const { ...data } = this.formBannerEdit.value;
-      // is_active === 'true' ? data.is_active = true : data.is_active = false;
+    if ( isShowLoading ) {
+      Swal.fire({
+        title: 'Cargando',
+        html: 'Por favor espera un momento...',
+        didOpen: () => {
+          Swal.showLoading()
+        }
+      });
+    }
+    
+    this.BannerService.getBanner()
+    .subscribe({ 
+      next : ( res : Banner[] ) => {
+        this.banners = res;
+        this.showBanners( this.tableMode );
+      },
+      error : ( error : any ) => { this.errorHandler( error ) },
+      complete : () => { isShowLoading && Swal.close() }
+    });
+  }
 
-      this.BannerService.updateBanner(data, this.formBannerEdit.value.id).subscribe(
-        (res:any)=>{
-          this.getWebBanner();
-          this.closeModal();
+  create = ( form : FormGroup ) => {
+    const isValid : boolean = this.validateForms( form );
+    if ( isValid ){
+      this.BannerService.createBanner( form.value )
+      .subscribe({
+        next : () => {
+          this.get();
+          this.closeRightSidebar();
+          Swal.fire('Exito!', 'Banner creado exitosamente', 'success');
+        },
+        error : ( error : any ) => { this.errorHandler( error ) }
+      });
+    }
+  }
+
+  edit = ( form : FormGroup ) => {
+    const isValid : boolean = this.validateForms( form );
+    if ( isValid ) {
+      this.BannerService.updateBanner( form.value )
+      .subscribe({
+        next : () => {
+          this.get();
+          this.closeRightSidebar();
           Swal.fire(' Success','Editado correctamente','success');
         },
-        (error:any)=>{
-          Swal.fire('Error','vuelva a intentarlo','error');
-        }
-      )
+        error : ( error : any ) => { this.errorHandler( error ) }
+      });
     }
   }
 
-  create(){
-      
-
-    if(this.formBannerCreate.invalid){
-      Swal.fire('Error','Faltan Campos Por Validar','warning')    
-    }else{
-      
-      this.BannerService.createBanner(this.formBannerCreate.value).subscribe(
-        (res:any)=>{
-          
-          this.getWebBanner()
-          this.closeRightMenu();
-          Swal.fire(' Success','Guardado correctamente','success')
-        },
-        (error:any)=>{
-          Swal.fire('Error','vuelva a intentarlo','error')
-        }
-      )
-    }
-}
-  getWebBanner = () =>{
-    Swal.fire({
-      title: 'Cargando',
-      html: 'Por favor espera un momento...',
-      showCancelButton: false,
-      showConfirmButton: false,
-      allowOutsideClick: false,
-      didOpen: () => {
-        Swal.showLoading()
-      }
-    });
-    this.BannerService.getBanner().subscribe(
-      (res:any) =>{
-        this.webBanner = res;
-        this.totalWebBanner = res.length;
-        this.collectionSize = this.webBanner.length;
-        this.charging = false;
-        Swal.close();
+  getPages = () =>{
+    this.webPagesService.get()
+    .subscribe({
+      next  : ( res : Page[] ) => { 
+        this.pages = res;
+        this.pagPages.collectionSize = res.length;
       },
-    (error:any) =>{})
-  }
-
-  getWebPages = () =>{
-    Swal.fire({
-      title: 'Cargando',
-      html: 'Por favor espera un momento...',
-      showCancelButton: false,
-      showConfirmButton: false,
-      allowOutsideClick: false,
-      didOpen: () => {
-        Swal.showLoading()
-      }
+      error : ( error : any ) => { this.errorHandler( error ) }
     });
-    this.webPagesService.get().subscribe(
-      (res:Page[]) =>{
-        this.webPages = res;
-        
-        this.totalWebPage = res.length;
-        this.collectionSizePage = this.webPages.length;
-        this.charging = false;
-        Swal.close();
-      },
-    (error:any) =>{})
   }
 
+  showBanners = ( mode : string ) => {
 
-
-  openModal(content1: string, data: any) {
-    if (data == 0) {
-      this.idView = 'create';
-    } else if (data == 1){    
-      this.idView = 'edit';
+    if ( mode === 'all' ) {
+      this.bannersForTable = this.banners;
     }
-    
-    this.modal = this.modalService.open(content1, { ariaLabelledBy: 'modal-basic-title', size: 'lg' })
+
+    if ( mode === 'actives' ){
+      this.bannersForTable = this.banners.filter((b:Banner) => b.is_active);
+    }
+
+    if ( mode === 'inactives' ){
+      this.bannersForTable = this.banners.filter((b:Banner) => !b.is_active);
+    }
+
+    this.pagBanners.collectionSize = this.bannersForTable.length;
+    this.pagBanners.page = 1;
+    this.tableMode = mode;
   }
 
-  openModalEdit(content1: string, data: any) {
-    this.formBannerEdit.patchValue({
-      id: data.id,
-      page: data.page,
-      name: data.name,
-      is_active: data.is_active,
-    })
-    
-    this.modalService.open(content1, { ariaLabelledBy: 'modal-basic-title', size: 'lg' })
-  }
-
-  closeModal(){
-    this.modalService.dismissAll()
-  }
-
-  private getDismissReason(reason: ModalDismissReasons): string {
-		if (reason === ModalDismissReasons.ESC) {
-			return 'by pressing ESC';
-		} else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
-			return 'by clicking on a backdrop';
-		} else {
-			return `with: ${reason}`;
-		}
-  }
-
-  closeRightMenu() {
-    (document.getElementById('rightMenu')as HTMLFormElement).style.width = '0';
-  }
-
-  getName(pageId) {
-    let siteName = '';
-
-    if (pageId != '' && pageId != null) {
-      const siteName = this.webPages.find(page => page.id === pageId);
-      return siteName.name
+  openRightSidebar( mode: string, banner? : Banner ) {
+    if ( mode === 'edit' && banner ){
+      this.sidebarMode = mode;
+      this.loadFormEdit( banner );
+    } else if ( mode === 'create' ) {
+      this.sidebarMode = mode;
+      this.loadFormCreate();
     } else {
-      return siteName;
+      this.sidebarMode = 'create';
+      return;
     }
+
+    const rightMenu : HTMLFormElement = document.getElementById('rightMenu') as HTMLFormElement ;
+    
+    if ( rightMenu.style.width === '285px' ) {
+      this.closeRightSidebar();
+      return;
+    }
+    rightMenu.style.width = '285px';
   }
 
-  addTaskSection() {
-
-    this.formBannerCreate.reset();
-
-    if ((document.getElementById('rightMenu')as HTMLFormElement).style.width === '300px') {
-        this.closeRightMenu();
-        return;
-    }
-    (document.getElementById('rightMenu')as HTMLFormElement).style.width = '300px';
-
-    this.titleTaskSection = 'Task';
-
-    const banner = new Banner();
-    banner.name = 'bla@bla.com';
-    banner.status = true;
-
+  closeRightSidebar() {
+    const rightMenu : HTMLFormElement = document.getElementById('rightMenu') as HTMLFormElement ;
+    rightMenu.style.width = '0px';
   }
 
-  seleccionar(Page){
-    if (this.idView == 'create') {
-      this.formBannerCreate.get('page').setValue(Page.id);
-      this.modalService.dismissAll();
-    } else {
-      this.formBannerEdit.get('page').setValue(Page.id);
-      this.modal.close()
-    }
+  openModal( targetModal: NgbModal, size : string = 'md', ) {  
+    this.modalService.open( targetModal , {
+      size : size ,
+      centered: true,
+      backdrop: 'static',
+    });
   }
+
+  closeModals = () => {
+    this.modalService.dismissAll();
+  }
+
+  selectPage = ( form : FormGroup, page : Page ) => {
+    form.get('page').setValue(page?.id || '');
+    this.closeModals();
+  }
+
+  errorHandler = ( error : any ) => {
+    Swal.fire('Error', "Ha ocurrido un error, reintentar operación", 'error');
+  }
+
 }

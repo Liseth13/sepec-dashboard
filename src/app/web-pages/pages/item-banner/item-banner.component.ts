@@ -1,9 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ModalDismissReasons, NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { Pagination } from 'src/app/shared/interfaces/Pagination';
 import Swal from 'sweetalert2';
+import { Banner } from '../../interfaces/banner';
+import { ItemBanner } from '../../interfaces/item-banner';
 import { BannerItemService } from '../../services/banner-item.service';
 import { BannerService } from '../../services/banner.service';
+
 
 @Component({
   selector: 'app-item-banner',
@@ -11,19 +15,18 @@ import { BannerService } from '../../services/banner.service';
   styleUrls: ['./item-banner.component.scss']
 })
 export class ItemBannerComponent implements OnInit {
-  public totalWebItemBanner : number = 0;
-  formItemBannerCreate:  FormGroup;
-  formItemBannerEdit:  FormGroup;
-  public formSubmitted = false;
+  formCreate:  FormGroup;
+  formEdit:  FormGroup;
 
-  public charging : boolean = true;
+  itemsBanner: Array <ItemBanner> = [];
+  itemsBannerForTable : Array<ItemBanner> = [];
+  banners :  Array <Banner> = []; 
 
-  public webItemBanner: Array <any> = [];
-  private webItemBannerId: number = 0;
-  banners :  Array <any> = []; 
+  tableMode : 'all' | 'actives' | 'inactives' | string = 'all';
+  sidebarMode : 'create' | 'edit' | string = 'create';
 
-  idView: string = '';
-  modal: NgbModalRef;
+ // idView: string = '';
+  //modal: NgbModalRef;
 
   public imageUpload!: File;
 
@@ -36,227 +39,232 @@ export class ItemBannerComponent implements OnInit {
   public tempImg: any = null;
   
   //Paginación
-  page =1;
-  pageSize = 8;
-  pageP = 1;
-  pageSizeP = 8;
-  collectionSize = 0;
-  collectionSizePage = 0;
-  
-  _searchTerm = '';
+  pagItems    = new Pagination();
+  pagBanners = new Pagination();
 
-  dataForm: any = null;
  
 
-
-  closeResult = '';
-  constructor(
-    private formBuilder : FormBuilder, private bannerItemService: BannerItemService,
-    private modalService: NgbModal, private bannerService: BannerService,private activeModal: NgbActiveModal
-  ) { this.loadformItemBannerCreate(); this.loadformItemBannerEdit();}
+  constructor
+  (
+    private formBuilder : FormBuilder, 
+    private bannerItemService: BannerItemService,
+    private modalService: NgbModal, 
+    private bannerService: BannerService
+  ) { this.loadFormCreate()}
 
   ngOnInit(): void {
-    this.getWebItemBanner();
-    this.getWebBanner();
+    this.get();
+    this.getBanners();
   }
 
-  getWebItemBanner = () =>{
-    Swal.fire({
-      title: 'Cargando',
-      html: 'Por favor espera un momento...',
-      showCancelButton: false,
-      showConfirmButton: false,
-      allowOutsideClick: false,
-      didOpen: () => {
-        Swal.showLoading()
-      }
-    });
-    this.bannerItemService.getItemBanner().subscribe(
-      (res:any) =>{
-        this.webItemBanner = res;
-        this.totalWebItemBanner = res.length;
-        this.collectionSize = this.webItemBanner.length;
-        this.charging = false;
-        Swal.close();
-      },
-    (error:any) =>{})
-  }
+ 
 
-  loadformItemBannerCreate(){
-    this.formItemBannerCreate = this.formBuilder.group({ 
-      banner:['',[Validators.required, Validators.maxLength(100),Validators.minLength(3)]],
-      name:['',[Validators.required, Validators.maxLength(100),Validators.minLength(3)]],
-      url:['',[Validators.required, Validators.maxLength(300),Validators.minLength(3)]],
-      text:['',[Validators.required, Validators.maxLength(100),Validators.minLength(3)]],
-      img:[null],
+  loadFormCreate(){
+    this.formCreate = this.formBuilder.group({ 
+      banner:['',[Validators.required]],
+      name  :['',[Validators.required, Validators.maxLength(100),Validators.minLength(3)]],
+      url   :['',[Validators.required, Validators.maxLength(300),Validators.minLength(3)]],
+      text  :['',[Validators.required, Validators.maxLength(150000),Validators.minLength(3)]],
+      img   :[null],
     })
   }
 
-  loadformItemBannerEdit(){
-    this.formItemBannerEdit = this.formBuilder.group({
-      banner:[0],
-      name:['',[Validators.required, Validators.maxLength(100),Validators.minLength(3)]],
-      url:['',[Validators.required, Validators.maxLength(300),Validators.minLength(3)]],
-      text:['',[Validators.required, Validators.maxLength(100),Validators.minLength(3)]],
-      img:[null],
-      is_active:[null,[Validators.required]],
+  loadFormEdit( itemBanner : ItemBanner ){
+    this.formEdit = this.formBuilder.group({
+      banner:[ itemBanner.banner ],
+      name  :[itemBanner.name,[Validators.required, Validators.maxLength(100),Validators.minLength(3)]],
+      url   :[itemBanner.url ,[Validators.required, Validators.maxLength(300),Validators.minLength(3)]],
+      text  :[itemBanner.text,[Validators.required, Validators.maxLength(100),Validators.minLength(3)]],
+      img   :[itemBanner.img],
+      is_active:[itemBanner.is_active,[Validators.required]],
     })
   }
+
+  validateForms = ( form : FormGroup  ) : boolean => {
+    if ( form.valid ) {
+      return true;
+    }
+    Swal.fire('Error','Faltan Campos Por Validar','warning');
+    return false;
+  };
   
-  edit(){
+  get = ( isShowLoading : boolean = false ) =>{
 
-    this.formSubmitted = true;
-
-    if(this.formItemBannerEdit.invalid){
-      Swal.fire('Error','Faltan Campos Por Validar','warning');
-    }else{
-      if( !this.validImageExtension || !this.allowedFileSize ){
-        return Swal.fire('Error','Verifica la extensión y el tamaño de la imagen','warning');
-      }
-
-      const { ...data } = this.formItemBannerEdit.value;
-      const dataForm = new FormData();
-      for (var key in data) {
-        if(key === 'img' && this.imageUpload !== null){
-          dataForm.append('img', this.imageUpload);
-        }else{
-          if(key !== 'img'){
-            dataForm.append(key, data[key]);
-          }
+    if ( isShowLoading ) {
+      Swal.fire({
+        title: 'Cargando',
+        html: 'Por favor espera un momento...',
+        didOpen: () => {
+          Swal.showLoading()
         }
-      }
-      this.bannerItemService.updateItemBanner(dataForm, this.webItemBannerId).subscribe(
-        (res:any)=>{
-          this.getWebItemBanner();
-          Swal.fire(' Success','Editado correctamente','success');
-        },
-        (error:any)=>{
-          Swal.fire('Error','vuelva a intentarlo','error');
-        }
-      )
-    }
-  }
-
-   create(){ 
-    this.formSubmitted = true;
-    if(this.formItemBannerCreate.invalid){
-      Swal.fire('Error','Faltan Campos Por Validar','warning')
-    }else{
-      if( this.imageUpload === null ){
-        return Swal.fire('Error','Debes seleccionar una imagen','warning');
-      }
-      if( !this.validImageExtension || !this.allowedFileSize ){
-        return Swal.fire('Error','Verifica la extensión y el tamaño de la imagen','warning');
-      }
-      const { ...data } = this.formItemBannerCreate.value;
-      const dataForm = new FormData();
-      for (var key in data) {
-        if(key === 'img'){
-          dataForm.append('img', this.imageUpload);
-        }else{
-          dataForm.append(key, data[key]);
-        }
-      }
-      
-      this.bannerItemService.createItemBanner(dataForm).subscribe(
-        (res:any)=>{
-          
-          this.getWebItemBanner()
-          this.closeRightMenu();
-          Swal.fire('Guardado','Guardado correctamente','success')
-        },
-        (error:any)=>{
-          Swal.fire('Error','vuelva a intentarlo','error')
-        }
-      );
-    }
-  }
-
-  openModal(content1: string, data: any) {
-    this.imageUpload = null;
-    this.formSubmitted = false; 
-    if(data === 0){
-      this.idView = 'create';
-      this.formItemBannerCreate.patchValue({
-        banner: '',
-        name: '',
-        url: '',
-        text: '',
-        img: null,
-        is_active: null
       });
-    }
-
-    this.tempImg = data.img;
-    if(data !== 0){
-      this.formItemBannerEdit.patchValue({
-        banner: data.banner,
-        name: data.name,
-        url: data.url,
-        text: data.text,
-        img: data.img,
-        is_active: data.is_active
-      });
-      this.webItemBannerId = data.id;
     }
     
-		this.modalService.open(content1, { ariaLabelledBy: 'modal-basic-title', size: 'lg' }).result.then((result) => {
-			this.closeResult = `Closed with: ${result}`;
-		}, (reason) => {
-			this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-		});
-	}
-
-  private getDismissReason(reason: ModalDismissReasons): string {
-		if (reason === ModalDismissReasons.ESC) {
-			return 'by pressing ESC';
-		} else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
-			return 'by clicking on a backdrop';
-		} else {
-			return `with: ${reason}`;
-		}
-  }
-
-  closeRightMenu() {
-    (document.getElementById('rightMenu')as HTMLFormElement).style.width = '0';
-  }
-
-  getWebBanner = () =>{
-    this.bannerService.getBanner().subscribe(
-      (res:any) =>{
-        this.banners = res;
+    this.bannerItemService.getItemBanner()
+    .subscribe({ 
+      next : ( res : ItemBanner[] ) => {
+        this.itemsBanner = res;
+        this.showItemsBanner( this.tableMode );
       },
-    (error:any) =>{})
+      error : ( error : any ) => { this.errorHandler( error ) },
+      complete : () => { isShowLoading && Swal.close() }
+    });
   }
 
-  seleccionar(banner:any){
-    if (this.idView == 'create') {
-      this.formItemBannerCreate.get('banner').setValue(banner.id);
-    } else {
-      var x = 1
-      this.formItemBannerEdit.get('banner').setValue(banner.id);
+  getBanners = () => {
+    this.bannerService.getBanner()
+    .subscribe({
+      next : ( res : Banner[] ) => {
+        this.banners = res;
+        this.pagBanners.collectionSize = res.length;
+      },
+      error : ( error : any ) => { this.errorHandler( error ) }
+    });
+  }
+
+  edit = ( form : FormGroup ) => {
+    const isValid : boolean = this.validateForms( form );
+    // if ( isValid ){
+    //   const validExtension : boolean;
+    //   const validSizeFile : boolean;
+
+    //   if ( validExtension && validSizeFile ) {
+
+    //   }
+    // }
+
+    //   const { ...data } = this.formEdit.value;
+    //   const dataForm = new FormData();
+    //   for (var key in data) {
+    //     if(key === 'img' && this.imageUpload !== null){
+    //       dataForm.append('img', this.imageUpload);
+    //     }else{
+    //       if(key !== 'img'){
+    //         dataForm.append(key, data[key]);
+    //       }
+    //     }
+    //   }
+    //   this.bannerItemService.updateItemBanner(dataForm, this.webItemBannerId).subscribe(
+    //     (res:any)=>{
+    //       this.get();
+    //       Swal.fire(' Success','Editado correctamente','success');
+    //     },
+    //     (error:any)=>{
+    //       Swal.fire('Error','vuelva a intentarlo','error');
+    //     }
+    //   )
+    // }
+  }
+
+  create = ( form : FormGroup ) => { 
+    const isValid : boolean = this.validateForms( form );
+    if ( isValid ){
+      const formData = this.createFormData( form );
+      this.bannerItemService.createItemBanner( formData )
+      .subscribe({
+        next : ( res : ItemBanner ) => {
+          this.get();
+          this.closeRightSidebar();
+          Swal.fire('Exito!', 'Banner creado exitosamente', 'success');
+        },
+        error : ( error : any ) => { this.errorHandler( error ) }
+      });
     }
   }
 
-  changeImage( file: File ){
+  createFormData = ( form : FormGroup ) : FormData => {
+    const formData = new FormData();
+    for ( let prop in form.value ) {
+      if ( prop === 'img' ){
+        formData.append('img', this.imageUpload);
+      } else {
+        formData.append(prop, form.value[prop]);
+      } 
+    }
+
+    return formData;
+  }
+
+  openRightSidebar( mode: string, itemBanner? : any ) {
+    if ( mode === 'edit' && itemBanner ){
+      this.sidebarMode = mode;
+      this.loadFormEdit( itemBanner );
+    } else if ( mode === 'create' ) {
+      this.sidebarMode = mode;
+      this.loadFormCreate();
+    } else {
+      this.sidebarMode = 'create';
+      return;
+    }
+
+    const rightMenu : HTMLFormElement = document.getElementById('rightMenu') as HTMLFormElement ;
     
-    this.imageUpload = file;
+    if ( rightMenu.style.width === '285px' ) {
+      this.closeRightSidebar();
+      return;
+    }
+    rightMenu.style.width = '285px';
+  }
+
+  closeRightSidebar() {
+    const rightMenu : HTMLFormElement = document.getElementById('rightMenu') as HTMLFormElement ;
+    rightMenu.style.width = '0px';
+  }
+
+  openModal( targetModal: NgbModal, size : string = 'md', ) {  
+    this.modalService.open( targetModal , {
+      size : size ,
+      centered: true,
+      backdrop: 'static',
+    });
+  }
+
+  closeModals = () => {
+    this.modalService.dismissAll();
+  }
+
+
+  showItemsBanner = ( mode : string ) => {
+
+    if ( mode === 'all' ) {
+      this.itemsBannerForTable = this.itemsBanner;
+    }
+
+    if ( mode === 'actives' ){
+      this.itemsBannerForTable = this.itemsBanner.filter((i:ItemBanner) => i.is_active);
+    }
+
+    if ( mode === 'inactives' ){
+      this.itemsBannerForTable = this.itemsBanner.filter((i:ItemBanner) => !i.is_active);
+    }
+
+    this.pagBanners.collectionSize = this.itemsBannerForTable.length;
+    this.pagBanners.page = 1;
+    this.tableMode = mode;
+  }
+
+
+
+  changeImage( file: File ) : FileReader{
+    
+    // this.imageUpload = file;
 
     //Validamos si no existe el archivo, es decir no se selecciono ningún archivo
-    if ( !file ) { 
-      return this.tempImg = null;
-    }
+    // if ( !file ) { 
+    //   return this.tempImg = null;
+    // }
 
-    this.formItemBannerEdit.patchValue({
-      img: file
-    });
+    // this.formEdit.patchValue({
+    //   img: file
+    // });
 
-    this.checkImageExtension( file );
-    this.checkFileSize( file );
+    // this.checkImageExtension( file );
+    // this.checkFileSize( file );
 
-    if( this.validImageExtension === false ){
-       return this.tempImg = null;
-    }
+    // if( this.validImageExtension === false ){
+    //    return this.tempImg = null;
+    // }
+
 
     const reader = new FileReader();
     reader.readAsDataURL( file );
@@ -265,34 +273,31 @@ export class ItemBannerComponent implements OnInit {
       this.tempImg = reader.result;
     }
 
-    return this.tempImg;
+    return reader;
 
   }
 
-  checkFileSize( file: File ){
-    // Validar tamaño del archivo a subir
-    if (file.size > 10485760 ) {
-        //False es para indicar que el tamaño del archivo subido no es permitido
-        this.allowedFileSize = false;
-    } else {
-        //True es para indicar que el tamaño del archivo subido si es permitido
-        this.allowedFileSize = true;
+  checkFileSize( file: File ) : boolean {
+    if (file.size <= 10485760 ) {
+        return true;
     }
+    return false;
   }
 
-  checkImageExtension( file: File ){
+  checkImageExtension( file: File ) : boolean {
     const cutName = file.name.split('.'); // wolverine.1.3.jpg
     const fileExtension = cutName[cutName.length - 1];
-
     // Validar extension
     const validExtensions = ['png', 'jpg', 'jpeg', 'PNG', 'JPG', 'JPEG'];
-    if (!validExtensions.includes(fileExtension)) {
+    if (validExtensions.includes(fileExtension)) {
         //False es para indicar que la extensión no es permitida
-        this.validImageExtension = false;
-    } else {
-        //True es para indicar que la extensión si es permitida
-        this.validImageExtension = true;
+        return true;
     }
+    return false;
+  }
+
+  errorHandler = ( error : any ) => {
+    Swal.fire('Error', "Ha ocurrido un error, reintentar operación", 'error');
   }
 
   

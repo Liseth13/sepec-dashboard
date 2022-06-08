@@ -1,201 +1,234 @@
-<div class="col-12 mb-3 table-users" *ngIf="!charging">
+<ng-template #modalPages let-modal>
+    <div class="modal-header">
+        <h3 class="modal-title font-weight-bold" id="taskLabel">
+            Seleccionar Página
+        </h3>
+        <button type="button" class="close" (click)="modal.dismiss()" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
     <div class="card">
         <div class="card-body">
-            <div class="row bd-highlight mb-2">
-                <div class="col-12">
-                    <h1 class="fant"> Banner </h1>
-                    <div class="float-left align-center justify-content-center">
-                        <h1 class="h3 mb-0 text-gray-800 pt-2">Total: {{ totalWebBanner }}</h1>
-                    </div>
-                
-                    <div class="float-right bd-highlight">
-                        <button class="btn btn-info cursor" (click)="addTaskSection()">
-                            <i class="fas fa-plus-circle"></i> Crear banner
-                        </button>
-                    </div>
-                </div>
-            </div>
             <div class="table-responsive">
                 <table class="table table-bordered table-hover">
-                    <thead class="thead-dark">
+                    <thead class = "table-dark">
                         <tr>
                             <th>Página</th>
-                            <th>Nombre</th>
                             <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let data of webBanner |slice: (page-1) * pageSize : (page-1) * pageSize + pageSize">
-                            <td>{{ data.page | pageName : webPages }}</td>
-                            <td>{{ data.name }}</td>
-                            <td *ngIf="data.is_active"><span class="label label-success">Activo</span></td>
-                            <td *ngIf="!data.is_active"><span class="label label-danger">No activo</span></td>
-                            <td class="text-center">
+                        <tr class="text-center" *ngFor="let page of pages | slice: (pagPages.page-1) * pagPages.pageSize : (pagPages.page-1) * pagPages.pageSize + pagPages.pageSize">
+                            <td>{{page.name}}</td>
+                            <td ><span class="label" [ngClass]="{'label-success' : page.is_active, 'label-danger' : !page.is_active }">{{ page.is_active? 'Activo' : 'Inactivo' }}</span></td>
+                            <td class ="text-center">
                                 <div class="row">
                                     <div class="col-12 action-btn">
-                                        <a class="btn btn-warning ml-1 action-text cursor" (click)="openModalEdit(modalEditBanner, data)">
-                                            <i class="far fa-edit"></i>
-                                        </a>
-                                    </div>  
+                                        <button
+                                            class="btn btn-info ml-1 action-text cursor-pointer"
+                                            (click)="sidebarMode === 'create'? selectPage(formCreate, page) : selectPage(formEdit, page)"
+                                        >
+                                            Seleccionar
+                                            <i class="fas fa-chevron-circle-right ml-1"></i>
+                                        </button>
+                                    </div>
                                 </div>
                             </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-            <div class="d-flex justify-content-center mt-5">
-                <ngb-pagination [collectionSize]="collectionSize" [(page)]="page" [pageSize]="pageSize">
-
+            <div class="d-flex justify-content-center mt-2">
+                <ngb-pagination [collectionSize]="pagPages.collectionSize" [(page)]="pagPages.page" [pageSize]="pagPages.pageSize">
                 </ngb-pagination>
             </div>
         </div>
     </div>
-</div>
+</ng-template>
 
-<!-- Crear Banner -->
-<div class="app-sidebar card" id="rightMenu">
-    <!-- Header -->
-   <div class="d-flex p-3 border-bottom card-header">
-       <div class="d-flex align-items-center">
-           Crear Banner
-       </div>
-       <div class="ml-auto">
-           <a href="javascript:void(0)" class="text-danger" (click)='closeRightMenu()'>
-               X
-           </a>
-       </div>
-   </div>
-
-   <!-- Body -->
-   <div class="row">
-       <div class="p-4">
-           <div class="card card-body">
-               <form *ngIf='selectedST' [formGroup]="formBannerCreate"  (ngSubmit)="create()">
-                   <div class="form-group">
-                       <label> Página</label>
-                       <div class="input-group mb-3">
-                       <input type="text" class="form-control" disabled value="{{ getName(formBannerCreate.value.page) || ''}}" >
-                       <button type="button" class=" ml-1 btn btn-info" (click)="openModal(modalMostrarPages, 0)">
-                        <i class="fa fa-search me-1"></i>
-                       </button>
+<div class="card">
+    <div class="card-body">
+        <h3>
+            Banners 
+            <button (click)="openRightSidebar('create')" class="btn btn-primary cursor float-right">
+                <i class="fas fa-plus-circle"></i> Crear banner
+            </button>
+            <div class="clearfix"></div>
+        </h3>
+        <hr>
+        <div class="row mt-3 d-flex justify-content-center">
+            <div class="col-md-6 col-lg-3 col-xlg-3">
+                <div class="card card-hover" (click)="showBanners('all')">
+                    <div class="box bg-info cursor-pointer text-center">
+                        <h1 class="fw-light text-white">
+                            {{ banners.length }}
+                        </h1>
+                        <h6 class="text-white">
+                            Todos
+                        </h6>
                     </div>
-                   </div>
-                   <div class="form-group">
-                       <label> Nombre</label>
-                       <input type="text" class="form-control" formControlName="name" placeholder="Nombre del banner" >
-                   </div>
-                   <div class="form-group">
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3 col-xlg-3">
+                <div class="card card-hover" (click)="showBanners('actives')">
+                    <div class="box bg-success cursor-pointer text-center">
+                        <h1 class="fw-light text-white">
+                            {{ banners | counterStatus : true }}
+                        </h1>
+                        <h6 class="text-white">
+                            Banners activos
+                        </h6>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3 col-xlg-3">
+                <div class="card card-hover" (click)="showBanners('inactives')">
+                    <div class="box bg-danger cursor-pointer text-center">
+                        <h1  class="fw-light text-white">
+                            {{ banners | counterStatus : false }}
+                        </h1>
+                        <h6 class="text-white">
+                            Banners inactivos
+                        </h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 mb-3 table-users">
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <!-- <th class="w100">Icon</th> -->
+                                    <th>Nombre</th>
+                                    <th>Página</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let banner of bannersForTable | slice: (pagBanners.page-1) * pagBanners.pageSize : (pagBanners.page-1) * pagBanners.pageSize + pagBanners.pageSize">
+                                    <!-- <td class="text-center">
+                                        <img [src]="site.icon" alt="Icon" class="avatar cursor">
+                                    </td> -->
+                                    <td>{{ banner.name }}</td>
+                                    <td>{{ banner.page | pageName : pages }}</td>
+                                    <td *ngIf="banner.is_active"><span class="label label-success">Activo</span></td>
+                                    <td *ngIf="!banner.is_active"><span class="label label-danger">No activo</span></td>
+                                    <td class="text-center">
+                                        <div class="row">
+                                            <div class="col-12 action-btn">
+                                                <a class="btn btn-warning ml-1 action-text cursor" (click)="openRightSidebar('edit', banner)">
+                                                    <i class="far fa-edit"></i>
+                                                </a>
+                                            </div>  
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="d-flex justify-content-center mt-5">
+                        <ngb-pagination 
+                            [collectionSize]="pagBanners.collectionSize" [(page)]="pagBanners.page" [pageSize]="pagBanners.pageSize">
+                        </ngb-pagination>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- sidebar -->
+<div class="app-sidebar card" id="rightMenu">
+    <div>
+        <!-- -------------------------------------------------------------------------------------- -->
+        <!-- Header of sidebar -->
+        <!-- -------------------------------------------------------------------------------------- -->
+        <div class="d-flex p-3 border-bottom card-header">
+            <div  class="d-flex align-items-center">
+                <h2 class="text-center text-title"> {{sidebarMode === 'create'? 'Crear banner' : 'Editar banner'}} </h2>
+            </div>
+
+            <div class="ml-auto">
+                <a href="javascript:void(0)" class="text-danger" (click)='closeRightSidebar()'>
+                    <i-feather name="x" class="feather-sm"></i-feather>
+                </a>
+            </div>
+        </div>
+        <!-- ./  Header of sidebar -->
+        <!-- -------------------------------------------------------------------------------------- -->
+        <!-- Body of sidebar -->
+        <!-- -------------------------------------------------------------------------------------- -->
+        <div class="p-4">
+            <form *ngIf="sidebarMode === 'create'" [formGroup] = "formCreate" (ngSubmit)="create( formCreate )">
+                <div class="form-group">
+                    <label for="pageNameCreate">Página</label>
+                    <div class="input-group mb-3">    
+                        <button type = "button" class=" ml-1 btn btn-info" (click) ="openModal( modalPages, 'lg' )" >
+                            <i class="fa fa-search me-1"></i>
+                            
+                        </button>      
+                        <input type="text" value="{{ formCreate.get('page').value | pageName : pages }}" class="form-control"  id="pageNameCreate" disabled>
+                    </div>  
+                </div>
+                <div class="form-group">
+                    <label> Nombre</label>
+                    <input type="text" class="form-control" formControlName="name" placeholder="Nombre del banner">
+                </div>
+                
+                <div class="form-group">
                     <button type="submit" class="btn btn-success btn-block" >
                         <i-feather name="save" class="feather-sm mr-2"></i-feather>
                         Crear banner
                     </button>
                 </div>
                 <div class="form-group">
-                    <button type="button" class="btn btn-danger btn-block" (click)='formBannerCreate.reset()'>
+                    <button type="button" class="btn btn-danger btn-block" (click)='loadFormCreate()'>
                         <i-feather name="trash-2" class="feather-sm mr-2"></i-feather>
                         Limpiar Formulario
                     </button>
                 </div>
-               </form>
-           </div>
-       </div>
-   </div>
-</div>
- <!-- mostrar Paginas -->
- <ng-template id="modalShow" #modalMostrarPages let-modal>
-    <div class="modal-header">
-        <h4 class="modal-title" id="modal-basic-title"> Mostrar pagina</h4>
-        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
-    <div class="float-left align-center justify-content-center">
-        <h1 class="h3 mb-0 text-gray-800 pt-2 ml-3">Total: {{ totalWebPage }}</h1>
-    </div>
-    <div class="modal-body">
-        <div class="table-responsive" > 
-        
-            <table class="table table-bordered table-hover">
-                <thead class="thead-dark">
-                    <tr>
-                        <th>Pagina</th>
-                        <th>Estado</th>
-                        <th>Seleccionar</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr *ngFor="let item of webPages |slice: (pageP-1) * pageSizeP : (pageP-1) * pageSizeP + pageSizeP">
-                        <td>{{ item.name }}</td>
-                        <td><span class="label" [ngClass]="{'label-success' : item.is_active, 'label-danger' : !item.is_active }">{{ item.is_active? 'Activo' : 'Inactivo' }}</span></td>
-                        <td>
-                            <div class="col">
-                                <button *ngIf="idView == 'create'" class="btn btn-info" (click)="seleccionar(item)">
-                                    <span>
-                                        <i class="fas fa-chevron-circle-right"></i>
-                                    </span> Seleccionar                       
-                                </button>
-                                <button *ngIf="idView == 'edit'" class="btn btn-warning" (click)="seleccionar(item)">
-                                    <span>
-                                        <i class="fas fa-chevron-circle-right"></i>
-                                    </span> Seleccionar                       
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-                <div class="d-flex justify-content-center mt-5">
-                    <ngb-pagination [collectionSize]="collectionSizePage" [(page)]="pageP" [pageSize]="pageSizeP">
-    
-                    </ngb-pagination>
-                </div>
-            </table>
-        </div>
-    </div>
-    <div class="modal-footer">
-        
-    </div>
-</ng-template>
-<!-- modal Editar Banner -->
-<ng-template #modalEditBanner let-modal>
-    <div class="modal-header">
-        <h4 class="modal-title" id="modal-basic-title"> Editar Banner</h4>
-        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
-    
-    <div class="row">
-        <div class="col-sm-12 col-md-12 col-lg-12">
-            <div class="card card-body">
-                <form class="form-group" [formGroup]="formBannerEdit" (ngSubmit)="edit()">
-                    
-                    <div class="form-group">
-                        <label> Page</label>
-                        <div class="input-group mb-3"> 
-                        <input type="text" class="form-control" disabled value="{{ getName(formBannerEdit.value.page) || ''}}" >
-                        <button type="button" class=" ml-1 btn btn-info" (click)="openModal(modalMostrarPages, 1)">
+            </form>
+
+            <form *ngIf="sidebarMode === 'edit'"  [formGroup] = "formEdit" (ngSubmit)="edit( formEdit )">
+                <div class="form-group">
+                    <label for="pageNameEdit">Página</label>
+                    <div class="input-group mb-3">    
+                        <button type = "button" class=" ml-1 btn btn-info" (click) ="openModal( modalPages, 'lg' )" >
                             <i class="fa fa-search me-1"></i>
-                        </button>
-                        </div>
-                    </div>
-                        <div class="form-group">
-                            <label> Nombre</label>
-                            <input type="text" class="form-control" formControlName="name" placeholder="Escribir Nombre" >
-                        </div>
-                    <div class="form-group" >
-                        <label>Estado</label>
-                        <select class="custom-select col-12" id="inlineFormCustomSelect" formControlName="is_active" >
-                            <option value="" selected>--Seleccione una Opcion</option>
-                            <option value="true">Activado</option>
-                            <option value="false">Desactivado</option>
-                        </select>
-                    </div>
-                        <div class="modal-footer" >
-                            <button type="submit" class="btn btn-success" >Guardar</button>
-                        </div>
-                </form>
-            </div>
+                            
+                        </button>      
+                        <input type="text" value="{{ formEdit.get('page').value | pageName : pages }}" class="form-control"  id="pageNameEdit" disabled>
+                    </div>  
+                </div>
+                <div class="form-group">
+                    <label>Nombre</label>
+                    <input type="text" class="form-control" formControlName="name" placeholder="Escriba Nombre del Sitio Web">
+                </div>
+                <div class="form-group">
+                    <label for="statusEdit">Estado</label>                 
+                    <select id="statusEdit" formControlName = "is_active" class="form-control">
+                        <option value="true" >Activo</option>
+                        <option value="false" >Inactivo</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success btn-block">
+                        <i-feather name="save" class="feather-sm mr-2"></i-feather>
+                        Guardar cambios
+                    </button>
+                </div>
+                <div class="form-group">
+                    <button type="button" class="btn btn-danger btn-block" (click)='closeRightSidebar()'>
+                        <i-feather name="trash-2" class="feather-sm mr-2"></i-feather>
+                        Cancelar
+                    </button>
+                </div>
+            </form>
         </div>
+        <!-- ./ Body of sidebar -->
     </div>
-</ng-template>
+</div>

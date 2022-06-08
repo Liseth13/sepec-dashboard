@@ -22,7 +22,7 @@ export const ROUTES: RouteInfo[] = [
       },
       {
         path: "/dash/sites/footers",
-        title: "Footer",
+        title: "Footers",
         icon: "Layout",
         class: "",
         label: "",
@@ -32,7 +32,7 @@ export const ROUTES: RouteInfo[] = [
       },
       {
         path: "/dash/sites/menu",
-        title: "Menu",
+        title: "Menús",
         icon: "Layout",
         class: "",
         label: "",
@@ -63,7 +63,7 @@ export const ROUTES: RouteInfo[] = [
       },
       {
         path: "./dash/web-pages/banner",
-        title: "Banner",
+        title: "Banners",
         icon: "",
         class: "",
         label: "",

@@ -86,7 +86,7 @@ export class PostsComponent implements OnInit, OnChanges {
     if ( form.valid ) {
       return true;
     }
-    Swal.fire('Error!', 'Los campos del formulario no son validos','error');
+    Swal.fire('Error','Faltan Campos Por Validar','warning');
     return false;
   }
 

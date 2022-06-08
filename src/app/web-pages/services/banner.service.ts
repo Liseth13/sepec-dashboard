@@ -1,5 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Banner } from '../interfaces/banner';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +15,7 @@ export class BannerService {
 configUrl = 'https://sepec-backend.herokuapp.com';
 // port = 443
 
-getBanner(from?: number, limit?: number, active?: boolean) {
+getBanner() {
   return this.http.get(`${this.configUrl}/api/v1/website/banners/`);
   
 }
@@ -24,8 +25,8 @@ createBanner(data: any) {
 
 }
 
-updateBanner(data: any, weBanner: number) {
-  return this.http.put(`${this.configUrl}/api/v1/website/banners/${weBanner}/`, data);
+updateBanner(banner: Banner) {
+  return this.http.put(`${this.configUrl}/api/v1/website/banners/${banner.id}/`, banner);
 
 }
 }

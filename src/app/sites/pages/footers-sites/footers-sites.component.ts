@@ -114,7 +114,7 @@ export class FootersSitesComponent implements OnInit {
       ( res : Footer ) => {  
         this.get();
         this.closeRightSidebar();
-        Swal.fire('Exito!','Guardado correctamente','success')
+        Swal.fire('Exito!','Footer creado correctamente','success');
       }, ( error : any ) => { this.errorHandler( error ) });
     }
   }
@@ -171,8 +171,8 @@ export class FootersSitesComponent implements OnInit {
     const rightMenu : HTMLFormElement = document.getElementById('rightMenu') as HTMLFormElement ;
     
     if ( rightMenu.style.width === '285px' ) {
-        this.closeRightSidebar();
-        return;
+      this.closeRightSidebar();
+      return;
     }
     rightMenu.style.width = '285px';
   }
