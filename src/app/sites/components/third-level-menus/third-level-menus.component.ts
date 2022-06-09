@@ -3,12 +3,11 @@ import { Pagination } from 'src/app/shared/interfaces/Pagination';
 import { Menu } from '../../interfaces/menu';
 
 @Component({
-  selector: 'app-first-level-menus',
-  templateUrl: './first-level-menus.component.html',
-  styleUrls: ['./first-level-menus.component.scss']
+  selector: 'app-third-level-menus',
+  templateUrl: './third-level-menus.component.html',
+  styleUrls: ['./third-level-menus.component.scss']
 })
-export class FirstLevelMenusComponent implements OnInit, OnChanges {
-
+export class ThirdLevelMenusComponent implements OnInit, OnChanges {
   @Input() menus : Array<Menu> = [];
 
   @Input() sites : Array<any> = [];
@@ -16,7 +15,7 @@ export class FirstLevelMenusComponent implements OnInit, OnChanges {
   @Input() pages : Array<any> = [];
 
   @Input() allMenus : Array<any> = [];
-
+  
   @Output() messageEvent = new EventEmitter<Menu>();
 
   menusForTable : Array<Menu> = [];
@@ -26,18 +25,17 @@ export class FirstLevelMenusComponent implements OnInit, OnChanges {
   pagMenu = new Pagination();
 
   tableMode : 'all' | 'actives' | 'inactives' | string = 'all';
-
+ 
 
   constructor() { }
-  
-  ngOnInit(): void {
-    this.showMenus('all');
-  }
-
   ngOnChanges(changes: SimpleChanges): void {
     changes.menus && this.showMenus( this.tableMode );
   }
 
+  ngOnInit(): void {
+    this.showMenus('all');
+  }
+  
   showMenus = ( mode : string ) => {
     if ( mode === 'all' ) {
       this.menusForTable = this.menus;

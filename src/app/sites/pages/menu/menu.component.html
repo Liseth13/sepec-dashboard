@@ -2,265 +2,340 @@
     <div class="card-body">
         <h3>
             Menús
-        <button class="btn btn-primary float-right">
-            Nuevo menú
-        </button>
-        <div class="clearfix"></div>
+            <button (click)="openRightSidebar('create')" class="btn btn-info cursor float-right">
+                <i class="fas fa-plus-circle"></i>
+                Nuevo Menú
+            </button>
+            <div class="clearfix"></div>
         </h3>
         <hr>
-        <div class="pt-3 pb-5 row">   
+        <div class="pt-3 pb-5 row">
             <div class="col-md-6 text-left">
                 <div class="btn-group">
-                    <div class="btn btn-info"    [class.active]="level === 1" (click)="level = 1"> Primer Nivel </div>
-                    <div class="btn btn-success" [class.active]="level === 2" (click)="level = 2"> Segundo Nivel </div>
-                    <div class="btn btn-warning" [class.active]="level === 3" (click)="level = 3"> Tercer Nivel </div>
+                <br>
+                    <label>Seleccione el Nivel </label>
+                <br>
+                <select  class="form-control" (change)="changeView($event.target.value)">
+                  <option value ="1">Primer Nivel </option>
+                  <option value ="2">  Segundo Nivel  </option>
+                  <option value ="3"> Tercer Nivel </option>
+                </select>
                 </div>
             </div>
         </div>
-        <app-first-level-menus 
-            *ngIf = 'level === 1'
-            [menus] = 'menus'
-            [sites] = 'sites'
-        >
+        <app-first-level-menus *ngIf='level === 1' [menus]='menus | levelMenu: 1' [sites]='sites' [pages]='pages' [allMenus] = 'menus' (messageEvent)="receiveMessage($event)">
         </app-first-level-menus>
+        <app-second-level-menus *ngIf='level === 2' [menus]='menus |levelMenu : 2' [sites]='sites' [pages]='pages' [allMenus] = 'menus'(messageEvent)="receiveMessage($event)">
+        </app-second-level-menus>
+        <app-third-level-menus *ngIf='level === 3' [menus]='menus |levelMenu : 3' [sites]='sites' [pages]='pages' [allMenus] = 'menus'(messageEvent)="receiveMessage($event)">
+        </app-third-level-menus>
     </div>
 </div>
+<!-- sidebar Crear-->
+<div class="app-sidebar card" id="rightMenu">
+        <!-- -------------------------------------------------------------------------------------- -->
+        <!-- Header of sidebar -->
+        <!-- -------------------------------------------------------------------------------------- -->
+        <div class="d-flex p-3 border-bottom card-header">
+            <div class="d-flex align-items-center">
+                <h2 class="text-center text-title"> {{sidebarMode === 'create'? 'Crear menu' : 'Editar menu'}} </h2>
+            </div>
 
-
-
-<!-- <ul ngbNav #nav="ngbNav" class="nav-tabs">
-    <li ngbNavItem>
-        <a ngbNavLink>Nivel Uno</a>
-        <ng-template ngbNavContent >
-            <div class="col-12 mb-3 table-users mt-5" >
-                <app-first-level-menus *ngIf = "level === 1"></app-first-level-menus> 
-            </div> 
-        </ng-template>
-    </li>
-    <li ngbNavItem>
-      <a ngbNavLink>Second</a>
-      <ng-template ngbNavContent>Second content</ng-template>
-    </li>
-  </ul>
-  <div [ngbNavOutlet]="nav"></div> -->
-
-
-<!-- Crear Menu -->
-<!-- <div class="app-sidebar card" id="rightMenu"> -->
-    <!-- Header -->
-   <!-- <div class="d-flex p-3 border-bottom card-header">
-       <div class="d-flex align-items-center">
-           Crear menú
-       </div>
-       <div class="ml-auto">
-           <a href="javascript:void(0)" class="text-danger" (click)='closeRightMenu()'>
-               X
-           </a>
-       </div>
-   </div> -->
-
-   <!-- Body -->
-   <!-- <div class="row">
-       <div class="p-4">
-           <div class="card card-body">
-               <form *ngIf='mode === "create"' [formGroup]="formMenuCreate"  (ngSubmit)="create()">
-                   <div class="form-group">
-                       <label> Site</label>
-                       <input type="text" disabled value="{{ formMenuCreate.value.site | siteName : webSites}}" >
-                       <input type="hidden" class="form-control" formControlName="site">
-                       <button type="button" class="btn btn-primary mt-2" (click)="openModal(modalMostrarSitios, 'sites')">
-                           Buscar
-                       </button>
-                   </div>
-                   <div class="form-group">
-                       <label> Titulo</label>
-                       <input (keyup)="generateSlug(formMenuCreate.get('title').value, formMenuCreate)" type="text" class="form-control" formControlName="title" placeholder="Escribir Email" >
-                   </div>
-                   <div class="form-group">
-                       <label>
-                           <span class="help">Slug:</span>
-                       </label>
-                       <input  type="text" class="form-control" placeholder="Url" value="{{formMenuCreate.get('slug').value}}" disabled >
-                   </div>
-                   <div class="form-group">
-                        <label>
-                            <span class="help">Prioridad orden vertical:</span>
-                        </label>
-                        <input  type="text" class="form-control" formControlName="weight" placeholder="peso" disabled >
-                    </div>
-                    <div class="form-group">
-                        <label>
-                            <span class="help">Prioridad orden horizontal</span>
-                        </label>
-                        <input  type="text" class="form-control" formControlName="order" placeholder="peso" disabled >
-                    </div>
-
-                   <div class="form-group" >
-                        <label>Nivel</label>
-                        <select class="custom-select col-12" id="inlineFormCustomSelect" formControlName="level" (change)="changeLevel(formMenuCreate.get('level').value, formMenuCreate)" >
-                            <option [value]="" selected>--Seleccione una Opcion</option>
-                            <option [ngValue]="1">1</option>
-                            <option [ngValue]="2">2</option>
-                            <option [ngValue]="3">3</option>
-                        </select>
-                    </div>
-                    <div *ngIf="formMenuCreate.get('level').value == 2 || formMenuCreate.get('level').value == 3 " class="form-group">
-                        <label for="father"> Enlace de menú </label>
-                        <div class="input-group mb-3">    
-                            <button type = "button" class=" ml-1 btn btn-info" (click) ="openModal( modalSelectFather, 'father' )" >
-                                <i class="fa fa-search me-1"></i>
-                            </button>      
-                            <input type="text" value="{{ formMenuCreate.get('father').value | menuName : menus }}" class="form-control" disabled>
-                        </div>
-                    </div>
-                   <div class="modal-footer" >
-                       <button type="submit" class="btn btn-success" >Guardar</button>
-                   </div>
-               </form>
-           </div>
-       </div>
-   </div>
-</div> -->
-
- <!-- mostrar sitios -->
-<!-- <ng-template #modalMostrarSitios let-modal>
-    <div class="modal-header">
-        <h4 class="modal-title" id="modal-basic-title"> Sitios webs</h4>
-        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
-    <div class="modal-body">
-        <div class="table-responsive" > 
-        
-            <table class="table table-bordered table-hover">
-                <thead class="thead-dark">
-                    <tr>
-                        <th>Sitio</th>
-                        <th>Seleccionar</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr *ngFor="let site of webSites |slice: (paginationSites.page-1) * paginationSites.pageSize : (paginationSites.page-1) * paginationSites.pageSize + paginationSites.pageSize">
-                        <td>{{ site.name }}</td>
-                        <td>
-                            <div class="col">
-                                <button class="btn btn-info" (click)="selectSite(site, mode) ;  modal.dismiss('Cross click');">
-                                    <span>
-                                        <i class="fas fa-chevron-circle-right"></i>
-                                    </span> Seleccionar
-                       
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="ml-auto">
+                <a href="javascript:void(0)" class="text-danger" (click)='closeRightSidebar()'>
+                    <i-feather name="x" class="feather-sm"></i-feather>
+                </a>
+            </div>
         </div>
-    </div>
-</ng-template> -->
+        <!-- ./  Header of sidebar -->
+        <!-- -------------------------------------------------------------------------------------- -->
+        <!-- Body of sidebar -->
+        <!-- -------------------------------------------------------------------------------------- -->
+        <div class="p-4">
+            <!-- Create Menu -->
+            <form *ngIf="sidebarMode === 'create'" [formGroup]="formMenuCreate" (ngSubmit)="create( formMenuCreate )">
+                <div class="form-group">
+                    <label for="siteNameCreate">Sitio web</label>
+                    <div class="input-group mb-3">
+                        <button type="button" class=" ml-1 btn btn-info" (click)="openModal( modalWebSites, 'sites' )">
+                            <i class="fa fa-search me-1"></i>
 
-<!-- modalSelectFather -->
-<!-- <ng-template #modalSelectFather let-modal>
-    <div class="modal-header">
-        <h4 class="modal-title" id="modal-basic-title"> Enlazar menú </h4>
-        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
-    <div class="modal-body">
-        <div class="table-responsive" > 
-        
-            <table class="table table-bordered table-hover">
-                <thead class="thead-dark">
-                    <tr>
-                        <th>Menú</th>
-                        <th>Nivel</th>
-                        <th>Seleccionar</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr *ngFor="let menu of fathers  | slice: (paginationFathers.page-1) * paginationFathers.pageSize : (paginationFathers.page-1) * paginationFathers.pageSize + paginationFathers.pageSize">
-                        <td>{{ menu.title }}</td>
-                        <td>{{ menu.level }}</td>
-                        <td>
-                            <div class="col">
-                                <button class="btn btn-info" (click)="linkMenu(menu, formMenuCreate)">
-                                    <span>
-                                        <i class="fas fa-chevron-circle-right"></i>
-                                    </span> Seleccionar
-                       
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-
-            </table>
-        </div>
-        <div class="d-flex justify-content-center mt-5">
-            <ngb-pagination [collectionSize]="paginationFathers.collectionSize" [(page)]="paginationFathers.page" [pageSize]="paginationFathers.pageSize">
-            </ngb-pagination>
-        </div>
-    </div>
-</ng-template> -->
-<!-- modal Editar Menu -->
-<!-- <ng-template #modalEditMenu let-modal>
-    <div class="modal-header">
-        <h4 class="modal-title" id="modal-basic-title"> Editar Menu</h4>
-        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
-    
-    <div class="row">
-        <div class="col-sm-12 col-md-12 col-lg-12">
-            <div class="card card-body">
-                <form class="form-group" [formGroup]="formMenuEdit" (ngSubmit)="edit()">
-                    
-                    <div class="form-group">
-                        <label> Sitios</label>
-                        <input type="text" class="form-control" disabled value="{{ getName(formMenuEdit.value.page) || ''}}" >
-                        <button type="button" class="btn btn-primary" (click)="openModal(modalMostrarSitios, 1)">
-                            Buscar
                         </button>
-                        <div class="form-group">
-                            <label> Titulo</label>
-                            <input type="text" class="form-control" formControlName="title" placeholder="Escribir Email" >
-                        </div>
-                        <div class="form-group">
-                            <label>
-                                <span class="help"> Slug</span>
-                            </label>
-                            <input type="text" class="form-control" formControlName="slug" placeholder="Digite Numero de Telefono" >
-                        </div>
-                        <div class="form-group">
-                            <label >Peso</label>
-                            <input type="number" class="form-control" formControlName="weight" placeholder="Digite el peso" >
-                        </div>
-                        <div class="form-group" >
-                         <label>Nivel</label>
-                         <select class="custom-select col-12" id="inlineFormCustomSelect" formControlName="level" >
-                             <option value="" selected>--Seleccione una Opcion</option>
-                             <option value="1">1</option>
-                             <option value="2">2</option>
-                             <option value="3">3</option>
-                         </select>
-                     </div>
-                    <div class="form-group" >
-                        <label>Estado</label>
-                        <select class="custom-select col-12" id="inlineFormCustomSelect" formControlName="is_active" >
-                            <option value="" selected>--Seleccione una Opcion</option>
-                            <option value="true">Activado</option>
-                            <option value="false">Desactivado</option>
-                        </select>
+                        <input type="text" value="{{ formMenuCreate.controls['site'].value | siteName : sites }}" class="form-control" id="siteNameCreate" disabled>
                     </div>
-                        <div class="modal-footer" >
-                            <button type="submit" class="btn btn-success" >Guardar</button>
-                        </div>
+                </div>
+                <div class="form-group">
+                    <label> Titulo</label>
+                    <input type="text" class="form-control" formControlName="title" placeholder="Titulo del Menú">
+                </div>
+                <div class="form-group">
+                    <label> Peso</label>
+                    <input class="form-control" formControlName="weight" placeholder="Peso del Menú" min="0">
+                </div>
+                <div class="form-group">
+                    <label for="levelMenuCreate">Pagina</label>
+                    <div class="input-group mb-3">
+                        <button type="button" class=" ml-1 btn btn-info" (click)="openModal( modalPagina, 'pages' )" [disabled]="formMenuCreate.controls['site'].value == ''">
+                            <i class="fa fa-search me-1"></i>
+
+                        </button>
+                        <input  value="{{ formMenuCreate.controls['page'].value | pageNameTwo: pages }}" class="form-control" id="pageNameCreate" disabled>
                     </div>
-                </form>
+                </div>
+
+                <div class="form-group">
+                    <label>Nivel</label>
+                    <select formControlName="level" class="form-control" (change)="changeLevel($event.target.value)">
+                        <option value=""> -- Seleccionar nivel --</option>
+                        <option value="1">Nivel 1</option>
+                        <option value="2">Nivel 2</option>
+                        <option value="3">Nivel 3</option>
+                    </select>
+                </div>
+                
+                <div class="form-group" *ngIf="levelFather">
+                    <label for="levelMenuCreate">Padre</label>
+                    <div class="input-group mb-3">
+                        <button type="button" class=" ml-1 btn btn-info" (click)="openModal( modalMenus, 'menus' )">
+                            <i class="fa fa-search me-1"></i>
+
+                        </button>
+                        <input  value="{{ formMenuCreate.controls['father'].value | menuName: menus }}" class="form-control" id="levelMenuCreate" disabled>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success btn-block">
+                        <i-feather name="save" class="feather-sm mr-2"></i-feather>
+                        Crear Menú
+                    </button>
+                </div>
+                <div class="form-group">
+                    <button type="button" class="btn btn-danger btn-block" (click)="loadFormMenuCreate()">
+                        <i-feather name="trash-2" class="feather-sm mr-2"></i-feather>
+                        Limpiar Formulario
+                    </button>
+                </div>
+                
+            </form>
+            <!-- Edit Menu -->
+            <form *ngIf="sidebarMode === 'edit'" [formGroup]="formMenuEdit" (ngSubmit)="edit( formMenuEdit )">
+                <div class="form-group">
+                    <label for="siteNameCreate">Sitio web</label>
+                    <div class="input-group mb-3">
+                        <button type="button" class=" ml-1 btn btn-info" (click)="openModal( modalWebSites, 'sites' )">
+                            <i class="fa fa-search me-1"></i>
+    
+                        </button>
+                        <input type="text" value="{{ formMenuEdit.controls['site'].value | siteName : sites }}" class="form-control" id="siteNameCreate" disabled>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label> Titulo</label>
+                    <input type="text" class="form-control" formControlName="title" placeholder="Titulo del Menú">
+                </div>
+                <div class="form-group">
+                    <label> Peso</label>
+                    <input class="form-control" formControlName="weight" placeholder="Peso del Menú" min="0">
+                </div>
+                <div class="form-group">
+                    <label for="levelMenuCreate">Pagina</label>
+                    <div class="input-group mb-3">
+                        <button type="button" class=" ml-1 btn btn-info" (click)="openModal( modalPagina, 'pages' )" [disabled]="formMenuEdit.controls['site'].value == ''">
+                            <i class="fa fa-search me-1"></i>
+    
+                        </button>
+                        <input  value="{{ formMenuEdit.controls['page'].value | pageNameTwo: pages }}" class="form-control" id="pageNameCreate" disabled>
+                    </div>
+                </div>
+    
+                <div class="form-group">
+                    <label>Nivel</label>
+                    <select formControlName="level" class="form-control" (change)="changeLevel($event.target.value)">
+                        <option value=""> -- Seleccionar nivel --</option>
+                        <option value="1">Nivel 1</option>
+                        <option value="2">Nivel 2</option>
+                        <option value="3">Nivel 3</option>
+                    </select>
+                </div>
+                
+                <div class="form-group" *ngIf="levelFather">
+                    <label for="levelMenuCreate">Padre</label>
+                    <div class="input-group mb-3">
+                        <button type="button" class=" ml-1 btn btn-info" (click)="openModal( modalMenus, 'menus' )">
+                            <i class="fa fa-search me-1"></i>
+    
+                        </button>
+                        <input  value="{{ formMenuEdit.controls['father'].value | menuName: menus }}" class="form-control" id="levelMenuCreate" disabled>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Estado</label>
+                    <select formControlName="is_active" class="form-control">
+                        <option value="true">Activo</option>
+                        <option value="false">No activo</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success btn-block">
+                        <i-feather name="save" class="feather-sm mr-2"></i-feather>
+                        Actualizar Menú
+                    </button>
+                </div>
+                <div class="form-group">
+                    <button type="button" class="btn btn-danger btn-block" (click)="loadFormMenuEdit()">
+                        <i-feather name="trash-2" class="feather-sm mr-2"></i-feather>
+                        Limpiar Formulario
+                    </button>
+                </div>
+                
+            </form>
+        </div>
+</div>
+
+<!-- Modal web side -->
+<ng-template #modalWebSites let-modal>
+    <div class="modal-header">
+        <h3 class="modal-title font-weight-bold" id="taskLabel">
+            Seleccionar sitio web
+        </h3>
+        <button type="button" class="close" (click)="modal.dismiss()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Sitio web</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr
+                            *ngFor="let site of sites | slice: (paginationSites.page-1) * paginationSites.pageSize : (paginationSites.page-1) * paginationSites.pageSize + paginationSites.pageSize">
+                            <td>{{site.name}}</td>
+                            <td class="text-center">
+                                <div class="row">
+                                    <div class="col-12 action-btn">
+                                        <button class="btn btn-info ml-1 action-text cursor-pointer"
+                                            (click)="sidebarMode === 'create'? selectSite(site, 'create') : selectSite(site, 'edit')">
+                                            <i class="fas fa-chevron-circle-right"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="d-flex justify-content-center mt-2">
+                <ngb-pagination [collectionSize]="paginationSites.collectionSize"
+                    [(page)]="paginationSites.page" [pageSize]="paginationSites.pageSize">
+                </ngb-pagination>
             </div>
         </div>
     </div>
-</ng-template> -->
+</ng-template>
+
+<!-- Modal menus -->
+<ng-template #modalMenus let-modal>
+    <div class="modal-header">
+        <h3 class="modal-title font-weight-bold" id="taskLabel">
+            Seleccionar Menú
+        </h3>
+        <button type="button" class="close" (click)="modal.dismiss()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Nivel</th>
+                            <th>Menú</th>
+                            <th>Seleccionar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr
+                            *ngFor="let menu of menusPadre | slice: (paginationMenu.page-1) * paginationMenu.pageSize : (paginationMenu.page-1) * paginationMenu.pageSize + paginationMenu.pageSize">
+                            <td>{{menu.level}}</td>
+                            <td>{{menu.title}}</td>
+                            <td class="text-center">
+                                <div class="row">
+                                    <div class="col-12 action-btn">
+                                        <button class="btn btn-info ml-1 action-text cursor-pointer"
+                                            (click)="sidebarMode === 'create'? selectMenu(menu, 'create') : selectMenu(menu, 'edit')">
+                                            <i class="fas fa-chevron-circle-right"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="d-flex justify-content-center mt-2">
+                <ngb-pagination [collectionSize]="paginationMenu.collectionSize"
+                    [(page)]="paginationMenu.page" [pageSize]="paginationMenu.pageSize">
+                </ngb-pagination>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<!-- Modal Pagina -->
+<ng-template #modalPagina let-modal>
+    <div class="modal-header">
+        <h3 class="modal-title font-weight-bold" id="taskLabel">
+            Seleccionar pagina
+        </h3>
+        <button type="button" class="close" (click)="modal.dismiss()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="card">
+        <div class="card-body" *ngIf="pageFilter.length > 0">
+            <div class="table-responsive" >
+                <table class="table table-bordered table-hover" >
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Pagina</th>
+                            <th>Seleccionar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr
+                            *ngFor="let page of pageFilter | slice: (paginationPage.page-1) * paginationPage.pageSize : (paginationPage.page-1) * paginationPage.pageSize + paginationPage.pageSize">
+                            <td>{{page.name}}</td>
+                            <td class="text-center">
+                                <div class="row">
+                                    <div class="col-12 action-btn">
+                                        <button class="btn btn-info ml-1 action-text cursor-pointer"
+                                            (click)="sidebarMode === 'create'? selectPage(page, 'create') : selectPage(page, 'edit')">
+                                            <i class="fas fa-chevron-circle-right"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="d-flex justify-content-center mt-2">
+                <ngb-pagination [collectionSize]="paginationPage.collectionSize"
+                    [(page)]="paginationPage.page" [pageSize]="paginationPage.pageSize">
+                </ngb-pagination>
+            </div>
+        </div>
+
+        <div class="card-body" *ngIf="pageFilter.length == 0">
+            <h2>No hay páginas asociadas a este sitio</h2>
+        </div>
+    </div>
+</ng-template>

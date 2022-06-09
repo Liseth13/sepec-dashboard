@@ -3,11 +3,11 @@ import { Pagination } from 'src/app/shared/interfaces/Pagination';
 import { Menu } from '../../interfaces/menu';
 
 @Component({
-  selector: 'app-first-level-menus',
-  templateUrl: './first-level-menus.component.html',
-  styleUrls: ['./first-level-menus.component.scss']
+  selector: 'app-second-level-menus',
+  templateUrl: './second-level-menus.component.html',
+  styleUrls: ['./second-level-menus.component.scss']
 })
-export class FirstLevelMenusComponent implements OnInit, OnChanges {
+export class SecondLevelMenusComponent implements OnInit, OnChanges {
 
   @Input() menus : Array<Menu> = [];
 
@@ -26,10 +26,10 @@ export class FirstLevelMenusComponent implements OnInit, OnChanges {
   pagMenu = new Pagination();
 
   tableMode : 'all' | 'actives' | 'inactives' | string = 'all';
-
+ 
 
   constructor() { }
-  
+
   ngOnInit(): void {
     this.showMenus('all');
   }
@@ -38,7 +38,7 @@ export class FirstLevelMenusComponent implements OnInit, OnChanges {
     changes.menus && this.showMenus( this.tableMode );
   }
 
-  showMenus = ( mode : string ) => {
+  showMenus = (mode : string) => {
     if ( mode === 'all' ) {
       this.menusForTable = this.menus;
     }
@@ -54,9 +54,8 @@ export class FirstLevelMenusComponent implements OnInit, OnChanges {
     this.pagMenu.collectionSize = this.menusForTable.length;
     this.pagMenu.page = 1;
   }
-
+  
   chooseMenus = ( menu : any ) => {
     this.messageEvent.emit(menu);
   }
-
 }

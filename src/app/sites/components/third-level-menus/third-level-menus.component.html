@@ -44,9 +44,9 @@
                     <tr class="text-center">
                         <th>Sitio Web</th>
                         <th>Titulo</th>
-                        <!-- <th>Url</th> -->
-                        <th>Páginas</th>
+                        <th>Página</th>
                         <th>Padre</th>
+                        <!-- <th>Url</th> -->
                         <th>Nivel</th>
                         <th>Peso</th>
                         <th>Estado</th>
@@ -57,8 +57,8 @@
                     <tr class="text-center" *ngFor="let menu of menusForTable | slice: (pagMenu.page-1) * pagMenu.pageSize : (pagMenu.page-1) * pagMenu.pageSize + pagMenu.pageSize">
                         <td class="text-center">{{ menu.site | siteName: sites }}</td>
                         <td class="text-center">{{ menu.title }}</td>
-                        <td class="text-center">{{ menu.page != null ? (menu.page | pageNameTwo: pages) : 'Sig. Página'}}</td>
-                        <td class="text-center">{{ menu.father != null ? (menu.father | menuName: allMenus) : 'NULL'}}</td>
+                        <td class="text-center">{{ menu.page != null ? (menu.page | pageNameTwo: pages) : 'No tiene página'}}</td>
+                        <td class="text-center">{{ menu.father != null ? (menu.father | menuName: allMenus) : 'No tiene padre'}}</td>
                         <!-- <td>{{ menu.slug }}</td> -->
                         <td >{{ menu.level }}</td>
                         <td width="100">{{ menu.weight }}</td>
@@ -68,7 +68,7 @@
         
                         <td>
                             <div class="row">
-                                <div class="col-12 action-btn" >
+                                <div class="col-12 action-btn">
                                     <a class="btn btn-warning ml-1 action-text cursor" (click)="chooseMenus(menu)">
                                         <i class="far fa-edit"></i>
                                     </a>

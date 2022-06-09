@@ -14,6 +14,10 @@ import { LevelMenuPipe } from './pipes/level-menu.pipe';
 import { FirstLevelMenusComponent } from './components/first-level-menus/first-level-menus.component';
 import { SharedModule } from '../shared/shared.module';
 import { FeatherModule } from 'angular-feather';
+import { SecondLevelMenusComponent } from './components/second-level-menus/second-level-menus.component';
+import { ThirdLevelMenusComponent } from './components/third-level-menus/third-level-menus.component';
+import { WebPagesModule } from '../web-pages/web-pages.module';
+import { PageNameTwoPipe } from './pipes/page-name.pipe';
 
 @NgModule({
   declarations: [
@@ -23,7 +27,10 @@ import { FeatherModule } from 'angular-feather';
     SiteNamePipe,
     MenuNamePipe,
     LevelMenuPipe,
+    PageNameTwoPipe,
     FirstLevelMenusComponent,
+    SecondLevelMenusComponent,
+    ThirdLevelMenusComponent,
   ],
   imports: [
     CommonModule,
@@ -33,7 +40,7 @@ import { FeatherModule } from 'angular-feather';
     FormsModule,
     HttpClientModule, 
     SharedModule,
-    FeatherModule
+    FeatherModule,
   ],  
   exports : [
     SiteNamePipe
