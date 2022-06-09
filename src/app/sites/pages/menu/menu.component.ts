@@ -45,7 +45,6 @@ export class MenuComponent implements OnInit {
     this.get()
     this.getSites();
     this.loadFormMenuCreate();
-    this.loadFormMenuEdit();
     this.getPage();
   }
 
@@ -53,7 +52,6 @@ export class MenuComponent implements OnInit {
     this.pageService.get()
     .subscribe( ( res : any[] ) => {
       this.pages = res;
-      console.log('PAGINAS', res); 
     }, ( error : any ) => {
       this.errorHandler( error );
     });
@@ -63,7 +61,6 @@ export class MenuComponent implements OnInit {
     this.menuService.get()
     .subscribe( ( res : Menu[] ) => {
       this.menus = res;
-      console.log('MENUS', res); 
     }, ( error : any ) => {
       this.errorHandler( error );
     });
@@ -73,7 +70,6 @@ export class MenuComponent implements OnInit {
     this.webSiteService.get()
     .subscribe(( res : any ) => {
       this.sites = res;
-      console.log('SITIOS:', res); 
     }, ( error : any ) => { this.errorHandler( error ) });
   }
 
@@ -101,22 +97,22 @@ export class MenuComponent implements OnInit {
       level:['',[Validators.required, Validators.min(1), Validators.max(3)]],
       weight:['',[Validators.required, Validators.min(0)]],
       father:[null],
-      page:[null]
+      page:[null],
     })
   }
 
 
 
-  loadFormMenuEdit(){
+  loadFormMenuEdit(menu){
     this.formMenuEdit = this.formBuilder.group({
-      id: [''],
-      site:['',[Validators.required, Validators.maxLength(20),Validators.minLength(3)]],
-      title:['',[Validators.required, Validators.maxLength(100),Validators.minLength(4)]],
-      level:['',[Validators.required]],
-      weight:['',[Validators.required, Validators.min(0)]],
-      father:[null],
-      page:[null],
-      is_active:['',[Validators.required,]],
+      id: [menu?.id],
+      site:[menu?.site,[Validators.required, Validators.maxLength(20),Validators.minLength(3)]],
+      title:[menu?.title,[Validators.required, Validators.maxLength(100),Validators.minLength(4)]],
+      level:[menu?.level,[Validators.required]],
+      weight:[menu?.weight,[Validators.required, Validators.min(0)]],
+      father:[menu?.father],
+      page:[menu?.page],
+      is_active:[menu?.is_active,[Validators.required,]],
     })
   }
 
@@ -126,7 +122,6 @@ export class MenuComponent implements OnInit {
     if( isValid ) { 
       if (form.value.level == 2) {
         const siteFather = this.menus.find((m) => m.level == 1 && m.father != null && m.id === this.menuIdTemp);
-        console.log(siteFather);
         if (siteFather != undefined) {
           siteFather.page = null;
           this.formMenuEdit.patchValue({
@@ -144,7 +139,6 @@ export class MenuComponent implements OnInit {
       }
       if (form.value.level == 3) {
         const siteFather = this.menus.find((m) => m.level == 2 && m.father != null && m.id === this.menuIdTemp);
-        console.log(siteFather);
         if (siteFather != undefined) {
           siteFather.page = null;
           this.formMenuEdit.patchValue({
@@ -186,11 +180,14 @@ export class MenuComponent implements OnInit {
       }, ( error : any ) => { this.errorHandler( error ), this.swError = true });
     }
   }
-  openRightSidebar( mode: string) {
+  openRightSidebar( mode: string, menu?: Menu) {
     this.levelFather = false;
-    if ( mode === 'edit' ){
+    if ( mode === 'edit' && menu){
       this.sidebarMode = mode;
-      this.loadFormMenuEdit();
+      if (menu.father != null) {
+        this.levelFather = true;
+      }
+      this.loadFormMenuEdit(menu);
     } else if ( mode === 'create' ) {
       this.sidebarMode = mode;
       this.loadFormMenuCreate();
@@ -258,9 +255,7 @@ export class MenuComponent implements OnInit {
 
     selectMenu(menu: any, mode : string){
       this.menuIdTemp = menu.id;
-      console.log(this.menuIdTemp);
       
-
       if (mode== 'create') {
         this.formMenuCreate.get('father').setValue(menu.id);
       }
@@ -312,7 +307,9 @@ export class MenuComponent implements OnInit {
     }
   }
 
-
+  receiveMessage = ($event) => {
+    this.openRightSidebar('edit', $event);
+  }
    
 }
 

@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { Pagination } from 'src/app/shared/interfaces/Pagination';
 import { Menu } from '../../interfaces/menu';
 
@@ -17,6 +17,8 @@ export class SecondLevelMenusComponent implements OnInit, OnChanges {
 
   @Input() allMenus : Array<any> = [];
 
+  @Output() messageEvent = new EventEmitter<Menu>();
+
   menusForTable : Array<Menu> = [];
   
   submenus : Array<Menu> = [];
@@ -24,6 +26,7 @@ export class SecondLevelMenusComponent implements OnInit, OnChanges {
   pagMenu = new Pagination();
 
   tableMode : 'all' | 'actives' | 'inactives' | string = 'all';
+ 
 
   constructor() { }
 
@@ -50,5 +53,9 @@ export class SecondLevelMenusComponent implements OnInit, OnChanges {
 
     this.pagMenu.collectionSize = this.menusForTable.length;
     this.pagMenu.page = 1;
+  }
+  
+  chooseMenus = ( menu : any ) => {
+    this.messageEvent.emit(menu);
   }
 }

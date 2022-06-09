@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { Pagination } from 'src/app/shared/interfaces/Pagination';
 import { Menu } from '../../interfaces/menu';
 
@@ -15,6 +15,8 @@ export class ThirdLevelMenusComponent implements OnInit, OnChanges {
   @Input() pages : Array<any> = [];
 
   @Input() allMenus : Array<any> = [];
+  
+  @Output() messageEvent = new EventEmitter<Menu>();
 
   menusForTable : Array<Menu> = [];
   
@@ -23,6 +25,7 @@ export class ThirdLevelMenusComponent implements OnInit, OnChanges {
   pagMenu = new Pagination();
 
   tableMode : 'all' | 'actives' | 'inactives' | string = 'all';
+ 
 
   constructor() { }
   ngOnChanges(changes: SimpleChanges): void {
@@ -48,6 +51,10 @@ export class ThirdLevelMenusComponent implements OnInit, OnChanges {
 
     this.pagMenu.collectionSize = this.menusForTable.length;
     this.pagMenu.page = 1;
+  }
+
+  chooseMenus = ( menu : any ) => {
+    this.messageEvent.emit(menu);
   }
 
 }

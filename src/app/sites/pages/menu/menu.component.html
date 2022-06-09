@@ -23,16 +23,15 @@
                 </div>
             </div>
         </div>
-        <app-first-level-menus *ngIf='level === 1' [menus]='menus | levelMenu: 1' [sites]='sites' [pages]='pages' [allMenus] = 'menus'>
+        <app-first-level-menus *ngIf='level === 1' [menus]='menus | levelMenu: 1' [sites]='sites' [pages]='pages' [allMenus] = 'menus' (messageEvent)="receiveMessage($event)">
         </app-first-level-menus>
-        <app-second-level-menus *ngIf='level === 2' [menus]='menus |levelMenu : 2' [sites]='sites' [pages]='pages' [allMenus] = 'menus'>
+        <app-second-level-menus *ngIf='level === 2' [menus]='menus |levelMenu : 2' [sites]='sites' [pages]='pages' [allMenus] = 'menus'(messageEvent)="receiveMessage($event)">
         </app-second-level-menus>
-        <app-third-level-menus *ngIf='level === 3' [menus]='menus |levelMenu : 3' [sites]='sites' [pages]='pages' [allMenus] = 'menus'>
-
+        <app-third-level-menus *ngIf='level === 3' [menus]='menus |levelMenu : 3' [sites]='sites' [pages]='pages' [allMenus] = 'menus'(messageEvent)="receiveMessage($event)">
         </app-third-level-menus>
     </div>
 </div>
-<!-- sidebar -->
+<!-- sidebar Crear-->
 <div class="app-sidebar card" id="rightMenu">
         <!-- -------------------------------------------------------------------------------------- -->
         <!-- Header of sidebar -->
@@ -53,6 +52,7 @@
         <!-- Body of sidebar -->
         <!-- -------------------------------------------------------------------------------------- -->
         <div class="p-4">
+            <!-- Create Menu -->
             <form *ngIf="sidebarMode === 'create'" [formGroup]="formMenuCreate" (ngSubmit)="create( formMenuCreate )">
                 <div class="form-group">
                     <label for="siteNameCreate">Sitio web</label>
@@ -106,11 +106,84 @@
                 <div class="form-group">
                     <button type="submit" class="btn btn-success btn-block">
                         <i-feather name="save" class="feather-sm mr-2"></i-feather>
-                        Crear sitio web
+                        Crear Menú
                     </button>
                 </div>
                 <div class="form-group">
                     <button type="button" class="btn btn-danger btn-block" (click)="loadFormMenuCreate()">
+                        <i-feather name="trash-2" class="feather-sm mr-2"></i-feather>
+                        Limpiar Formulario
+                    </button>
+                </div>
+                
+            </form>
+            <!-- Edit Menu -->
+            <form *ngIf="sidebarMode === 'edit'" [formGroup]="formMenuEdit" (ngSubmit)="edit( formMenuEdit )">
+                <div class="form-group">
+                    <label for="siteNameCreate">Sitio web</label>
+                    <div class="input-group mb-3">
+                        <button type="button" class=" ml-1 btn btn-info" (click)="openModal( modalWebSites, 'sites' )">
+                            <i class="fa fa-search me-1"></i>
+    
+                        </button>
+                        <input type="text" value="{{ formMenuEdit.controls['site'].value | siteName : sites }}" class="form-control" id="siteNameCreate" disabled>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label> Titulo</label>
+                    <input type="text" class="form-control" formControlName="title" placeholder="Titulo del Menú">
+                </div>
+                <div class="form-group">
+                    <label> Peso</label>
+                    <input class="form-control" formControlName="weight" placeholder="Peso del Menú" min="0">
+                </div>
+                <div class="form-group">
+                    <label for="levelMenuCreate">Pagina</label>
+                    <div class="input-group mb-3">
+                        <button type="button" class=" ml-1 btn btn-info" (click)="openModal( modalPagina, 'pages' )" [disabled]="formMenuEdit.controls['site'].value == ''">
+                            <i class="fa fa-search me-1"></i>
+    
+                        </button>
+                        <input  value="{{ formMenuEdit.controls['page'].value | pageNameTwo: pages }}" class="form-control" id="pageNameCreate" disabled>
+                    </div>
+                </div>
+    
+                <div class="form-group">
+                    <label>Nivel</label>
+                    <select formControlName="level" class="form-control" (change)="changeLevel($event.target.value)">
+                        <option value=""> -- Seleccionar nivel --</option>
+                        <option value="1">Nivel 1</option>
+                        <option value="2">Nivel 2</option>
+                        <option value="3">Nivel 3</option>
+                    </select>
+                </div>
+                
+                <div class="form-group" *ngIf="levelFather">
+                    <label for="levelMenuCreate">Padre</label>
+                    <div class="input-group mb-3">
+                        <button type="button" class=" ml-1 btn btn-info" (click)="openModal( modalMenus, 'menus' )">
+                            <i class="fa fa-search me-1"></i>
+    
+                        </button>
+                        <input  value="{{ formMenuEdit.controls['father'].value | menuName: menus }}" class="form-control" id="levelMenuCreate" disabled>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Estado</label>
+                    <select formControlName="is_active" class="form-control">
+                        <option value="true">Activo</option>
+                        <option value="false">No activo</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success btn-block">
+                        <i-feather name="save" class="feather-sm mr-2"></i-feather>
+                        Actualizar Menú
+                    </button>
+                </div>
+                <div class="form-group">
+                    <button type="button" class="btn btn-danger btn-block" (click)="loadFormMenuEdit()">
                         <i-feather name="trash-2" class="feather-sm mr-2"></i-feather>
                         Limpiar Formulario
                     </button>
