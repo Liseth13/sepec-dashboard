@@ -28,7 +28,8 @@ export class ItemBannerComponent implements OnInit {
  // idView: string = '';
   //modal: NgbModalRef;
 
-  public imageUpload!: File;
+  public imageUpload : File;
+  public urlImgDefault = '../../../../assets/images/big/no-img.png';
 
   //Este validImageExtension para indicar si una extensión es valida o no, true es valida y false es no valida
   public validImageExtension: boolean = true;
@@ -49,7 +50,7 @@ export class ItemBannerComponent implements OnInit {
     private formBuilder : FormBuilder, 
     private bannerItemService: BannerItemService,
     private modalService: NgbModal, 
-    private bannerService: BannerService
+    private bannerService: BannerService,
   ) { this.loadFormCreate()}
 
   ngOnInit(): void {
@@ -63,9 +64,9 @@ export class ItemBannerComponent implements OnInit {
     this.formCreate = this.formBuilder.group({ 
       banner:['',[Validators.required]],
       name  :['',[Validators.required, Validators.maxLength(100),Validators.minLength(3)]],
-      url   :['',[Validators.required, Validators.maxLength(300),Validators.minLength(3)]],
+      url   :['prueba',[Validators.required, Validators.maxLength(300),Validators.minLength(3)]],
       text  :['',[Validators.required, Validators.maxLength(150000),Validators.minLength(3)]],
-      img   :[null],
+      img   :[''],
     })
   }
 
@@ -73,7 +74,7 @@ export class ItemBannerComponent implements OnInit {
     this.formEdit = this.formBuilder.group({
       banner:[ itemBanner.banner ],
       name  :[itemBanner.name,[Validators.required, Validators.maxLength(100),Validators.minLength(3)]],
-      url   :[itemBanner.url ,[Validators.required, Validators.maxLength(300),Validators.minLength(3)]],
+      url   :[itemBanner.url || 'sin-url',[Validators.required, Validators.maxLength(300),Validators.minLength(3)]],
       text  :[itemBanner.text,[Validators.required, Validators.maxLength(100),Validators.minLength(3)]],
       img   :[itemBanner.img],
       is_active:[itemBanner.is_active,[Validators.required]],
@@ -104,7 +105,8 @@ export class ItemBannerComponent implements OnInit {
     .subscribe({ 
       next : ( res : ItemBanner[] ) => {
         this.itemsBanner = res;
-        this.showItemsBanner( this.tableMode );
+        // this.pagBanners.collectionSize = res.length;
+        this.showItems( this.tableMode );
       },
       error : ( error : any ) => { this.errorHandler( error ) },
       complete : () => { isShowLoading && Swal.close() }
@@ -124,36 +126,6 @@ export class ItemBannerComponent implements OnInit {
 
   edit = ( form : FormGroup ) => {
     const isValid : boolean = this.validateForms( form );
-    // if ( isValid ){
-    //   const validExtension : boolean;
-    //   const validSizeFile : boolean;
-
-    //   if ( validExtension && validSizeFile ) {
-
-    //   }
-    // }
-
-    //   const { ...data } = this.formEdit.value;
-    //   const dataForm = new FormData();
-    //   for (var key in data) {
-    //     if(key === 'img' && this.imageUpload !== null){
-    //       dataForm.append('img', this.imageUpload);
-    //     }else{
-    //       if(key !== 'img'){
-    //         dataForm.append(key, data[key]);
-    //       }
-    //     }
-    //   }
-    //   this.bannerItemService.updateItemBanner(dataForm, this.webItemBannerId).subscribe(
-    //     (res:any)=>{
-    //       this.get();
-    //       Swal.fire(' Success','Editado correctamente','success');
-    //     },
-    //     (error:any)=>{
-    //       Swal.fire('Error','vuelva a intentarlo','error');
-    //     }
-    //   )
-    // }
   }
 
   create = ( form : FormGroup ) => { 
@@ -172,20 +144,27 @@ export class ItemBannerComponent implements OnInit {
     }
   }
 
-  createFormData = ( form : FormGroup ) : FormData => {
+  createFormData = ( {value} : FormGroup ) : FormData => {
     const formData = new FormData();
-    for ( let prop in form.value ) {
+    for ( let prop in value ) {
       if ( prop === 'img' ){
         formData.append('img', this.imageUpload);
       } else {
-        formData.append(prop, form.value[prop]);
+        formData.append(prop,value[prop]);
       } 
+      
     }
+    console.log(formData)
 
     return formData;
   }
 
-  openRightSidebar( mode: string, itemBanner? : any ) {
+  selectBanner = ( form : FormGroup, banner : Banner ) => {
+    form.get('banner').setValue(banner?.id || '');
+    this.closeModals();
+  }
+
+  openRightSidebar( mode: string, itemBanner? : ItemBanner ) {
     if ( mode === 'edit' && itemBanner ){
       this.sidebarMode = mode;
       this.loadFormEdit( itemBanner );
@@ -224,7 +203,7 @@ export class ItemBannerComponent implements OnInit {
   }
 
 
-  showItemsBanner = ( mode : string ) => {
+  showItems = ( mode : string ) => {
 
     if ( mode === 'all' ) {
       this.itemsBannerForTable = this.itemsBanner;
@@ -238,25 +217,24 @@ export class ItemBannerComponent implements OnInit {
       this.itemsBannerForTable = this.itemsBanner.filter((i:ItemBanner) => !i.is_active);
     }
 
-    this.pagBanners.collectionSize = this.itemsBannerForTable.length;
-    this.pagBanners.page = 1;
+    this.pagItems.collectionSize = this.itemsBannerForTable.length;
+    this.pagItems.page = 1;
     this.tableMode = mode;
   }
 
 
 
-  changeImage( file: File ) : FileReader{
+  changeImage( file : File, form : FormGroup ) {
+   
+    console.log
     
-    // this.imageUpload = file;
+    this.imageUpload = file;
 
     //Validamos si no existe el archivo, es decir no se selecciono ningún archivo
     // if ( !file ) { 
-    //   return this.tempImg = null;
+    //   alert('No hay archivpo')
     // }
-
-    // this.formEdit.patchValue({
-    //   img: file
-    // });
+    
 
     // this.checkImageExtension( file );
     // this.checkFileSize( file );
@@ -264,21 +242,21 @@ export class ItemBannerComponent implements OnInit {
     // if( this.validImageExtension === false ){
     //    return this.tempImg = null;
     // }
-
+    
 
     const reader = new FileReader();
     reader.readAsDataURL( file );
-
     reader.onloadend = () => {
-      this.tempImg = reader.result;
+      // this.tempImg = imgUrl;
+      //form.patchValue({ img : imgUrl });
+      const imgUrl = reader.result;
+      form.get('img').setValue(imgUrl);
+      
     }
-
-    return reader;
-
   }
 
   checkFileSize( file: File ) : boolean {
-    if (file.size <= 10485760 ) {
+    if (file.size <= 10485760 ) {   
         return true;
     }
     return false;
@@ -297,6 +275,7 @@ export class ItemBannerComponent implements OnInit {
   }
 
   errorHandler = ( error : any ) => {
+    console.log(error)
     Swal.fire('Error', "Ha ocurrido un error, reintentar operación", 'error');
   }
 

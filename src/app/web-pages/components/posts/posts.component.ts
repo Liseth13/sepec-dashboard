@@ -64,7 +64,7 @@ export class PostsComponent implements OnInit, OnChanges {
     this.formCreate = this.formBuilder.group({
       page_id   : [ this.idPage, [ Validators.required ] ],
       title  : [ '', [ Validators.required, Validators.minLength( 5 ), Validators.maxLength( 200 ) ] ],
-      slug   : ['', [ Validators.required] ],
+      slug   : ['prueba' ],
       body   : [ '', [ Validators.required, Validators.minLength(5), Validators.maxLength(150000) ] ],
       author : [ '1', [ Validators.required] ]
     });

@@ -4,7 +4,7 @@
             Nuevo post para {{ idPage | pageName : pages }}
         </h2>
         <button type="button" class="close text-white" (click)="modal.dismiss()" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
+            <span aria-hidden="true">&times;</span>
         </button>
     </div>
     <div class="card">
@@ -14,11 +14,11 @@
                     <label for="title">Título</label>
                     <input class="form-control" type="text" formControlName = "title" id="title" placeholder="Título del post">
                 </div>
-                <div class="form-group">
+                <!-- <div class="form-group">
                     <label for="slug">Url</label>
-                    <!-- <input class="form-control" type="text" formControlName = "slug" id="slug" placeholder="Dirección url"> -->
+                   
                     <span id="slug" class="ml-2">Generado automaticamente</span>
-                </div>
+                </div> -->
                 <!-- <div class="form-group">
                     <label for="title">Autor:</label>
                     <input class="form-control" type="text" formControlName = "author" id="author" placeholder="Nombre del autor">
@@ -59,10 +59,10 @@
                     <label for="titleEdit">Título:</label>
                     <input class="form-control" type="text" formControlName = "title" id="titleEdit" placeholder="Título del post">
                 </div>
-                <div class="form-group">
+                <!-- <div class="form-group">
                     <label for="title">Url:</label>
                     <input class="form-control" type="text" formControlName = "slug" id="slugEdit" placeholder="Dirección url">
-                </div>
+                </div> -->
                 <!-- <div class="form-group">
                     <label for="title">Autor:</label>
                     <input class="form-control" type="text" formControlName = "author" id="author" placeholder="Nombre del autor">
