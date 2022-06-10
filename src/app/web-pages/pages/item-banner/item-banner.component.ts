@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ModalDismissReasons, NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Pagination } from 'src/app/shared/interfaces/Pagination';
 import Swal from 'sweetalert2';
 import { Banner } from '../../interfaces/banner';
@@ -15,6 +15,7 @@ import { BannerService } from '../../services/banner.service';
   styleUrls: ['./item-banner.component.scss']
 })
 export class ItemBannerComponent implements OnInit {
+
   formCreate:  FormGroup;
   formEdit:  FormGroup;
 
@@ -25,22 +26,18 @@ export class ItemBannerComponent implements OnInit {
   tableMode : 'all' | 'actives' | 'inactives' | string = 'all';
   sidebarMode : 'create' | 'edit' | string = 'create';
 
+  //Validación de imagen
+  public isImgExtensionValid : boolean = true;
+  public isImgSizeValid      : boolean = true;
+
  // idView: string = '';
   //modal: NgbModalRef;
 
   public imageUpload : File;
-  public urlImgDefault = '../../../../assets/images/big/no-img.png';
 
-  //Este validImageExtension para indicar si una extensión es valida o no, true es valida y false es no valida
-  public validImageExtension: boolean = true;
+  public tempImg : string;
 
-  //Variable donde se comprobara el tamaño de un archivo a subir, true es permitido y false es que supera el tamaño
-  public allowedFileSize: boolean = true;
-
-  public tempImg: any = null;
-  
-  //Paginación
-  pagItems    = new Pagination();
+  pagItems   = new Pagination();
   pagBanners = new Pagination();
 
  
@@ -51,7 +48,10 @@ export class ItemBannerComponent implements OnInit {
     private bannerItemService: BannerItemService,
     private modalService: NgbModal, 
     private bannerService: BannerService,
-  ) { this.loadFormCreate()}
+  ) { 
+    this.loadFormCreate();
+    this.loadFormEdit();
+  }
 
   ngOnInit(): void {
     this.get();
@@ -67,22 +67,30 @@ export class ItemBannerComponent implements OnInit {
       url   :['prueba',[Validators.required, Validators.maxLength(300),Validators.minLength(3)]],
       text  :['',[Validators.required, Validators.maxLength(150000),Validators.minLength(3)]],
       img   :[''],
-    })
+    });
   }
 
-  loadFormEdit( itemBanner : ItemBanner ){
+  loadFormEdit( itemBanner? : ItemBanner ){
     this.formEdit = this.formBuilder.group({
-      banner:[ itemBanner.banner ],
-      name  :[itemBanner.name,[Validators.required, Validators.maxLength(100),Validators.minLength(3)]],
-      url   :[itemBanner.url || 'sin-url',[Validators.required, Validators.maxLength(300),Validators.minLength(3)]],
-      text  :[itemBanner.text,[Validators.required, Validators.maxLength(100),Validators.minLength(3)]],
-      img   :[itemBanner.img],
-      is_active:[itemBanner.is_active,[Validators.required]],
-    })
+      id    :[itemBanner?.id || null, [ Validators.required ]],
+      banner:[ itemBanner?.banner || null ],
+      name  :[itemBanner?.name || null,[Validators.required, Validators.maxLength(100),Validators.minLength(3)]],
+      url   :[itemBanner?.url || null,[Validators.required, Validators.maxLength(300),Validators.minLength(3)]],
+      text  :[itemBanner?.text || null,[Validators.required, Validators.maxLength(100),Validators.minLength(3)]],
+      img   :[itemBanner?.img || null],
+      is_active:[itemBanner?.is_active, [Validators.required]],
+    });
   }
 
-  validateForms = ( form : FormGroup  ) : boolean => {
+  validateForms = ( form : FormGroup ) : boolean => {  
+
     if ( form.valid ) {
+      if (this.imageUpload ){
+        if ( !this.isImgExtensionValid && !this.isImgSizeValid ) {
+          Swal.fire('Error','La imagen cargada no es válida','warning');
+          return false;
+        }
+      }
       return true;
     }
     Swal.fire('Error','Faltan Campos Por Validar','warning');
@@ -124,14 +132,10 @@ export class ItemBannerComponent implements OnInit {
     });
   }
 
-  edit = ( form : FormGroup ) => {
-    const isValid : boolean = this.validateForms( form );
-  }
-
   create = ( form : FormGroup ) => { 
     const isValid : boolean = this.validateForms( form );
     if ( isValid ){
-      const formData = this.createFormData( form );
+      const formData : FormData = this.createFormData( form );
       this.bannerItemService.createItemBanner( formData )
       .subscribe({
         next : ( res : ItemBanner ) => {
@@ -144,18 +148,33 @@ export class ItemBannerComponent implements OnInit {
     }
   }
 
-  createFormData = ( {value} : FormGroup ) : FormData => {
+  edit = ( form : FormGroup ) => {
+    const isValid : boolean = this.validateForms( form );
+    if ( isValid ) {
+      const formData : FormData = this.createFormData( form );
+      this.bannerItemService.updateItemBanner( formData, form.get('id').value )
+      .subscribe({
+        next  : () => {
+          this.get();
+          this.closeRightSidebar();
+          Swal.fire(' Success','Editado correctamente','success');
+        },
+        error : ( error  :any ) => { this.errorHandler( error ) }
+      });
+    }
+  }
+
+  createFormData = ( { value } : FormGroup ) : FormData => {
+    console.log(value)
     const formData = new FormData();
     for ( let prop in value ) {
       if ( prop === 'img' ){
-        formData.append('img', this.imageUpload);
+        this.imageUpload && formData.append('img', this.imageUpload) ;
       } else {
         formData.append(prop,value[prop]);
       } 
       
     }
-    console.log(formData)
-
     return formData;
   }
 
@@ -164,17 +183,27 @@ export class ItemBannerComponent implements OnInit {
     this.closeModals();
   }
 
-  openRightSidebar( mode: string, itemBanner? : ItemBanner ) {
+  openRightSidebar( mode: string, input : HTMLInputElement, itemBanner? : ItemBanner ) {
+
+    const localUrlImg = '../../../../assets/images/big/no-img.png';
+    
+    if( (mode !== 'create') && (mode !== 'edit') ){
+      return;
+    }
+
     if ( mode === 'edit' && itemBanner ){
       this.sidebarMode = mode;
       this.loadFormEdit( itemBanner );
-    } else if ( mode === 'create' ) {
-      this.sidebarMode = mode;
-      this.loadFormCreate();
-    } else {
-      this.sidebarMode = 'create';
-      return;
+      this.tempImg = itemBanner.img;
     }
+    if ( mode === 'create' ) {
+       this.loadFormCreate();
+       this.tempImg = localUrlImg;
+    }
+    this.sidebarMode = mode;
+    input.value = '';
+    this.imageUpload = null;
+   
 
     const rightMenu : HTMLFormElement = document.getElementById('rightMenu') as HTMLFormElement ;
     
@@ -224,51 +253,51 @@ export class ItemBannerComponent implements OnInit {
 
 
 
-  changeImage( file : File, form : FormGroup ) {
-   
-    console.log
+  changeImage( input : HTMLInputElement, form : FormGroup ) {
+
+    const file : File = input.files[0];
+
+    if (!file){
+      return;
+    }
+
+    //this.deleteImgUpload( input, form );
+
+    this.isImgSizeValid = this.checkFileSize( file );
+    this.isImgExtensionValid = this.checkImageExtension( file );
     
+    if ( !this.isImgSizeValid || !this.isImgExtensionValid ){
+      this.deleteImgUpload( input, false, form );
+      return; 
+    }
+
     this.imageUpload = file;
 
-    //Validamos si no existe el archivo, es decir no se selecciono ningún archivo
-    // if ( !file ) { 
-    //   alert('No hay archivpo')
-    // }
-    
-
-    // this.checkImageExtension( file );
-    // this.checkFileSize( file );
-
-    // if( this.validImageExtension === false ){
-    //    return this.tempImg = null;
-    // }
-    
-
     const reader = new FileReader();
+
     reader.readAsDataURL( file );
+
     reader.onloadend = () => {
-      // this.tempImg = imgUrl;
-      //form.patchValue({ img : imgUrl });
+
       const imgUrl = reader.result;
+
       form.get('img').setValue(imgUrl);
-      
     }
   }
 
-  checkFileSize( file: File ) : boolean {
+  checkFileSize( file : File ) : boolean {
     if (file.size <= 10485760 ) {   
         return true;
     }
     return false;
   }
 
-  checkImageExtension( file: File ) : boolean {
+  checkImageExtension( file : File ) : boolean {
     const cutName = file.name.split('.'); // wolverine.1.3.jpg
     const fileExtension = cutName[cutName.length - 1];
     // Validar extension
     const validExtensions = ['png', 'jpg', 'jpeg', 'PNG', 'JPG', 'JPEG'];
     if (validExtensions.includes(fileExtension)) {
-        //False es para indicar que la extensión no es permitida
         return true;
     }
     return false;
@@ -279,7 +308,22 @@ export class ItemBannerComponent implements OnInit {
     Swal.fire('Error', "Ha ocurrido un error, reintentar operación", 'error');
   }
 
-  
+  formReset = ( form : FormGroup, input : HTMLInputElement ) => {
+    this.deleteImgUpload( input, true, form);
+    form.reset();
+    this.isImgSizeValid = true;
+    this.isImgExtensionValid = true;
+  }
+
+  deleteImgUpload = ( input : HTMLInputElement, resetValidations : boolean = true, form : FormGroup ) => {
+    input.value = '';
+    this.imageUpload = null;
+    if ( resetValidations ){
+      this.isImgExtensionValid = true;
+      this.isImgSizeValid = true;
+    }
+    form && form.get('img').setValue( this.sidebarMode === 'create' ? '' : this.tempImg || '' );
+  }
 }
 
 

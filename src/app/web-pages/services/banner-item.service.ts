@@ -19,11 +19,11 @@ getItemBanner(from?: number, limit?: number, active?: boolean) {
   
 }
 
-createItemBanner(data: any) {
-  return this.http.post(`${this.configUrl}/api/v1/website/bannersitems/`, data);
+createItemBanner( itemBanner : FormData ) {
+  return this.http.post(`${this.configUrl}/api/v1/website/bannersitems/`, itemBanner);
 }
 
- updateItemBanner(data: any, weBanner: number) {
-  return this.http.put(`${this.configUrl}/api/v1/website/bannersitems/${weBanner}/`, data);
+ updateItemBanner(itemBanner : FormData, id : string ) {
+  return this.http.put(`${this.configUrl}/api/v1/website/bannersitems/${id}/`, itemBanner);
 }
 }
