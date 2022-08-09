@@ -53,10 +53,8 @@ export class WebPagesComponent implements OnInit {
     private pageContentService : pageContentService
   ) { 
 
-    //this.modalPageContentManager = PageContentManagerComponent
     this.loadFormCreate();
-    //console.log(this.modalPageContentManager.getId())
-    // this.contentManager.getId()
+
   }
 
   ngOnInit(): void {

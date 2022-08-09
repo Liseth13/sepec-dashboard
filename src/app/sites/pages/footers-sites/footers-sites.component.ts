@@ -63,12 +63,9 @@ export class FootersSitesComponent implements OnInit {
       phone  :[ footer.phone ,[Validators.required, Validators.maxLength(100),Validators.minLength(2)]],
       is_active:[ footer.is_active ,[Validators.required]],
     });
-    console.log(this.formEdit.value);
-    
   }
 
   validateForms = ( form : FormGroup ) : boolean => {
-    console.log(form.value)
     if ( form.valid ) {
       return true;
     }

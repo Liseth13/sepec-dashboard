@@ -91,10 +91,8 @@ export class PostsComponent implements OnInit, OnChanges {
   }
 
   get( isShowLoading : boolean = false ){
-    console.log( this.paginationPosts.status )
     this.postService.get( this.idPage,this.paginationPosts.page, this.paginationPosts.pageSize, this.paginationPosts.status ).subscribe(
     ( res : any ) => { 
-      console.log(res)
       this.posts = res.results ;
       this.paginationPosts.collectionSize = res.count;
       

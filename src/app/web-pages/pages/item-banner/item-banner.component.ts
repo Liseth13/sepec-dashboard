@@ -165,7 +165,6 @@ export class ItemBannerComponent implements OnInit {
   }
 
   createFormData = ( { value } : FormGroup ) : FormData => {
-    console.log(value)
     const formData = new FormData();
     for ( let prop in value ) {
       if ( prop === 'img' ){
@@ -304,7 +303,6 @@ export class ItemBannerComponent implements OnInit {
   }
 
   errorHandler = ( error : any ) => {
-    console.log(error)
     Swal.fire('Error', "Ha ocurrido un error, reintentar operación", 'error');
   }
 

@@ -1,5 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { environment } from 'src/environments/environment.prod';
 
 @Injectable({
   providedIn: 'root'
@@ -13,24 +14,24 @@ export class menuService {
   //headers = new HttpHeaders();
  
 
-  configUrl = 'https://sepec-backend.herokuapp.com';
+  private api = environment.api_url;
   // port = 443
 
-  get = () => this.http.get(`${this.configUrl}/api/v1/website/menus/`);
+  get = () => this.http.get(`${this.api}/api/v1/website/menus/`);
   
 
   createMenu(data: any) {
     
-    return this.http.post(`${this.configUrl}/api/v1/website/menus/`, data, {headers: {'Content-Type': 'application/json; charset=utf-8'}});
+    return this.http.post(`${this.api}/api/v1/website/menus/`, data, {headers: {'Content-Type': 'application/json; charset=utf-8'}});
 
   }
   
   updateMenu(data: any, menuId: number) {
 
-    return this.http.put(`${this.configUrl}/api/v1/website/menus/${menuId}/`, data);
+    return this.http.put(`${this.api}/api/v1/website/menus/${menuId}/`, data);
 
   }
 
-  getWebSites = () => this.http.get(`${this.configUrl}/api/v1/website/sites/`);
+  getWebSites = () => this.http.get(`${this.api}/api/v1/website/sites/`);
   
 }
